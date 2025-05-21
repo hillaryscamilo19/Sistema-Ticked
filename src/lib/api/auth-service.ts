@@ -9,12 +9,12 @@ export interface LoginCredentials {
 }
 
 export const authService = {
-  login: async (credentials?: LoginCredentials): Promise<any> => {
-  if (!credentials) {
+ login: async (params?: LoginCredentials): Promise<any> => {
+  if (!params) {
     throw new Error("Credenciales requeridas");
   }
 
-  const { username, password } = credentials;
+  const { username, password } = params;
 
   const response = await fetch("/api/login", {
     method: "POST",
@@ -28,6 +28,7 @@ export const authService = {
 
   return await response.json();
 },
+
 
 
   logout: async (): Promise<boolean> => {

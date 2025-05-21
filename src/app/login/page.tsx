@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { authService } from "../lib/api/auth-service";
 import { UserIcon, LockClosedIcon, ArrowRightStartOnRectangleIcon} from "@heroicons/react/24/outline";
 import { AlertCircle } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { AlertTitle } from "../../components/ui/alert";
 import "../app/style.css";
 import { useApi } from "../../hooks/use-api";
+import { authService } from "../../lib/api/auth-service";
 
 export function LoginForm() {
   const navigate = useNavigate();
