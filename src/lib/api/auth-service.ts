@@ -1,7 +1,4 @@
-import { apiClient } from "./api-client";
-import { API_ENDPOINTS } from "./api-config";
-
-// lib/api/auth-service.ts
+import axios from "axios";
 
 export interface LoginCredentials {
   username: string;
@@ -9,25 +6,29 @@ export interface LoginCredentials {
 }
 
 export const authService = {
- login: async (params?: LoginCredentials): Promise<any> => {
+login: async (params?: LoginCredentials): Promise<any> => {
   if (!params) {
     throw new Error("Credenciales requeridas");
   }
 
   const { username, password } = params;
-
-  const response = await fetch("/api/login", {
-    method: "POST",
-    body: JSON.stringify({ username, password }),
-    headers: { "Content-Type": "application/json" },
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+  const response = await axios.post(`${API_URL}/token`, {
+    username,
+    password,
+  }, {
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
   });
 
-  if (!response.ok) {
+  if (!response) {
     throw new Error("Error al iniciar sesión");
   }
 
-  return await response.json();
+  return response.data; // <--- aquí está la corrección
 },
+
 
 
 
@@ -42,12 +43,9 @@ export const authService = {
     return null;
   },
 
-  isAuthenticated: (): boolean => {
-    return !!localStorage.getItem("authToken");
-  },
+  isAuthenticated: () => !!localStorage.getItem("token"),
 
-  getAccessToken: (): string | null => {
-    return localStorage.getItem("authToken");
-  },
+  getAccessToken: () => !!localStorage.getItem("token"),
+ 
 };
 

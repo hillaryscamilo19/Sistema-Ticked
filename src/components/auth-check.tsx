@@ -1,32 +1,42 @@
-"use client"
+import React, { useEffect, useState, type ReactNode } from "react";
+import { useNavigate } from "react-router-dom";
 
-import type React from "react"
+interface AuthCheckProps {
+  children: ReactNode;
+}
 
-import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
-import { useEffect } from "react"
+export function AuthCheck({ children }: AuthCheckProps) {
+  const navigate = useNavigate();
+  const [status, setStatus] = useState<"loading" | "authenticated" | "unauthenticated">("loading");
 
-export function AuthCheck({ children }: { children: React.ReactNode }) {
-  const { data: session, status } = useSession()
-  const router = useRouter()
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      // Aquí podrías hacer una verificación más robusta con una petición si deseas
+      setStatus("authenticated");
+    } else {
+      setStatus("unauthenticated");
+    }
+  }, []);
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/login")
+      navigate("/login");
     }
-  }, [status, router])
+  }, [status, navigate]);
 
   if (status === "loading") {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
       </div>
-    )
+    );
   }
 
   if (status === "authenticated") {
-    return <>{children}</>
+    return <>{children}</>;
   }
 
-  return null
+  return null;
 }

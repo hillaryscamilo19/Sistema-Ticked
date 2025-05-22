@@ -1,8 +1,6 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { Moon, Sun, LogOut, CircleUserRoundIcon } from 'lucide-react';
-import { useRouter } from "next/navigation";
+import { useNavigate } from "react-router-dom";
 
 export default function Navbar() {
   const [darkMode, setDarkMode] = useState(true);
@@ -10,8 +8,7 @@ export default function Navbar() {
   const [usuario, setUsuario] = useState(null);
   const [departamento, setDepartamento] = useState("");
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
-
+  const navigate = useNavigate();
 
   const toggleTheme = () => {
     setDarkMode(!darkMode);
@@ -20,52 +17,43 @@ export default function Navbar() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     setDropdownOpen(false);
-    router.push("/login");
+    navigate("/login");
   };
 
   type Usuario = {
-  _id: string;
-  fullname?: string;
-  role?: string;
-  departamento_id?: string;
-};
+    _id: string;
+    fullname?: string;
+    role?: string;
+    departamento_id?: string;
+  };
 
-
-  // Obtener información del usuario
   useEffect(() => {
     const fetchUsuario = async () => {
       try {
-        // Obtener el token del localStorage
         const token = localStorage.getItem("token");
-        
         if (!token) {
-          // Si no hay token, redirigir al login
-          router.push("/login");
+          navigate("/login");
           return;
         }
-        
-        // Hacer la solicitud con el token en el encabezado
-        const response = await fetch("http://localhost:8000/users/me", {
+
+        const response = await fetch("http://localhost:8000/usuarios", {
           headers: {
             "Authorization": `Bearer ${token}`
           }
         });
-        
+
         if (!response.ok) {
           if (response.status === 401) {
-            // Token inválido o expirado
             localStorage.removeItem("token");
-            router.push("/login");
+            navigate("/login");
             return;
           }
           throw new Error(`Error: ${response.status}`);
         }
-        
+
         const data = await response.json();
-        console.log("Datos del usuario:", data);
         setUsuario(data);
-        
-        // Si tenemos el ID del departamento, obtener su información
+
         if (data.departamento_id) {
           fetchDepartamento(data.departamento_id);
         }
@@ -77,36 +65,29 @@ export default function Navbar() {
     };
 
     fetchUsuario();
-  }, [router]);
+  }, [navigate]);
 
- // Función para obtener el nombre del departamento por su ID
-  const fetchDepartamento = async (departamentoId) => {
+  const fetchDepartamento = async (departamentoId: string) => {
     try {
       const token = localStorage.getItem("token");
-      
-      // Obtener todos los departamentos
       const response = await fetch("http://localhost:8000/departments/", {
         headers: {
           "Authorization": `Bearer ${token}`
         }
       });
-      
+
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
-      
+
       const departamentos = await response.json();
-      
-      // Buscar el departamento por ID
       const departamentoEncontrado = departamentos.find(
-        (dept) => dept.id === departamentoId
+        (dept: any) => dept.id === departamentoId
       );
-      
+
       if (departamentoEncontrado) {
-        // Usar el campo 'nombre' del departamento
         setDepartamento(departamentoEncontrado.nombre);
       } else {
-        console.error("Departamento no encontrado:", departamentoId);
         setDepartamento("Departamento no encontrado");
       }
     } catch (error) {
@@ -114,49 +95,10 @@ export default function Navbar() {
       setDepartamento("Error al cargar departamento");
     }
   };
-
-  useEffect(() => {
-const fetchDepartamento = async (departamentoId) => {
-    try {
-      const token = localStorage.getItem("token");
-      
-      // Obtener todos los departamentos
-      const response = await fetch("http://localhost:8000/departments/", {
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-      
-      const departamentos = await response.json();
-      
-      // Buscar el departamento por ID
-      const departamentoEncontrado = departamentos.find(
-        (dept) => dept.id === departamentoId
-      );
-      
-      if (departamentoEncontrado) {
-        // Usar el campo 'nombre' del departamento
-        setDepartamento(departamentoEncontrado.nombre);
-      } else {
-        console.error("Departamento no encontrado:", departamentoId);
-        setDepartamento("Departamento no encontrado");
-      }
-    } catch (error) {
-      console.error("Error al cargar el departamento:", error);
-      setDepartamento("Error al cargar departamento");
-    }
-  };
-  }, []);
-
 
   return (
-    <nav className="w-full bg-slate-50 bg-slate-950 p-4 flex items-center justify-end relative shadow-md">
+    <nav className="w-full bg-slate-950 p-4 flex items-center justify-end relative shadow-md">
       <div className="flex items-center gap-4">
-        {/* Modo oscuro/claro */}
         <div className="flex items-center gap-2">
           <label className="relative inline-flex items-center cursor-pointer">
             <input
@@ -168,11 +110,9 @@ const fetchDepartamento = async (departamentoId) => {
             <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-400 rounded-full peer dark:bg-gray-600 peer-checked:bg-green-500"></div>
             <span className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition peer-checked:translate-x-full"></span>
           </label>
-
           {darkMode ? <Moon size={18} /> : <Sun size={18} />}
         </div>
 
-        {/* Ícono de perfil */}
         <div className="relative">
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -190,13 +130,10 @@ const fetchDepartamento = async (departamentoId) => {
             <span className="text-sm">▼</span>
           </button>
 
-          {/* Dropdown */}
           {dropdownOpen && (
             <div className="absolute right-0 mt-2 w-40 bg-slate-700 rounded-md shadow-md z-10">
               {usuario?.role === "Administrador" && (
-                <button
-                  className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-600"
-                >
+                <button className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-600">
                   Administrador
                 </button>
               )}

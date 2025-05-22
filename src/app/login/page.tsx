@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { UserIcon, LockClosedIcon, ArrowRightStartOnRectangleIcon} from "@heroicons/react/24/outline";
+import { UserCircleIcon, LockClosedIcon, ArrowRightStartOnRectangleIcon} from "@heroicons/react/24/outline";
 import { AlertCircle } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { AlertTitle } from "../../components/ui/alert";
@@ -22,7 +22,7 @@ export function LoginForm() {
         setErrorMessage("Credenciales inválidas");
         return;
       }
-      localStorage.setItem("authToken", data.token);
+      localStorage.setItem("token", data.token);
       setIsRedirecting(true);
       navigate("/dashboard");
     },
@@ -41,7 +41,7 @@ export function LoginForm() {
   }, [errorParam]);
 
   return (
-    <div className="login-container">
+    <div className="login-">
       <div className="login-card row">
         {/* Columna Izquierda */}
         <div className="col-md-6 login-left d-none d-md-flex flex-column align-items-center justify-content-center text-center">
@@ -57,7 +57,7 @@ export function LoginForm() {
         {/* Columna Derecha */}
         <div className="col-md-6 login-right p-5">
           <div className="w-full p-4 sm:p-12.5 xl:p-17.5">
-            <h2 className="mb-1.5 block font-medium">Inicio de sesión</h2>
+            <h2 className="mb-1.5 block font-medium TextSeccion">Inicio de sesión</h2>
             <h1 className="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2">
               Iniciar sesión en TYZ
             </h1>
@@ -85,7 +85,7 @@ export function LoginForm() {
                   onChange={(e) => setUsername(e.target.value)}
                   required
                 />
-                <UserIcon className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" />
+                <UserCircleIcon className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" />
               </div>
             </div>
 

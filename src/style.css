@@ -1,0 +1,180 @@
+/* Contenedor principal */
+.login-container {
+  margin-left: 264px;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #fcfcfc;
+}
+
+/* Card principal */
+.login-card {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  max-width: 1250px;
+  min-height: 700px;
+  background-color: #fff;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.TextSeccion{
+  font-size: 16px;
+  color: #33333373;
+}
+
+.TextTYZ{
+  font-size: 29px;
+   color: #333;
+}
+
+/* Lado izquierdo */
+.login-left {
+  width: 50%;
+  background-color: #ffffff;
+  padding: 60px 40px;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  z-index: 2;
+}
+
+/* Lado derecho */
+.login-right {
+  width: 50%;
+  height: 68%;
+  background-color: #ffffff;
+  padding: 60px 50px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.texto{
+  color: rgba(101, 162, 6, 1);;
+}
+
+.img {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  gap: 28px;
+  flex-direction: column;
+}
+
+.Boton {
+  background-color: rgba(101, 162, 6, 1);
+  margin-top: 5%;
+}
+
+.title {
+  color: rgba(101, 162, 6, 1);
+}
+
+.iconoClose{
+    width: 4%;
+    margin: -7px;
+    margin-left: -39px;
+}
+
+.iconoUser{
+    width: 4%;
+    margin: -7px;
+    margin-left: -39px;
+}
+
+.IconoBoton{
+  width: 7%;
+}
+
+.InputUsuario {
+  width: 69%;
+  height: 45px;
+  border-radius: 7px;
+  border: 2px solid #d1d6da98;
+  padding-left: 12px; /* Empuja el texto y placeholder hacia la derecha */
+}
+
+
+.error {
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.titleError {
+  place-content: center flex-start;
+  align-items: center;
+  gap: 2%;
+  display: flex;
+}
+
+.IconoList{
+    width: 50px;
+    color: rgba(23, 185, 36, 0.705);
+}
+
+.IconoWrench{
+     width: 50px;
+    color: rgb(209, 128, 22);
+}
+
+.IconoClock{
+     width: 50px;
+    color: rgb(112, 16, 141)
+}
+
+.IconoDocument{
+     width: 50px;
+    color: rgb(207, 194, 15)
+}
+
+.PanelTicked{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    align-content: stretch;
+    flex-direction: row;
+}
+
+.PanelNombre{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    align-content: stretch;
+    flex-direction: row;
+}
+
+.container{
+    background-color: aliceblue;
+}
+
+.container-abajo{
+    background-color: #ffffff;
+    width: 100%;
+    height: 550px;
+    border-radius: 1px;
+}
+
+.container-arriba {
+    background-color: #ffffff;
+}
+
+.imgae{
+    width: 36%;
+    height: 86px;
+}
+
+img{
+    margin-left: 7%;
+}

@@ -1,27 +1,20 @@
-"use client";
-
-import type React from "react";
 import { useState } from "react";
-import { signIn } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
-import { useApi } from "@/hooks/use-api";
+import { useApi } from "../hooks/use-api";
 import {
   UserIcon,
   LockClosedIcon,
   ArrowRightStartOnRectangleIcon,
 } from "@heroicons/react/24/outline";
-import Image from "next/image";
-import { AlertTitle } from "@/components/ui/alert";
+import { AlertTitle } from "../components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import "../app/style.css";
-import tyz from "../../public/img/tyz.png";
-import logo from "../../public/img/logo2.png";
-import "../app/style.css";
-import { authService } from "@/lib/api/auth-service";
-import router from "next/router";
-
+import tyz from "../img/tyz.png";
+import logo from "../img/logo2.png";
+import "../style.css";
+import { authService } from "../lib/api/auth-service";
+import { useNavigate, useSearchParams } from "react-router-dom";
 export function LoginForm() {
-  const searchParams = useSearchParams();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isRedirecting, setIsRedirecting] = useState(false);
@@ -42,33 +35,12 @@ export function LoginForm() {
     },
     {
       onSuccess: async (data) => {
-        if (!data) {
-          setErrorMessage(
-            "Error al iniciar sesión. Por favor, inténtalo de nuevo."
-          );
-          return;
-        }
-        console.log("URL de callback:", process.env.NODE_ENV);
-        console.log("NEXTAUTH_URL:", process.env.NEXTAUTH_URL);
-        const result = await signIn("credentials", {
-          redirect: false,
-          callbackUrl: "/dashboard",
-          username,
-          password,
-        });
-
-        if (result?.error) {
-          console.error("Error de inicio de sesión:", result.error);
-          setErrorMessage(
-            "Error al iniciar sesión. Por favor, inténtalo de nuevo."
-          );
-          return;
-        }
-
-        if (result?.ok) {
-          console.log("Inicio de sesión exitoso, redirigiendo...");
+        if (data?.access_token) {
+          localStorage.setItem("token", data.access_token);
           setIsRedirecting(true);
-          router.push("/dashboard");
+           navigate("/dashboard");
+        } else {
+          setErrorMessage("Token no recibido.");
         }
       },
       onError: (error) => {
@@ -81,22 +53,22 @@ export function LoginForm() {
   );
 
   return (
-    <div className="login-container">
+    <div className="login-container min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="login-card row">
         {/* Columna Izquierda */}
         <div className="col-md-6 login-left d-none d-md-flex flex-column align-items-center justify-content-center text-center">
           <div className="py-10 px-26 text-center img">
-            <Image src={tyz} alt="Logo" width={200} height={100} />
+            <img src={tyz} alt="Logo" width={150} height={100} className="imgae" />
             <p className="text-center text-gray-600 mb-8 max-w-sm ">
               Aplicación de tickets interna para las solicitudes realizadas
               entre departamentos.
             </p>
-            <Image
+            <img
               className="img-fluid mb-3"
               src={logo}
               alt="Logo"
-              width={250}
-              height={100}
+              width={350}
+              height={200}
             />
           </div>
         </div>
@@ -104,8 +76,8 @@ export function LoginForm() {
         {/* Columna Derecha */}
         <div className="col-md-6 login-right p-5">
           <div className="w-full p-4 sm:p-12.5 xl:p-17.5">
-            <h2 className="mb-1.5 block font-medium">Inicio de sesión</h2>
-            <h1 className="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2">
+            <h2 className="mb-1.5 block font-medium TextSeccion">Inicio de sesión</h2>
+            <h1 className="TextTYZ">
               Iniciar sesión en TYZ
             </h1>
 
@@ -128,12 +100,12 @@ export function LoginForm() {
                   id="username"
                   type="text"
                   placeholder="Escriba su nombre de usuario o email"
-                  className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-600"
+                  className="InputUsuario"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
                 />
-                <UserIcon className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" />
+                <UserIcon className="iconoUser h-5 absolute left-3 top-2.5 text-gray-400" />
               </div>
             </div>
 
@@ -145,14 +117,15 @@ export function LoginForm() {
                   id="password"
                   type="password"
                   placeholder="Escriba su contraseña"
-                  className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-600"
+                  className="InputUsuario"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   disabled={isLoading || isRedirecting}
                 />
-                <LockClosedIcon className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" />
+                <LockClosedIcon className="iconoClose  h-5 absolute left-3 top-2.5 text-gray-400" />
               </div>
+              
             </div>
 
             {/* Botón Entrar */}
@@ -160,16 +133,16 @@ export function LoginForm() {
               onClick={login}
               type="submit"
               disabled={isLoading || isRedirecting}
-              className="Boton flex justify-center w-full cursor-pointer rounded-lg border color-tyz text-white py-2 rounded-lg hover:bg-green-500 transition"
+              className="w-full Boton hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition"
             >
-              <ArrowRightStartOnRectangleIcon className="w-6 h-6 mr-1" />
+              <ArrowRightStartOnRectangleIcon className="IconoBoton h-6 mr-1" />
               {isLoading ? "Iniciando sesión..." : "Entrar"}
             </button>
 
             {/* Registro */}
             <p className="text-center text-sm text-gray-600 mt-4">
               ¿No tienes una cuenta?{" "}
-              <a href="/registro" className="text-green-600 hover:underline">
+              <a href="/registro" className="texto">
                 Registrarse
               </a>
             </p>
