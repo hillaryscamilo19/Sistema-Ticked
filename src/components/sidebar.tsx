@@ -1,4 +1,3 @@
-import React from "react";
 import {
   HomeIcon,
   PlusIcon,
@@ -8,7 +7,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
 import Logo from "../img/LogTYZ.png";
-import "../global.css";
+import "../style.css";
 
 interface SidebarProps {
   className?: string;

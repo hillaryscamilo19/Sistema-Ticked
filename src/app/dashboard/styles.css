@@ -35,7 +35,7 @@
 }
 
 .container{
-    background-color: aliceblue;
+    background-color: rgb(253, 253, 253);
 }
 
 .container-abajo{
@@ -51,4 +51,14 @@
 
 img{
     margin-left: 29%;
+}
+
+.text-Ticked {
+    color: rgba(0, 0, 0, 0.719);
+    font-size: 35px;
+}
+
+.text-Estadistica{
+    color: rgba(119, 116, 116, 0.466);
+    font-size: 23px;
 }

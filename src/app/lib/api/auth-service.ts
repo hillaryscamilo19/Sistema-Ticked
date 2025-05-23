@@ -1,4 +1,3 @@
-import CredentialsProvider from "next-auth/providers/credentials";
 import { apiClient } from "./api-client";
 import { API_ENDPOINTS } from "./api-config";
 

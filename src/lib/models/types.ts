@@ -1,55 +1,54 @@
-import type { ObjectId } from "mongodb"
-
 export interface User {
-  _id?: ObjectId
-  fullname: string
-  email: string
-  phone_ext?: number
-  department: ObjectId
-  role: number
-  username: string
-  password: string
-  status: boolean
-  createdAt?: Date
-  updatedAt?: Date
+  id?: string; // antes era _id?: ObjectId
+  fullname: string;
+  email: string;
+  phone_ext?: number;
+  department_id: string;
+  role: number;
+  username: string;
+  password?: string;
+  status: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
+
 export interface Department {
-  _id?: ObjectId
+  _id?: string
   name: string
 }
 
 export interface Category {
-  _id?: ObjectId
+  _id?: string
   name: string
-  list_departments: ObjectId[]
+  list_departments: string[]
 }
 
 export interface Message {
-  _id?: ObjectId
+  _id?: string
   message: string
-  createdById: ObjectId
+  createdById: string
   createdAt?: Date
   updatedAt?: Date
 }
 
 export interface Attachment {
-  _id?: ObjectId
+  _id?: string
   file_name: string
   file_path: string
   file_extension: string
-  ticket_id: ObjectId
+  ticket_id: string
 }
 
 export interface Ticket {
-  _id?: ObjectId
+  _id?: string
   title: string
   description: string
-  category: ObjectId
-  assigned_department: ObjectId
-  assigned_users: ObjectId[]
-  created_user: ObjectId
-  messages: ObjectId[]
+  category: string
+  assigned_department: string
+  assigned_users: string[]
+  created_user: string
+  messages: string[]
   status: number
   createdAt?: Date
   updatedAt?: Date

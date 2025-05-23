@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useCallback } from "react"
 
 interface UseApiOptions<T> {
@@ -7,7 +5,10 @@ interface UseApiOptions<T> {
   onError?: (error: Error) => void
 }
 
-export function useApi<T, P = unknown>(apiFunction: (params?: P) => Promise<T>, options: UseApiOptions<T> = {}) {
+export function useApi<T, P = unknown>(
+  apiFunction: (params?: P) => Promise<T>, 
+  options: UseApiOptions<T> = {}
+) {
   const [data, setData] = useState<T | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
@@ -31,13 +32,20 @@ export function useApi<T, P = unknown>(apiFunction: (params?: P) => Promise<T>, 
         setIsLoading(false)
       }
     },
-    [apiFunction, options],
+    [apiFunction, options.onSuccess, options.onError]
   )
+
+  const reset = useCallback(() => {
+    setData(null)
+    setError(null)
+    setIsLoading(false)
+  }, [])
 
   return {
     data,
     isLoading,
     error,
     execute,
+    reset
   }
 }

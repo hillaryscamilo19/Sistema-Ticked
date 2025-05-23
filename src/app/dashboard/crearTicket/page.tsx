@@ -1,8 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import "../asignacion/style.css";
-
-import "bootstrap/dist/css/bootstrap.min.css";
 
 type Departamento = {
   _id: string;
@@ -22,36 +19,44 @@ export default function CrearNuevoTicket() {
   const [departamento, setDepartamento] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [archivo, setArchivo] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  // Cargar departamentos
+  // Cargar datos
   useEffect(() => {
-    const fetchDepartamentos = async () => {
+    const fetchDatos = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/departments/");
-        const data = await res.json();
-        setDepartamentoList(data);
+        const [resDept, resCat] = await Promise.all([
+          fetch("http://localhost:8000/departments/"),
+          fetch("http://localhost:3000/categories", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }),
+        ]);
+        const [dataDept, dataCat] = await Promise.all([
+          resDept.json(),
+          resCat.json(),
+        ]);
+        setDepartamentoList(dataDept);
+        setCategoriaList(dataCat);
       } catch (error) {
-        console.error("Error al cargar departamentos:", error);
+        console.error("Error al cargar datos:", error);
       }
     };
-    fetchDepartamentos();
-  }, []);
 
-  // Cargar categorías
-  useEffect(() => {
-    const fetchCategorias = async () => {
-      try {
-        const res = await fetch("http://localhost:8000/api/categories");
-        const data = await res.json();
-        setCategoriaList(data);
-      } catch (error) {
-        console.error("Error al cargar categorías:", error);
-      }
-    };
-    fetchCategorias();
+    fetchDatos();
   }, []);
 
   const handleSubmit = async () => {
+    if (loading) return;
+
+    // Validar campos requeridos
+    if (!asunto || !descripcion || !categoria || !departamento) {
+      alert("Por favor, complete todos los campos obligatorios.");
+      return;
+    }
+
     const token = localStorage.getItem("token");
     if (!token) {
       alert("Token de autenticación no encontrado.");
@@ -66,6 +71,7 @@ export default function CrearNuevoTicket() {
     if (archivo) formData.append("attachment", archivo);
 
     try {
+      setLoading(true);
       const res = await fetch("http://localhost:8000/tickets/", {
         method: "POST",
         headers: {
@@ -76,7 +82,7 @@ export default function CrearNuevoTicket() {
 
       if (res.ok) {
         alert("Ticket creado correctamente.");
-        // Reset formulario
+        // Resetear formulario
         setAsunto("");
         setCategoria("");
         setDepartamento("");
@@ -88,24 +94,33 @@ export default function CrearNuevoTicket() {
       }
     } catch (error) {
       console.error("Error al enviar ticket:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="p-6 min-h-screen">
+    <div className="p-6 min-h-screen bg-gray-100">
       <div className="mb-6">
-        <h1 className="fs-5 text text-white font-bold">Crear nuevo Ticket</h1>
+        <h1 className="text-xl font-bold text-gray-800">Crear nuevo Ticket</h1>
+        <p className="text-sm text-gray-600">
+          Formulario de creación de ticket
+        </p>
       </div>
 
-      <div className="p-6 rounded shadow-md main">
-        <p className="text-sm text-black">Formulario de creación de ticket</p>
-
+      <div className="p-6 bg-white rounded shadow-md max-w-2xl mx-auto">
         <div className="mb-4">
-          <label className="block mb-1 font-medium text-black">Asunto</label>
+          <label
+            htmlFor="asunto"
+            className="block mb-1 font-medium text-gray-700"
+          >
+            Asunto
+          </label>
           <input
+            id="asunto"
             type="text"
             placeholder="Escriba el asunto de su ticket"
-            className="w-full border text-black border-gray-300 rounded px-4 py-2"
+            className="w-full border border-gray-300 rounded px-4 py-2"
             value={asunto}
             onChange={(e) => setAsunto(e.target.value)}
           />
@@ -113,13 +128,19 @@ export default function CrearNuevoTicket() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
-            <label className="block mb-1 font-medium text-black">Departamento</label>
+            <label
+              htmlFor="departamento"
+              className="block mb-1 font-medium text-gray-700"
+            >
+              Departamento
+            </label>
             <select
-              className="text-dark-emphasis w-full border border-gray-300 rounded-lg px-4 py-2"
+              id="departamento"
+              className="w-full border border-gray-300 rounded px-4 py-2"
               value={departamento}
               onChange={(e) => setDepartamento(e.target.value)}
             >
-              <option value="">---Seleccione un departamento</option>
+              <option value="">--- Seleccione un departamento</option>
               {departamentoList.map((dept) => (
                 <option key={dept._id} value={dept._id}>
                   {dept.name}
@@ -129,13 +150,19 @@ export default function CrearNuevoTicket() {
           </div>
 
           <div>
-            <label className="block mb-1 font-medium text-black">Categoría</label>
+            <label
+              htmlFor="categoria"
+              className="block mb-1 font-medium text-gray-700"
+            >
+              Categoría
+            </label>
             <select
-              className="text-dark-emphasis w-full border border-gray-300 rounded-lg px-4 py-2"
+              id="categoria"
+              className="w-full border border-gray-300 rounded px-4 py-2"
               value={categoria}
               onChange={(e) => setCategoria(e.target.value)}
             >
-              <option value="">---Seleccione una categoría</option>
+              <option value="">--- Seleccione una categoría</option>
               {categoriaList.map((cat) => (
                 <option key={cat._id} value={cat._id}>
                   {cat.name}
@@ -146,30 +173,47 @@ export default function CrearNuevoTicket() {
         </div>
 
         <div className="mb-4">
-          <label className="block mb-1 font-medium text-black">Descripción</label>
+          <label
+            htmlFor="descripcion"
+            className="block mb-1 font-medium text-gray-700"
+          >
+            Descripción
+          </label>
           <textarea
+            id="descripcion"
             rows={5}
             placeholder="Describa su solicitud"
-            className="w-full border border-gray-300 rounded px-4 py-2 text-black"
+            className="w-full border border-gray-300 rounded px-4 py-2"
             value={descripcion}
             onChange={(e) => setDescripcion(e.target.value)}
           ></textarea>
         </div>
 
-        <div className="input-group mb-3">
+        <div className="mb-4">
+          <label
+            htmlFor="archivo"
+            className="block mb-1 font-medium text-gray-700"
+          >
+            Adjuntar archivo (opcional)
+          </label>
           <input
+            id="archivo"
             type="file"
-            className="form-control text-black"
-            id="inputGroupFile01"
+            className="w-full text-gray-700"
             onChange={(e) => setArchivo(e.target.files?.[0] || null)}
           />
         </div>
 
         <button
-          className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition w-100"
           onClick={handleSubmit}
+          disabled={loading}
+          className={`w-full px-6 py-2 rounded text-white transition ${
+            loading
+              ? "bg-gray-500 cursor-not-allowed"
+              : "bg-green-600 hover:bg-green-700"
+          }`}
         >
-          Enviar Ticket
+          {loading ? "Enviando..." : "Enviar Ticket"}
         </button>
       </div>
     </div>
