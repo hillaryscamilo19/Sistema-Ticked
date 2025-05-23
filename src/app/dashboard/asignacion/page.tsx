@@ -1,156 +1,65 @@
-"use client";
-import { useEffect, useState } from "react";
-import "../asignacion/style.css";
-import { TicketIcon } from "lucide-react";
-import "bootstrap/dist/css/bootstrap.min.css";
+'use client'
+import { useEffect, useState } from 'react'
+import { Card, CardHeader, CardTitle, CardContent } from '../../../components/ui/card'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select'
+import { useParams } from 'react-router-dom'
 
-export default function CrearNuevoTicket() {
-  type Departamento = {
-  _id: string;
-  name: string;
-};
+const estadosDisponibles = [
+  'abierto',
+  'proceso',
+  'espera',
+  'revision',
+  'completado',
+  'cancelado',
+]
 
-const [departamentoList, setDepartamentoList] = useState<Departamento[]>([]);
-  const [asunto, setAsunto] = useState("");
-  const [categoria, setCategoria] = useState("");
-  const [departamentos, setDepartamentos] = useState("");
-  const [descripcion, setDescripcion] = useState("");
-  const [archivo, setArchivo] = useState<File | null>(null);
-
-
-  useEffect(() => {
-    const fetchDepartamentos = async () => {
-      try {
-        const response = await fetch("http://localhost:8000/api/departments/");
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status}`);
-        }
-        const data = await response.json();
-        setDepartamentoList(data);
-      } catch (error) {
-        console.error("Error al cargar departamentos:", error);
-      }
-    };
-
-    fetchDepartamentos();
-  }, []);
+export default function TicketDetail() {
+  const { id } = useParams()
+  const [ticket, setTicket] = useState<any>(null)
 
   useEffect(() => {
-    const fetchcategoria = async () => {
-      try {
-        const response = await fetch("http://localhost:8000/api/categories");
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status}`);
-        }
-        const data = await response.json();
-        setDepartamentoList(data);
-      } catch (error) {
-        console.error("Error al cargar Categoria:", error);
-      }
-    };
+    fetch(`/tickets/${id}`)
+      .then(res => res.json())
+      .then(data => setTicket(data))
+  }, [id])
 
-    fetchcategoria();
-  }, []);
+  const handleChangeEstado = (nuevoEstado: string) => {
+    fetch(`/tickets/${id}/estado`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ estado: nuevoEstado }),
+    }).then(() => setTicket({ ...ticket, estado: nuevoEstado }))
+  }
+
+  if (!ticket) return <div className="p-4">Cargando...</div>
 
   return (
-    <div className="p-6 -100 min-h-screen">
-      <div className="mb-6">
-        <h1 className="fs-5 text text-white font-bold">Crear nuevo Ticket</h1>
-      </div>
-
-      <div className=" p-6 rounded shadow-md main">
-        <p className="text-sm  text-black">
-          Formulario de creación de ticket
-        </p>
-        <div className="mb-4">
-          <label className="block mb-1 font-medium text-black">Asunto</label>
-          <input
-            type="text"
-            placeholder="Escriba el asunto de su ticket"
-            className="w-full border text-black border-gray-300 rounded px-4 py-2"
-            value={asunto}
-            onChange={(e) => setAsunto(e.target.value)}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <label className="block mb-1 font-medium text-black">Departamento</label>
-            <div className="relative">
-              <select
-                name="departments"
-                className="text-dark-emphasis w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-50"
-                value={departamentos}
-                onChange={(e) => setDepartamentos(e.target.value)}
-              >
-                <option value="">---Seleccione un departamento</option>
-                {departamentoList && departamentoList.length > 0 ? (
-                  departamentoList.map((dept) => (
-                    <option key={dept._id} value={dept._id}>
-                      {dept.name}
-                    </option>
-                  ))
-                ) : (
-                  <option value="" disabled>
-                    {departamentoList
-                      ? "No hay departamentos disponibles"
-                      : "Cargando departamentos..."}
-                  </option>
-                )}
-              </select>
-            </div>
+    <div className="container mx-auto py-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Detalles del Ticket #{ticket.id}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div><strong>Título:</strong> {ticket.titulo}</div>
+          <div><strong>Descripción:</strong> {ticket.descripcion}</div>
+          <div><strong>Estado actual:</strong> {ticket.estado}</div>
+          <div><strong>Creado por:</strong> {ticket.creador.nombre}</div>
+          <div className="mt-4">
+            <Select onValueChange={handleChangeEstado} defaultValue={ticket.estado}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {estadosDisponibles.map(e => (
+                  <SelectItem key={e} value={e}>
+                    {e.charAt(0).toUpperCase() + e.slice(1)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <div>
-            <label className="block mb-1 font-medium text-black">Categoria</label>
-            <div className="relative">
-              <select
-                name="departments"
-                className="text-dark-emphasis w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-50"
-                value={categoria}
-                onChange={(e) => setCategoria(e.target.value)}
-              >
-                <option value="">---Seleccione una Categoria</option>
-                {departamentoList && departamentoList.length > 0 ? (
-                  departamentoList.map((cat) => (
-                    <option key={cat._id} value={cat._id}>
-                      {cat.name}
-                    </option>
-                  ))
-                ) : (
-                  <option value="" disabled>
-                    {departamentoList
-                      ? "No hay Categoria disponibles"
-                      : "Cargando Categoria..."}
-                  </option>
-                )}
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div className="mb-4">
-          <label className="block mb-1 font-medium text-black">Descripción</label>
-          <textarea
-            rows={5}
-            placeholder="Describa su solicitud"
-            className="w-full border border-gray-300 rounded px-4 py-2 text-black"
-            value={descripcion}
-            onChange={(e) => setDescripcion(e.target.value)}
-          ></textarea>
-        </div>
-
-        <div className="input-group mb-3">
-          <input 
-          type="file" 
-          className="form-control text-black" 
-          id="inputGroupFile01" 
-          onChange={(e) => setArchivo(e.target.files?.[0] || null)}/>
-        </div>
-
-        <button className=" backgraou text-white px-6 py-2 rounded hover:bg-green-700 transition w-100">
-          Enviar Tickets
-        </button>
-      </div>
+        </CardContent>
+      </Card>
     </div>
-  );
+  )
 }

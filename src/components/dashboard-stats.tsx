@@ -8,7 +8,6 @@ import {
 import "../app/dashboard/styles.css";
 import axios from "axios";
 import { useState, useEffect } from "react";
-import Image from "next/image";
 
 // Tipos
 type StatsType = {

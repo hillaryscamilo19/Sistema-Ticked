@@ -1,6 +1,6 @@
 import type React from "react"
-import { Sidebar } from "@/components/sidebar"
-import { Header } from "@/components/header"
+import { Sidebar } from "../components/sidebar"
+import { Header } from "../components/header"
 
 export function DashboardLay({ children }: { children: React.ReactNode }) {
   return (
