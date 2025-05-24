@@ -3,7 +3,7 @@ import { Moon, Sun, LogOut, CircleUserRoundIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import "../global.css";
 
-export function Header() {
+export default function Header() {
   const [darkMode, setDarkMode] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [usuario, setUsuario] = useState<Usuario | null>(null);

@@ -9,11 +9,9 @@ import { Link } from "react-router-dom";
 import Logo from "../img/LogTYZ.png";
 import "../style.css";
 
-interface SidebarProps {
-  className?: string;
-}
 
-export function Sidebar({ className }: SidebarProps) {
+
+export function Sidebar() {
   return (
     <aside className="sidebar-container">
       <div className="logo-wrapper">
@@ -28,7 +26,7 @@ export function Sidebar({ className }: SidebarProps) {
             <HomeIcon className="nav-icon" />
             <span>Inicio</span>
           </Link>
-          <Link to="/crearTicket" className="nav-link">
+          <Link  to="/dashboard/crear"  className="nav-link">
             <PlusIcon className="nav-icon" />
             <span>Crear nuevo ticket</span>
           </Link>

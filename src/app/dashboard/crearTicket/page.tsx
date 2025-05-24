@@ -25,15 +25,18 @@ export default function CrearNuevoTicket() {
   useEffect(() => {
     const fetchDatos = async () => {
       try {
+        const token = localStorage.getItem("token");
+
         const [resDept, resCat] = await Promise.all([
-          fetch("http://localhost:8000/departments/"),
-          fetch("http://localhost:3000/categories", {
+          fetch("http://localhost:8000/departments"),
+          fetch("http://localhost:8000/categories", {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
           }),
         ]);
+
         const [dataDept, dataCat] = await Promise.all([
           resDept.json(),
           resCat.json(),
@@ -141,8 +144,8 @@ export default function CrearNuevoTicket() {
               onChange={(e) => setDepartamento(e.target.value)}
             >
               <option value="">--- Seleccione un departamento</option>
-              {departamentoList.map((dept) => (
-                <option key={dept._id} value={dept._id}>
+              {departamentoList.map((dept, index) => (
+                <option key={dept._id || index} value={dept._id}>
                   {dept.name}
                 </option>
               ))}
@@ -163,8 +166,8 @@ export default function CrearNuevoTicket() {
               onChange={(e) => setCategoria(e.target.value)}
             >
               <option value="">--- Seleccione una categoría</option>
-              {categoriaList.map((cat) => (
-                <option key={cat._id} value={cat._id}>
+              {categoriaList.map((cat, index) => (
+                <option key={cat._id || index} value={cat._id}>
                   {cat.name}
                 </option>
               ))}

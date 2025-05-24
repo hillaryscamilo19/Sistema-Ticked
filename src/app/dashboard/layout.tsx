@@ -11,7 +11,7 @@ export default function DashboardLayout({
 }) {
   return (
     <AuthCheck>
-      <div className="flex h-screen bg-gray-50">
+      <div className="flex h-screen">
         {/* Sidebar fijo a la izquierda */}
         <Sidebar children={undefined} name={""} departmentName={""} onLogout={function (): void {
           throw new Error("Function not implemented.");

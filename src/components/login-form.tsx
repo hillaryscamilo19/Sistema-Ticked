@@ -93,14 +93,14 @@ export function LoginForm() {
             )}
 
             {/* Input Usuario */}
-            <div className="form-group mb-4">
+            <div className="mb-6 relative">
               <span className="block mb-1 text-gray-600">Usuario</span>
               <div className="relative">
                 <input
                   id="username"
                   type="text"
                   placeholder="Escriba su nombre de usuario o email"
-                  className="InputUsuario"
+                  className="inputPassword"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required

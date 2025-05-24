@@ -96,11 +96,20 @@
 }
 
 .InputUsuario {
-  width: 69%;
+  width: 81%;
   height: 45px;
   border-radius: 7px;
   border: 2px solid #d1d6da98;
-  padding-left: 12px; /* Empuja el texto y placeholder hacia la derecha */
+  padding-left: 12px;
+}
+
+.inputPassword{
+  width: 81%;
+  height: 45px;
+  border-radius: 7px;
+  border: 2px solid #d1d6da98;
+  padding-left: 12px; 
+
 }
 
 
@@ -156,7 +165,6 @@
 }
 
 .container{
-    background-color: aliceblue;
 }
 
 .container-abajo{
@@ -167,7 +175,6 @@
 }
 
 .container-arriba {
-    background-color: #ffffff;
 }
 
 .imgae{

@@ -10,12 +10,10 @@ import { authService } from "./lib/api/auth-service";
 import { LoginForm } from "./components/login-form";
 
 // Importa tus páginas/componentes
-import Inicio from "./app/dashboard/page";
-import { Header } from "./components/header";
-import NuevoTicket from "./app/dashboard/crearTicket/page";
-import Sidebar from "./components/sidebar";
-
+import Dashboard from "./app/dashboard/page";
+import PrivateLayout from "./PrivateLayout";
 import RegisterPage from "./app/registro/page";
+import CreateTicketForm from "./app/dashboard/crearTicket/page";
 
 const PrivateRoute = () => {
   return authService.isAuthenticated() ? <Outlet /> : <Navigate to="/login" />;
@@ -49,41 +47,18 @@ function App() {
     window.location.href = "/login";
   };
 
-  const PrivateLayout = () => (
-    <Header
-      name={username || "Usuario"}
-      departmentName={departmentName || "Sin departamento"}
-      onLogout={handleLogout}
-    >
-      <Outlet />
-    </Header>
-  );
-
   return (
     <BrowserRouter>
       <Routes>
-        <Route
-          path="/"
-          element={token ? <Navigate to="/inicio" /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/login"
-          element={
-            <LoginForm
-              setToken={setToken}
-              setUsername={setUsername}
-              setDepartmentName={setDepartmentName}
-              setUserId={setUserId}
-            />
-          }
-        />
-        <Route path="/register" element={<RegisterPage />} />
+        <Route path="login" element={<LoginForm />} />
+        <Route path="registro" element={<RegisterPage />} />
 
-        <Route element={<PrivateRoute />}>
-          <Route element={<PrivateLayout />}>
-            <Route path="/inicio" element={<Inicio />} />
-            <Route path="/tickets/nuevo" element={<NuevoTicket />} />
-          </Route>
+        <Route path="dashboard" element={<PrivateLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="crear" element={<CreateTicketForm />} />
+          {/*<Route path="mis-tickets" element={<MisTickets />} />*/}
+          {/*<Route path="departamento" element={<TicketsDepartamento />} />*/}
+          {/*<Route path="nuestros-creados" element={<TicketsCreados />} />*/}
         </Route>
       </Routes>
     </BrowserRouter>
