@@ -1,0 +1,114 @@
+body,
+html {
+  background-color: #f3f6fb;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.Container {
+  width: 100%;
+  margin-left: 22%;
+  padding: 15px;
+  margin-top: 10%;
+  background-color: #ffffff;
+  border-radius: 0px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+.Title-1 {
+  font-size: 26px;
+  font-weight: 600;
+  color: #2d2d2d;
+  margin-bottom: 0.5rem;
+}
+
+.text-2 {
+  font-size: 16px;
+  font-weight: 500;
+  color: #4a4a4a;
+  margin-bottom: 1.5rem;
+}
+
+.container-Input {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+input[type="text"],
+select,
+input[type="file"] {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background-color: #fff;
+  font-size: 14px;
+  transition: border 0.3s ease;
+}
+
+input[type="text"]:focus,
+select:focus,
+input[type="file"]:focus {
+  border-color: #65a206;
+  outline: none;
+}
+
+label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.editable-container {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 0.75rem;
+  min-height: 150px;
+  background-color: #fff;
+  font-size: 14px;
+  margin-bottom: 1rem;
+}
+
+.Boton {
+  background-color: #65a206;
+  width: 100%;
+  padding: 0.9rem 2rem;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: block;
+  margin: 2rem auto 0;
+}
+
+.Boton:hover {
+  background-color: #558c05;
+}
+
+.Boton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.container-tex {
+  width: 100%;
+  height: 40px;
+  display: flex;
+  background-color: #ffffff;
+  justify-content: flex-start;
+  align-content: center;
+  align-items: flex-start;
+}
+
+.IcoTicked {
+  width: 25px;
+}

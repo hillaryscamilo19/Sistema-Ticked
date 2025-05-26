@@ -1,12 +1,11 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/select"
 import { Button } from "../../../../components/ui/button"
-import { FileText, ChevronRight, Link } from "lucide-react"
-import '../../styles.css';
+import { FileText, ChevronRight} from "lucide-react"
+import '../[id]/style.css';
 import { useEffect, useState } from "react";
 
-export default function TickedPage() {
+export default function TickedAsigando() {
   // ✅ Los hooks van DENTRO del componente
   const [tickets, setTickets] = useState([]);
   
@@ -20,7 +19,7 @@ export default function TickedPage() {
   useEffect(() => {
     const fetchTickets = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/tickets/", {
+        const res = await fetch("http://localhost:8000/tickets/", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
@@ -49,14 +48,14 @@ export default function TickedPage() {
   }
 
   return (
-    <div className="container mx-auto py-6">
-      <Card>
-        <CardHeader>
+    <div>
+      <Card className="card">
+        <CardHeader className="card-header">
           <CardTitle>Mis asignados</CardTitle>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="abierto">
-            <TabsList>
+            <TabsList className="tabs-list">
               <TabsTrigger value="abierto">Abiertos ({groupedTickets.abierto?.length || 0})</TabsTrigger>
               <TabsTrigger value="proceso">En Proceso ({groupedTickets.proceso?.length || 0})</TabsTrigger>
               <TabsTrigger value="completado">Completados ({groupedTickets.completado?.length || 0})</TabsTrigger>
@@ -68,75 +67,76 @@ export default function TickedPage() {
                   groupedTickets.abierto.map((ticket) => (
                     <div
                       key={ticket.id}
-                      className="bg-white p-4 rounded-md border"
+                     className="ticket-item"
                     >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="text-sm font-medium">Ticket {ticket.codigo}</span>
+                      <div  className="ticket-details">
+                        <div className="ticket-header">
+                         
+                            <span className="">Ticket {ticket.codigo}</span>
                             <span className="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded">
                               {ticket.status}
                             </span>
-                          </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="">
                             Fecha: {new Date(ticket.created_at).toLocaleDateString()} · Creado por: {ticket.creator_name}
                           </div>
                         </div>
-                        <div className="flex items-center gap-4">
-                          <div className="flex flex-col items-end">
-                            <div className="flex items-center gap-2">
-                              <FileText className="h-4 w-4 text-gray-500" />
-                              <span className="text-sm font-medium">{ticket.category_name}</span>
+                        <div className="">
+                          <div className="">
+                            <div className="">
+                              <FileText className="" />
+                              <span className="">{ticket.category_name}</span>
                             </div>
-                            <span className="text-xs text-gray-500">
+                            <span className="">
                               {formatRelativeDate(ticket.created_at)}
                             </span>
                           </div>
                           <Button variant="outline" size="sm">
-                            <span className="mr-2">Ver detalles</span>
-                            <ChevronRight className="h-4 w-4" />
+                            <span className="">Ver detalles</span>
+                            <ChevronRight className="" />
                           </Button>
                         </div>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <div className="flex items-center justify-center h-40 border rounded-md">
-                    <p className="text-gray-500">No hay tickets abiertos</p>
+                  <div className="">
+                    <p className="">No hay tickets abiertos</p>
                   </div>
                 )}
               </div>
             </TabsContent>
 
             <TabsContent value="proceso">
-              <div className="space-y-4">
+              <div className="">
                 {groupedTickets.proceso?.length > 0 ? (
                   groupedTickets.proceso.map((ticket) => (
-                    <div key={ticket.id} className="bg-white p-4 rounded-md border">
+                    <div key={ticket.id} className="">
                       {/* Mismo contenido que arriba */}
                       <p>Ticket en proceso: {ticket.codigo}</p>
                     </div>
                   ))
                 ) : (
-                  <div className="flex items-center justify-center h-40 border rounded-md">
-                    <p className="text-gray-500">No hay tickets en proceso</p>
+                  <div className="">
+                    <p className="">No hay tickets en proceso</p>
                   </div>
                 )}
               </div>
             </TabsContent>
 
             <TabsContent value="completado">
-              <div className="space-y-4">
+              <div className="">
                 {groupedTickets.completado?.length > 0 ? (
                   groupedTickets.completado.map((ticket) => (
-                    <div key={ticket.id} className="bg-white p-4 rounded-md border">
+                    <div key={ticket.id} className="">
                       {/* Mismo contenido que arriba */}
-                      <p>Ticket completado: {ticket.codigo}</p>
+                                                  <span className="">
+                              {formatRelativeDate(ticket.created_at)}
+                            </span>
                     </div>
                   ))
                 ) : (
-                  <div className="flex items-center justify-center h-40 border rounded-md">
-                    <p className="text-gray-500">No hay tickets completados</p>
+                  <div className="">
+                    <p className="">No hay tickets completados</p>
                   </div>
                 )}
               </div>

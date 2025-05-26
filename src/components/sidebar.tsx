@@ -35,7 +35,7 @@ export function Sidebar() {
         {/* ASIGNADOS */}
         <div className="nav-section">
           <h2 className="section-title">ASIGNADOS</h2>
-          <Link to="/mis-tickets" className="nav-link">
+          <Link to="/dashboard/asignado" className="nav-link">
             <TicketIcon className="nav-icon" />
             <span>Mis tickets asignados</span>
           </Link>
