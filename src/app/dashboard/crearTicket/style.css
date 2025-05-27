@@ -7,13 +7,13 @@ html {
 }
 
 .Container {
-  width: 100%;
-  margin-left: 22%;
-  padding: 15px;
-  margin-top: 10%;
-  background-color: #ffffff;
-  border-radius: 0px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    width: 135%;
+    margin-left: 2%;
+    padding: 15px;
+    margin-top: 7%;
+    background-color: #ffffff;
+    border-radius: 0px;
+    box-shadow: 0 8px 20px rgb(0 0 0 / 27%);
 }
 
 .Title-1 {

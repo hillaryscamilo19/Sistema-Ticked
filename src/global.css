@@ -274,8 +274,9 @@ button[type="submit"] {
 }
 
 button[type="button"] {
-  background-color: #f44336;
-  color: white;
+  height: 8px;
+  background-color: #eee;
+  color: rgb(0, 0, 0);
 }
 /* Contenedor principal */
 .login-container {

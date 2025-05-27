@@ -1,17 +1,125 @@
-/* styles.css */
 /* Card */
-.card {
-  background-color: white;
-  border-radius: 0px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  margin: 2rem;
+.card1 {
+    background: #ffffff;
+    margin-left: 53px;
+    margin-top: 84px;
+    width: 146%;
+    padding: 22px;
+    height: 176px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
 .card-header h2 {
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 1rem;
+}
+
+.container-card {
+  display: flex;
+  align-items: center;
+  padding: 17px;
+  flex-wrap: wrap;
+  flex-direction: row;
+  align-content: stretch;
+  justify-content: space-between;
+}
+
+.fecha {
+  color: #888;
+  font-size: 75%;
+}
+
+.Creado {
+  color: #888;
+  font-size: 72%;
+}
+
+.IconoOffice {
+  width: 21px;
+}
+
+.IconoList {
+  width: 18px;
+}
+
+.IcoUser {
+  width: 22px;
+}
+
+.IcoTag {
+  width: 22px;
+}
+
+.Boton-Statu {
+  height: 25%;
+  height: 15px;
+  color: #0b71e6;
+  border: 1px solid #1791d8;
+  border-radius: 6px;
+}
+
+.statusCounts {
+  margin-left: 10px;
+  color: #000000;
+  border: 1px solid #dce3e7;
+  background: #f1f1f1;
+  border-radius: 6px;
+}
+
+.Input {
+      width: 46%;
+    height: 74p
+}
+
+.raya{
+    width: 100%;
+    background-color: #a19c9c73;
+    height: 1px;
+}
+
+.Container-Date-Create {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  align-content: stretch;
+  flex-wrap: wrap;
+}
+.titulo {
+  font-size: 20px;
+}
+
+.Titulo-card {
+  font-size: 13px;
+  font-family: unset;
+}
+
+.Boton-Detalle {
+  width: 102%;
+  height: 38px;
+  border: 1px solid #d1d6da;
+  border-radius: 5px;
+}
+
+.buscador-tabs {
+  display: flex;
+  width: 101%;
+  justify-content: space-around;
+  align-content: space-around;
+  flex-wrap: wrap;
+  align-items: center;
+  flex-direction: row;
+}
+
+.tabs {
+  display: flex;
+  margin-bottom: 8px;
+  gap: 59px;
+}
+
+.card-2 {
+  width: 103%;
+  margin-left: -22px;
 }
 
 /* Tabs */
@@ -32,7 +140,7 @@
 }
 
 .tabs-trigger.active {
-  color: #5cbd57;
+  color: #000000;
 }
 
 .tabs-trigger.active::after {
@@ -111,4 +219,38 @@
   color: #aaa;
   font-style: italic;
   padding: 2rem 0;
+}
+.ticket-item {
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 1rem;
+}
+
+.ticket-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ticket-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.ticket-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.ticket-status {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  background-color: #d1fae5;
+  color: #065f46;
+  border-radius: 9999px;
+  text-transform: uppercase;
 }

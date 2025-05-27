@@ -22,14 +22,14 @@
   overflow: hidden;
 }
 
-.TextSeccion{
+.TextSeccion {
   font-size: 16px;
   color: #33333373;
 }
 
-.TextTYZ{
+.TextTYZ {
   font-size: 29px;
-   color: #333;
+  color: #333;
 }
 
 /* Lado izquierdo */
@@ -58,8 +58,8 @@
   justify-content: center;
 }
 
-.texto{
-  color: rgba(101, 162, 6, 1);;
+.texto {
+  color: rgba(101, 162, 6, 1);
 }
 
 .img {
@@ -79,19 +79,19 @@
   color: rgba(101, 162, 6, 1);
 }
 
-.iconoClose{
-    width: 4%;
-    margin: -7px;
-    margin-left: -39px;
+.iconoClose {
+  width: 4%;
+  margin: -7px;
+  margin-left: -39px;
 }
 
-.iconoUser{
-    width: 1%;
-    margin: -7px;
-    margin-left: -39px;
+.iconoUser {
+  width: 1%;
+  margin: -7px;
+  margin-left: -39px;
 }
 
-.IconoBoton{
+.IconoBoton {
   width: 7%;
 }
 
@@ -103,15 +103,13 @@
   padding-left: 12px;
 }
 
-.inputPassword{
+.inputPassword {
   width: 81%;
   height: 45px;
   border-radius: 7px;
   border: 2px solid #d1d6da98;
-  padding-left: 12px; 
-
+  padding-left: 12px;
 }
-
 
 .error {
   flex-direction: column;
@@ -128,60 +126,60 @@
   display: flex;
 }
 
-.IconoList{
-    width: 50px;
-    color: rgba(23, 185, 36, 0.705);
+.IconoList {
+  width: 50px;
+  color: rgba(23, 185, 36, 0.705);
 }
 
-.IconoWrench{
-     width: 50px;
-    color: rgb(209, 128, 22);
+.IconoWrench {
+  width: 50px;
+  color: rgb(209, 128, 22);
 }
 
-.IconoClock{
-     width: 50px;
-    color: rgb(112, 16, 141)
+.IconoClock {
+  width: 50px;
+  color: rgb(112, 16, 141);
 }
 
-.IconoDocument{
-     width: 50px;
-    color: rgb(207, 194, 15)
+.IconoDocument {
+  width: 50px;
+  color: rgb(207, 194, 15);
 }
 
-.PanelTicked{
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    align-content: stretch;
-    flex-direction: row;
+.PanelTicked {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  align-content: stretch;
+  flex-direction: row;
 }
 
-.PanelNombre{
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    align-content: stretch;
-    flex-direction: row;
+.PanelNombre {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  align-content: stretch;
+  flex-direction: row;
 }
 
-.container{
+.container {
 }
 
-.container-abajo{
-    background-color: #ffffff;
-    width: 100%;
-    height: 550px;
-    border-radius: 1px;
+.container-abajo {
+  background-color: #ffffff;
+  width: 100%;
+  height: 550px;
+  border-radius: 1px;
 }
 
 .container-arriba {
 }
 
-.imgae{
-    width: 36%;
-    height: 86px;
+.imgae {
+  width: 36%;
+  height: 86px;
 }
 
-img{
-    margin-left: 7%;
+img {
+  margin-left: 7%;
 }
