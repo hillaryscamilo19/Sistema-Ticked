@@ -5,7 +5,7 @@ import {
   UsersIcon,
   TagIcon,
 } from "@heroicons/react/24/outline";
-import "../[id]/style.css";
+
 
 interface TicketUser {
   id: number;
@@ -96,8 +96,8 @@ function extractAssignedUsers(
     .join(", ");
 }
 
-export default function TicketList() {
-  const [tickets, setTickets] = useState<Ticket[]>([]);
+export default function AssignedDepartment (){
+   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [activeTab, setActiveTab] = useState<string>("5");
   const [searchTerm, setSearchTerm] = useState<string>("");
 
@@ -105,7 +105,7 @@ export default function TicketList() {
     const fetchTickets = async () => {
       try {
         const res = await fetch(
-          "http://localhost:8000/tickets/asignados-a-mi/",
+          "http://localhost:8000/tickets/asignados-departamento/",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -140,7 +140,7 @@ export default function TicketList() {
       <div className="">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="titulo">Listado de tickets asignados al usuario.</h1>
+          <h1 className="titulo">Listado de tickets asignados al departmento.</h1>
 
           {/* Status tabs */}
           <div className="buscador-tabs">
@@ -177,7 +177,9 @@ export default function TicketList() {
             </div>
           </div>
         </div>
-        <div className="raya"></div>
+        <div className="raya">
+
+        </div>
         {/* Tickets List */}
         <div className="card-2">
           {filteredTickets.length === 0 ? (

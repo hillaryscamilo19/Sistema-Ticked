@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
-import { Moon, Sun, LogOut, CircleUserRoundIcon } from "lucide-react";
+import { Moon, Sun, LogOut } from "lucide-react";
+import {
+  UserCircleIcon
+} from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
 import "../global.css";
 
@@ -82,10 +85,12 @@ export default function Header() {
       <div className="user-container">
         <button onClick={() => setDropdownOpen(!dropdownOpen)} className="user-button">
           <div className="user-info">
+            <span className="user-id">Hillarys Camilo</span>
+            <span className="user-role">Tecnologia</span>
             <span className="user-id">{loading ? "Cargando..." : usuario?._id}</span>
             <span className="user-role">{departamento}</span>
           </div>
-          <CircleUserRoundIcon size={30} />
+          <UserCircleIcon className="icoHeader" width={50} />
           <span className="arrow">▼</span>
         </button>
 

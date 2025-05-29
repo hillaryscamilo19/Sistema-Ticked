@@ -16,6 +16,11 @@ html {
     box-shadow: 0 8px 20px rgb(0 0 0 / 27%);
 }
 
+.TextPrinci{
+   font-family: none;
+    margin: auto 41%;
+}
+
 .Title-1 {
   font-size: 26px;
   font-weight: 600;
@@ -30,11 +35,20 @@ html {
   margin-bottom: 1.5rem;
 }
 
+.categoria{
+}
+
+.Depatamento{
+width: 90%;
+}
+
 .container-Input {
-  display: flex;
-  flex-direction: row;
-  gap: 1rem;
-  margin-bottom: 1rem;
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    justify-content: space-between;
+
 }
 
 input[type="text"],

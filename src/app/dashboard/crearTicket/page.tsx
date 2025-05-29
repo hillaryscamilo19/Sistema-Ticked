@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState, useCallback } from "react";
-import { createEditor, type Descendant } from "slate";
-import { Slate, Editable, withReact } from "slate-react";
+import { useEffect, useState} from "react";
+import {  type Descendant } from "slate";
 import { TicketIcon } from "@heroicons/react/24/outline";
 import "../crearTicket/style.css";
 
@@ -35,8 +34,6 @@ export default function CrearNuevoTicket() {
 
   // Guardaremos el HTML generado aquí para enviarlo
   const [descripcionHTML, setDescripcionHTML] = useState("");
-
-  const editor = useMemo(() => withReact(createEditor()), []);
 
   // Fetch de departamentos y categorías igual que antes
   useEffect(() => {
@@ -142,12 +139,18 @@ export default function CrearNuevoTicket() {
   const [archivo, setArchivo] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Renderizado básico de elementos Slate
+  
+  
 
   return (
+    
     <div className="Container">
+
       <div className="p-6 bg-white rounded shadow-md max-w-2xl mx-auto">
         <div className="mb-4">
+            <div className="TextPrinci">
+               <h3>Crear nuevo Ticket</h3>
+            </div>
           <div className="container-tex">
             <TicketIcon className="IcoTicked"></TicketIcon>
             <p className="text-2">Formulario de creación de ticket</p>
@@ -178,7 +181,7 @@ export default function CrearNuevoTicket() {
             </label>
             <select
               id="departamento"
-              className="w-full border border-gray-300 rounded px-4 py-2"
+              className="Depatamento border border-gray-300 rounded px-4 py-2"
               value={departamento}
               onChange={(e) => setDepartamento(e.target.value)}
             >
@@ -200,7 +203,7 @@ export default function CrearNuevoTicket() {
             </label>
             <select
               id="categoria"
-              className="w-full border border-gray-300 rounded px-4 py-2"
+              className=" categoria border border-gray-300 rounded px-4 py-2"
               value={categoria}
               onChange={(e) => setCategoria(e.target.value)}
             >
@@ -241,18 +244,15 @@ export default function CrearNuevoTicket() {
           </div>
         </div>
 
-        <div className="mb-4">
-          <label
-            htmlFor="archivo"
-            className="block mb-1 font-medium text-gray-700"
-          >
-            Adjuntar archivo (opcional)
+        <div>
+          <label htmlFor="formFileLg" 
+          className="form-label">Large file input example
           </label>
-          <input
-            id="archivo"
-            type="file"
-            className="w-full text-gray-700"
-            onChange={(e) => setArchivo(e.target.files?.[0] || null)}
+          <input 
+          className="form-control form-control-lg" 
+          id="formFileLg" 
+          type="file"
+           onChange={(e) => setArchivo(e.target.files?.[0] || null)}
           />
         </div>
 

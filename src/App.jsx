@@ -15,6 +15,8 @@ import PrivateLayout from "./PrivateLayout";
 import RegisterPage from "./app/registro/page";
 import CreateTicketForm from "./app/dashboard/crearTicket/page";
 import TickedAsigando from "./app/dashboard/ticked/[id]/page"
+import AssignedDepartment from "./app/dashboard/departamento/page"
+import NuestroCreado from "./app/dashboard/ourcreate/page"
 
 const PrivateRoute = () => {
   return authService.isAuthenticated() ? <Outlet /> : <Navigate to="/login" />;
@@ -59,8 +61,8 @@ function App() {
           <Route path="crear" element={<CreateTicketForm />} />
           <Route path="asignado" element={<TickedAsigando />}/>
           {/*<Route path="mis-tickets" element={<MisTickets />} />*/}
-          {/*<Route path="departamento" element={<TicketsDepartamento />} />*/}
-          {/*<Route path="nuestros-creados" element={<TicketsCreados />} />*/}
+          <Route path="departamento" element={<AssignedDepartment />} />
+          <Route path="ourcreate" element={<NuestroCreado />} />
         </Route>
       </Routes>
     </BrowserRouter>
