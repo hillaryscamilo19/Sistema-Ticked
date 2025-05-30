@@ -36,10 +36,16 @@ html {
 }
 
 .categoria{
+   height: 63px;
 }
 
 .Depatamento{
-width: 90%;
+    width: 197%;
+    height: 63px;
+}
+
+.asunto{
+  height: 63px;
 }
 
 .container-Input {

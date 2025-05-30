@@ -50,7 +50,7 @@ export default function Dashboard() {
             {[0, 1, 2, 3].map((statusCode) => (
               <span className="bg-stone-50" key={statusCode}>
                 <p className="Number">
-                  {isLoading ? "" : stats.byStatus[statusCode] ?? 12}
+                  {isLoading ? "" : stats.byStatus[statusCode] ?? 0}
                 </p>
                 <p className="title-text">{STATUS_LABELS[statusCode]}</p>
               </span>
@@ -62,40 +62,39 @@ export default function Dashboard() {
           <img src={Home} width={520}></img>
         </div>
 
-<div className="foorted">
-  <h2>Colaboradores del Departamento</h2>
-  <div className="colaboradores">
-    <div className="colaborador">
-      <UserIcon width={36} />
-      <div>
-        <h3>Randy Alejandro Gomez Garcia</h3>
-        <p>asistentesistema@ssv.com.do | #3901</p>
-      </div>
-    </div>
-    <div className="colaborador">
-      <UserIcon width={36} />
-      <div>
-        <h3>Ignacio Martinez</h3>
-        <p>isantiago@ssv.com.do | #3903</p>
-      </div>
-    </div>
-    <div className="colaborador">
-      <UserIcon width={36} />
-      <div>
-        <h3>Hillarys Camilo</h3>
-        <p>hcamilo@ssv.com.do | #3904</p>
-      </div>
-    </div>
-    <div className="colaborador">
-      <UserIcon width={36} />
-      <div>
-        <h3>Jairo Perdomo</h3>
-        <p>jairoperdomo43@gmail.com | #3906</p>
-      </div>
-    </div>
-  </div>
-</div>
-
+        <div className="foorted">
+          <h2>Colaboradores del Departamento</h2>
+          <div className="colaboradores">
+            <div className="colaborador">
+              <UserIcon width={36} />
+              <div>
+                <h3>Randy Alejandro Gomez Garcia</h3>
+                <p>asistentesistema@ssv.com.do | #3901</p>
+              </div>
+            </div>
+            <div className="colaborador">
+              <UserIcon width={36} />
+              <div>
+                <h3>Ignacio Martinez</h3>
+                <p>isantiago@ssv.com.do | #3903</p>
+              </div>
+            </div>
+            <div className="colaborador">
+              <UserIcon width={36} />
+              <div>
+                <h3>Hillarys Camilo</h3>
+                <p>hcamilo@ssv.com.do | #3904</p>
+              </div>
+            </div>
+            <div className="colaborador">
+              <UserIcon width={36} />
+              <div>
+                <h3>Jairo Perdomo</h3>
+                <p>jairoperdomo43@gmail.com | #3906</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

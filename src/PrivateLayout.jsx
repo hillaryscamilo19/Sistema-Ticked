@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "../src/components/sidebar";
-import Header from "../src/components/header";
+import Header from "../src/components/header.tsx";
 import "./global.css"
 
 const PrivateLayout = () => {

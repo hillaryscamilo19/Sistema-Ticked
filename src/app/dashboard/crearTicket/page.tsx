@@ -165,7 +165,7 @@ export default function CrearNuevoTicket() {
             id="asunto"
             type="text"
             placeholder="Escriba el asunto de su ticket"
-            className="w-full border border-gray-300 rounded px-4 py-2"
+            className="asunto w-full border border-gray-300 rounded px-4 py-2"
             value={asunto}
             onChange={(e) => setAsunto(e.target.value)}
           />
@@ -181,7 +181,7 @@ export default function CrearNuevoTicket() {
             </label>
             <select
               id="departamento"
-              className="Depatamento border border-gray-300 rounded px-4 py-2"
+              className="Depatamento border-gray-300 rounded px-4 py-2"
               value={departamento}
               onChange={(e) => setDepartamento(e.target.value)}
             >
@@ -203,7 +203,7 @@ export default function CrearNuevoTicket() {
             </label>
             <select
               id="categoria"
-              className=" categoria border border-gray-300 rounded px-4 py-2"
+              className=" categoria border-gray-300 rounded px-4 py-2"
               value={categoria}
               onChange={(e) => setCategoria(e.target.value)}
             >

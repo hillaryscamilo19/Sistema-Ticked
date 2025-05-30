@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { Moon, Sun, LogOut } from "lucide-react";
-import {
-  UserCircleIcon
-} from "@heroicons/react/24/outline";
+import { UserCircleIcon } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
 import "../global.css";
 
@@ -22,8 +20,9 @@ export default function Header() {
   };
 
   const toggleTheme = () => setDarkMode(!darkMode);
-
   const handleLogout = () => {
+
+
     localStorage.removeItem("token");
     setDropdownOpen(false);
     navigate("/login");
@@ -32,6 +31,8 @@ export default function Header() {
   const fetchDepartamento = async (departamentoId: string) => {
     try {
       const token = localStorage.getItem("token");
+      localStorage.setItem("token", token); // ← ¿esto lo tienes en el login?
+
       const response = await fetch("http://localhost:8000/departments/", {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -47,10 +48,11 @@ export default function Header() {
   useEffect(() => {
     const fetchUsuario = async () => {
       try {
+            console.log("Usuario cargado:", usuario);
         const token = localStorage.getItem("token");
         if (!token) return navigate("/login");
 
-        const res = await fetch("http://localhost:8000/usuarios", {
+        const res = await fetch("http://localhost:8000/usuarios/", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -79,15 +81,21 @@ export default function Header() {
           <input type="checkbox" checked={darkMode} onChange={toggleTheme} />
           <span className="slider"></span>
         </label>
-        <div className="icon">{darkMode ? <Moon size={18} /> : <Sun size={18} />}</div>
+        <div className="icon">
+          {darkMode ? <Moon size={18} /> : <Sun size={18} />}
+        </div>
       </div>
 
       <div className="user-container">
-        <button onClick={() => setDropdownOpen(!dropdownOpen)} className="user-button">
+        <button
+          onClick={() => setDropdownOpen(!dropdownOpen)}
+          className="user-button"
+        >
           <div className="user-info">
-            <span className="user-id">Hillarys Camilo</span>
-            <span className="user-role">Tecnologia</span>
-            <span className="user-id">{loading ? "Cargando..." : usuario?._id}</span>
+            <span className="user-id">
+              {loading ? "Cargando..." : usuario?.fullname || usuario?._id}
+            </span>
+
             <span className="user-role">{departamento}</span>
           </div>
           <UserCircleIcon className="icoHeader" width={50} />

@@ -18,13 +18,13 @@ export default function TicketDetail() {
   const [ticket, setTicket] = useState<any>(null)
 
   useEffect(() => {
-    fetch(`/tickets/${id}`)
+    fetch(`http://localhost:8000/tickets/${id}`)
       .then(res => res.json())
       .then(data => setTicket(data))
   }, [id])
 
   const handleChangeEstado = (nuevoEstado: string) => {
-    fetch(`/tickets/${id}/estado`, {
+    fetch(`http://localhost:8000/tickets/${id}/estado`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ estado: nuevoEstado }),
