@@ -90,7 +90,7 @@ export default function Dashboard() {
               <UserIcon width={36} />
               <div>
                 <h3>Jairo Perdomo</h3>
-                <p>jairoperdomo43@gmail.com | #3906</p>
+                <p>jairoperdomo43@gmail.com | #3902</p>
               </div>
             </div>
           </div>

@@ -4,8 +4,9 @@ import {
   ClipboardDocumentListIcon,
   UsersIcon,
   TagIcon,
+     MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
-
+import "./style.css"
 
 interface TicketUser {
   id: number;
@@ -136,130 +137,141 @@ export default function AssignedDepartment (){
   });
 
   return (
-    <div className="card1">
+<div className="ticket-list-container">
       <div className="">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="titulo">Listado de tickets asignados al departmento.</h1>
-
-          {/* Status tabs */}
-          <div className="buscador-tabs">
-            <nav className="tabs" aria-label="Tabs">
-              {Object.entries(statusMap).map(([key, label]) => {
-                const isActive = activeTab === key;
-                return (
-                  <div
-                    key={key}
-                    onClick={() => setActiveTab(key)}
-                    className={` ${isActive ? "" : ""}`}
-                  >
-                    {label}
-                    <span className="statusCounts">
-                      {statusCounts[key] || 0}
-                    </span>
-                    {statusCounts[key] > 0 && isActive && (
-                      <span className="ml-1 w-2 h-2 bg-blue-500 rounded-full inline-block"></span>
-                    )}
-                  </div>
-                );
-              })}
-            </nav>
-
-            {/* Search bar */}
-            <div className="Input">
-              {/*<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />*/}
-              <input
-                type="text"
-                placeholder="Buscar ticket"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
-        </div>
-        <div className="raya">
-
-        </div>
-        {/* Tickets List */}
-        <div className="card-2">
-          {filteredTickets.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-500">No hay tickets</p>
-            </div>
-          ) : (
-            filteredTickets.map((ticket) => (
-              <div
-                key={ticket.id}
-                className="bg-white border border-gray-0 rounded-lg p-0 hover:shadow-md transition-shadow duration-20"
-              >
-                <div className="container-card">
-                  {/* Left section - Main info */}
-                  <div className="flex-1">
-                    <div className="flex items-start gap-4">
-                      <div className="flex-1">
-                        <h3 className="Titulo-card">
-                          {ticket.title}
-                          <span className="Boton-Statu">
-                            {statusMap[ticket.status] || "Desconocido"}
-                          </span>
-                        </h3>
-
-                        <div className="Container-Date-Create">
-                          <span className="mx-8"></span>
-                          <small className="fecha">
-                            {" "}
-                            Fecha:{" "}
-                            {new Date(ticket.createdAt).toLocaleDateString(
-                              "en-EN"
-                            )}
-                          </small>
-                          .
-                          <small className="Creado">
-                            Creado por: {extractUserName(ticket.created_user)}{" "}
-                          </small>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Center section - Department and time */}
-                  <div className="flex flex-col items-center text-center min-w-0 mx-8">
-                    <div className="flex items-center text-sm text-gray-600 mb-1">
-                      <BuildingOfficeIcon className="IconoOffice" />
-                      <span className="font-medium">
-                        {extractDepartmentName(ticket.assigned_department)}
-                      </span>
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {formatRelativeDate(ticket.createdAt)}
-                    </div>
-                  </div>
-
-                  {/* Right section - Assigned users */}
-                  <div className="">
-                    <div className="d-block text-muted mb-2">
-                      <UsersIcon className="IcoUser" />
-                      <span>{extractAssignedUsers(ticket.assigned_users)}</span>
-                    </div>
-                    <div className="flex items-center text-xs text-gray-500">
-                      <TagIcon className="IcoTag" />
-                      <span>{ticket.category.name || "Otros"}</span>
-                    </div>
-                  </div>
-
-                  {/* Action button */}
-                  <div className="ml-6">
-                    <button className=" inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 Boton-Detalle">
-                      <ClipboardDocumentListIcon className="IconoList" />
-                      Ver detalles
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-    </div>
+       <div className="ticket-list-content">
+         {/* Header */}
+         <div className="header-section">
+           <h1 className="main-title">Listado de tickets asignados al departmento.</h1>
+ 
+           {/* Status tabs and search */}
+           <div className="tabs-search-container">
+             {/* Status tabs */}
+             <nav className="status-tabs" aria-label="Tabs">
+               {Object.entries(statusMap).map(([key, { label }]) => {
+                 const isActive = activeTab === key
+                 const count = statusCounts[key] || 0
+ 
+                 return (
+                   <button
+                     key={key}
+                     onClick={() => setActiveTab(key)}
+                     className={`status-tab ${isActive ? "active" : ""}`}
+                   >
+                     <UsersIcon className="tab-icon" />
+                     <span className="tab-label">{label}</span>
+                     <span className="tab-count">{count}</span>
+                     {isActive && count > 0 && <div className="active-indicator"></div>}
+                   </button>
+                 )
+               })}
+             </nav>
+ 
+             {/* Search bar */}
+             <div className="search-container">
+               <div className="search-icon-container">
+                 <MagnifyingGlassIcon className="search-icon" />
+               </div>
+               <input
+                 type="text"
+                 placeholder="Buscar ticket"
+                 value={searchTerm}
+                 onChange={(e) => setSearchTerm(e.target.value)}
+                 className="search-input"
+               />
+             </div>
+           </div>
+         </div>
+ 
+         {/* Divider */}
+         <div className="divider"></div>
+ 
+         {/* Tickets List */}
+         <div className="tickets-container">
+           {filteredTickets.length === 0 ? (
+             <div className="empty-state">
+               <ClipboardDocumentListIcon className="empty-icon" />
+               <h3 className="empty-title">No hay tickets</h3>
+               <p className="empty-description">
+                 {searchTerm
+                   ? `No se encontraron tickets que coincidan con "${searchTerm}"`
+                   : `No hay tickets con estado "${statusMap[activeTab]?.label}"`}
+               </p>
+             </div>
+           ) : (
+             filteredTickets.map((ticket) => (
+               <div key={ticket.id} className="ticket-row">
+                 <div className="ticket-content">
+                   {/* Left section - Title and metadata */}
+                   <div className="ticket-main-info">
+                     <div className="ticket-title-section">
+                       <h3 className="ticket-title">{ticket.title}</h3>
+                       <span className={`status-badge ${statusMap[ticket.status]?.color || "status-default"}`}>
+                         {statusMap[ticket.status]?.label || ticket.status}
+                       </span>
+                     </div>
+                     <div className="ticket-metadata">
+                       <span>Fecha: {new Date(ticket.created_at).toLocaleDateString("es-ES")}</span>
+                       <span className="metadata-separator">•</span>
+                       <span>Creado por: {extractUserName(ticket.created_user)}</span>
+                     </div>
+                   </div>
+ 
+                   {/* Center section - Department */}
+                   <div className="ticket-department">
+                     <div className="department-info">
+                       <BuildingOfficeIcon className="department-icon" />
+                       <span className="department-name">   {extractDepartmentName(ticket.assigned_department)}</span>
+                     </div>
+                     <div className="relative-date">{formatRelativeDate(ticket.createdAt)}</div>
+                   </div>
+ 
+                   {/* Right section - Assigned user and category */}
+                   <div className="ticket-assignment">
+                     <div className="assigned-user">
+                       <UsersIcon className="user-icon" />
+                       <span>{extractAssignedUsers(ticket.assigned_users)}</span>
+                     </div>
+                     <div className="ticket-category">
+                       <TagIcon className="category-icon" />
+                       <span className="category-name">{ticket.category.name || "Otros"}</span>
+                     </div>
+                   </div>
+ 
+                   {/* Action button */}
+                   <div className="ticket-actions">
+                     <Link to={`/dashboard/tickets/${ticket.id}`}>
+                       <button className="detail-button">
+                         <ClipboardDocumentListIcon className="button-icon" />
+                         Ver detalles
+                       </button>
+                     </Link>
+                   </div>
+                 </div>
+               </div>
+             ))
+           )}
+         </div>
+ 
+         {/* Pagination */}
+         {filteredTickets.length > 0 && (
+           <div className="pagination-container">
+             <div className="pagination-info">
+               <span className="pagination-text">Mostrar</span>
+               <select className="pagination-select">
+                 <option value="20">20</option>
+                 <option value="50">50</option>
+                 <option value="100">100</option>
+               </select>
+               <span className="pagination-text">elementos por página</span>
+             </div>
+             <div className="pagination-controls">
+               <button className="page-button active">1</button>
+             </div>
+           </div>
+         )}
+       </div>
+       </div>
+     </div>
   );
 }

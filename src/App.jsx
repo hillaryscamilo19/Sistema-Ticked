@@ -61,7 +61,7 @@ function App() {
           <Route index element={<Dashboard />} />
           <Route path="crear" element={<CreateTicketForm />} />
           <Route path="asignado" element={<TickedAsigando />}/>
-          <Route path="detalle" element={<TicketList />} />
+          <Route path="tickets/:id" element={<TicketList />} />
           <Route path="departamento" element={<AssignedDepartment />} />
           <Route path="ourcreate" element={<NuestroCreado />} />
         </Route>
