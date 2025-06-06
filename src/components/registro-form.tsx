@@ -9,7 +9,7 @@ import {
 import { useNavigate, Link } from "react-router-dom";
 import tyz from "../img/tyz.png";
 import logo from "../img/logo2.png";
-import "../style.css";
+import "../app/styles/stylesregistro.css";
 
 interface Departamento {
   _id: number;

@@ -7,7 +7,7 @@ import {
 } from "@heroicons/react/24/outline";
 import tyz from "../img/tyz.png";
 import logo from "../img/logo2.png";
-import "../style.css";
+import "../app/styles/stylesLogin.css";
 import { authService } from "../lib/api/auth-service";
 import { useNavigate, useSearchParams } from "react-router-dom";
 export function LoginForm() {

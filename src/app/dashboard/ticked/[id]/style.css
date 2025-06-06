@@ -25,6 +25,12 @@
   justify-content: space-between;
 }
 
+.tile-princ{
+  font-size: 15px;
+  margin: 15px;
+
+}
+
 .fecha {
   color: #888;
   font-size: 75%;
@@ -68,8 +74,8 @@
 }
 
 .Input {
-      width: 46%;
-    height: 74p
+       width: 89%;
+    height: 74px
 }
 
 .raya{
@@ -77,6 +83,7 @@
     background-color: #a19c9c73;
     height: 1px;
 }
+
 
 .Container-Date-Create {
   display: flex;
@@ -257,10 +264,10 @@
 /* Container principal */
 .ticket-list-container {
     margin-left: 65px;
-    width: 116%;
-    min-height: 100vh;
+    width: 92%;
+    min-height: 56vh;
     background-color: #ffffff;
-    margin-top: 132px;
+    margin-top: 103px;
 }
 
 .ticket-list-content {
@@ -292,8 +299,8 @@
 }
 
 .status-tabs {
-  display: flex;
-  gap: 32px;
+    display: flex;
+    gap: 20px;
 }
 
 .status-tab {
@@ -350,9 +357,9 @@
 }
 
 .search-icon-container {
-position: absolute;
-    left: 93px;
-    top: 45%;
+    position: absolute;
+    left: 97px;
+    top: 44%;
     transform: translateY(-50%);
     pointer-events: none;
 }
@@ -363,8 +370,10 @@ position: absolute;
   color: #9ca3af;
 }
 
-.search-input {
-  width: 320px;
+
+
+.searc-input {
+width: 89%;
   padding: 8px 12px 8px 40px;
   border: 1px solid #d1d5db;
   border-radius: 6px;
@@ -375,12 +384,12 @@ position: absolute;
   transition: all 0.2s ease;
 }
 
-.search-input:focus {
+.searc-input:focus {
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.search-input::placeholder {
+.searc-input::placeholder {
   color: #9ca3af;
 }
 
@@ -692,12 +701,12 @@ position: absolute;
 
 /* Paginación */
 .pagination-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 32px;
-  padding-top: 24px;
-  border-top: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 55px;
+    padding-top: 50px;
+    border-top: 1px solid #e5e7eb;
 }
 
 .pagination-info {
@@ -762,7 +771,7 @@ position: absolute;
   }
 
   .status-tabs {
-    gap: 16px;
+    gap: 2px;
     overflow-x: auto;
     padding-bottom: 8px;
   }

@@ -11,13 +11,13 @@ import { LoginForm } from "./components/login-form";
 
 // Importa tus páginas/componentes
 import Dashboard from "./app/dashboard/page";
-import PrivateLayout from "./PrivateLayout";
 import RegisterPage from "./app/registro/page";
 import CreateTicketForm from "./app/dashboard/crearTicket/page";
 import TickedAsigando from "./app/dashboard/ticked/[id]/page"
 import AssignedDepartment from "./app/dashboard/departamento/page"
 import NuestroCreado from "./app/dashboard/ourcreate/page"
 import TicketList from "./app/dashboard/asignacion/page"
+import Sidebar from "./components/sidebar";
 
 const PrivateRoute = () => {
   return authService.isAuthenticated() ? <Outlet /> : <Navigate to="/login" />;
@@ -57,7 +57,7 @@ function App() {
         <Route path="login" element={<LoginForm />} />
         <Route path="registro" element={<RegisterPage />} />
 
-        <Route path="dashboard" element={<PrivateLayout />}>
+        <Route path="dashboard" element={<Sidebar />}>
           <Route index element={<Dashboard />} />
           <Route path="crear" element={<CreateTicketForm />} />
           <Route path="asignado" element={<TickedAsigando />}/>
