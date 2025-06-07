@@ -6,11 +6,54 @@ import {
   WrenchIcon,
   UserIcon,
 } from "@heroicons/react/24/outline";
+import { useState, useEffect } from "react"
+import { Link, Outlet, useNavigate } from "react-router-dom"
 import { useTickets } from "../../hooks/useTickets";
 import "./styles.css";
 import Home from "../../img/Home.png";
 
+
+type Usuario = {
+  _id: string
+  fullname?: string
+  role?: string
+  phone_ext: number
+  department_id?: string
+}
+
+
 export default function Dashboard() {
+    const [darkMode, setDarkMode] = useState(true)
+    const [usuario, setUsuario] = useState<Usuario | null>(null)
+    const navigate = useNavigate()
+      const [loading, setLoading] = useState(true)
+  
+    // Primero cargar usuario
+    useEffect(() => {
+      const fetchUsuario = async () => {
+        try {
+          const token = localStorage.getItem("token")
+          const res = await fetch("http://localhost:8000/usuarios/departamento/colaboradores", {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+  
+          if (res.status === 401) {
+            localStorage.removeItem("token")
+            return navigate("/login")
+          }
+  
+          const data = await res.json()
+          setUsuario(data)
+        } catch (error) {
+          console.error("Error al cargar usuario:", error)
+        } finally {
+          setLoading(false)
+        }
+      }
+  
+      fetchUsuario()
+    }, [navigate])
+  
   const STATUS_LABELS: Record<number, string> = {
     0: "Asignados",
     1: "Proceso",

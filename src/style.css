@@ -1,0 +1,31 @@
+/* Estilos personalizados para mejorar la apariencia */
+.nav-link:hover {
+  background-color: rgba(226, 218, 218, 0.1) !important;
+  color: white !important;
+}
+
+.form-check-input:checked {
+  background-color: #10b981 !important;
+  border-color: #10b981 !important;
+}
+
+.btn-link:hover {
+  background-color: #f8f9fa !important;
+}
+
+.card {
+  border: 1px solid #d5d5d6;
+}
+
+.dropdown .collapse {
+  transition: all 0.3s ease;
+}
+
+/* Mejorar la visualización del dropdown */
+.collapse.show {
+  display: block !important;
+}
+
+.collapse:not(.show) {
+  display: none;
+}

@@ -106,7 +106,7 @@ export default function NuestroCreado() {
     const fetchTickets = async () => {
       try {
         const res = await fetch(
-          "http://localhost:8000/tickets/asignados-departamento/",
+          "http://localhost:8000/tickets/todos-creados-por-mi-departamento/",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
