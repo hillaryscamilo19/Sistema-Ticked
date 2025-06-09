@@ -21,6 +21,7 @@ import AdminTickets from "./app/component/admin/admin-tickets"
 import AdminUsuarios from "./app/component/admin/admin-usuarios"
 import AdminDepartamentos from "./app/component/admin/admin-departamentos"
 import AdminEstadisticas from "./app/component/admin/admin-estadisticas"
+import AdminCategoria from "./app/component/admin/admin-categoria"
 
 const PrivateRoute = () => {
   return authService.isAuthenticated() ? <Outlet /> : <Navigate to="/login" />
@@ -33,9 +34,12 @@ const TechAdminRoute = () => {
 
   useEffect(() => {
     const checkTechDepartment = async () => {
+      console.log("TechAdminRoute: Verificando acceso de tecnología...")
+
       try {
         const token = localStorage.getItem("token")
         if (!token) {
+          console.log("TechAdminRoute: No hay token")
           setLoading(false)
           return
         }
@@ -47,8 +51,9 @@ const TechAdminRoute = () => {
 
         if (userResponse.ok) {
           const userData = await userResponse.json()
+          console.log("TechAdminRoute: Datos del usuario:", userData)
 
-          if (userData.departamento_id) {
+          if (userData.department_id) {
             // Obtener datos del departamento
             const deptResponse = await fetch("http://localhost:8000/departments", {
               headers: { Authorization: `Bearer ${token}` },
@@ -56,9 +61,13 @@ const TechAdminRoute = () => {
 
             if (deptResponse.ok) {
               const departments = await deptResponse.json()
+              console.log("TechAdminRoute: Departamentos:", departments)
+
               const userDepartment = departments.find(
-                (dept) => dept._id === userData.departamento_id || dept.id === userData.departamento_id,
+                (dept) => dept._id === userData.department_id || dept.id === userData.department_id,
               )
+
+              console.log("TechAdminRoute: Departamento del usuario:", userDepartment)
 
               // Verificar si el departamento es "Tecnología"
               if (
@@ -68,13 +77,16 @@ const TechAdminRoute = () => {
                   userDepartment.nombre?.toLowerCase() === "tecnología" ||
                   userDepartment.nombre?.toLowerCase() === "tecnologia")
               ) {
+                console.log("TechAdminRoute: Usuario autorizado para admin")
                 setIsTechUser(true)
+              } else {
+                console.log("TechAdminRoute: Usuario NO autorizado para admin")
               }
             }
           }
         }
       } catch (error) {
-        console.error("Error verificando departamento de tecnología:", error)
+        console.error("TechAdminRoute: Error verificando departamento de tecnología:", error)
       } finally {
         setLoading(false)
       }
@@ -82,6 +94,8 @@ const TechAdminRoute = () => {
 
     checkTechDepartment()
   }, [])
+
+  console.log("TechAdminRoute: loading =", loading, "isTechUser =", isTechUser)
 
   if (loading) {
     return (
@@ -93,7 +107,13 @@ const TechAdminRoute = () => {
     )
   }
 
-  return isTechUser ? <Outlet /> : <Navigate to="/dashboard" />
+  if (!isTechUser) {
+    console.log("TechAdminRoute: Redirigiendo a dashboard - usuario no autorizado")
+    return <Navigate to="/dashboard" />
+  }
+
+  console.log("TechAdminRoute: Renderizando Outlet - usuario autorizado")
+  return <Outlet />
 }
 
 function App() {
@@ -125,12 +145,14 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="login" element={<LoginForm />} />
-        <Route path="registro" element={<RegisterPage />} />
+        {/* Rutas públicas */}
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/registro" element={<RegisterPage />} />
 
-        {/* Rutas del Dashboard */}
+        {/* Rutas protegidas */}
         <Route element={<PrivateRoute />}>
-          <Route path="dashboard" element={<Sidebar />}>
+          {/* Rutas del Dashboard con Sidebar */}
+          <Route path="/dashboard" element={<Sidebar />}>
             <Route index element={<Dashboard />} />
             <Route path="crear" element={<CreateTicketForm />} />
             <Route path="asignado" element={<TickedAsigando />} />
@@ -141,11 +163,12 @@ function App() {
 
           {/* Rutas del Panel de Administración - Solo para usuarios de Tecnología */}
           <Route element={<TechAdminRoute />}>
-            <Route path="admin" element={<AdminPanel />}>
-              <Route index element={<Navigate to="/admin/tickets" replace />} />
+            <Route path="/admin" element={<AdminPanel />}>
+              <Route index element={<Navigate to="tickets" replace />} />
               <Route path="tickets" element={<AdminTickets />} />
               <Route path="usuarios" element={<AdminUsuarios />} />
               <Route path="departamentos" element={<AdminDepartamentos />} />
+              <Route path="Categoria" element={<AdminCategoria />} />
               <Route path="estadisticas" element={<AdminEstadisticas />} />
             </Route>
           </Route>
@@ -159,3 +182,4 @@ function App() {
 }
 
 export default App
+

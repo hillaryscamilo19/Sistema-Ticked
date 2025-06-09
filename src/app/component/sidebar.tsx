@@ -12,6 +12,8 @@ import { Link, Outlet, useNavigate } from "react-router-dom"
 import { useState, useEffect } from "react"
 import { Moon } from "lucide-react"
 
+import tyz from "../../img/tyz.png"
+
 export function Sidebar() {
   const [darkMode, setDarkMode] = useState(true)
   const [usuario, setUsuario] = useState(null)
@@ -109,7 +111,7 @@ export function Sidebar() {
       <div className="bg-dark text-white p-3" style={{ width: "280px", overflowY: "auto" }}>
         <div className="text-center mb-4">
           <img
-            src="/placeholder.svg?height=106&width=200"
+            src={tyz}
             alt="TYZ Logo"
             width={200}
             height={106}

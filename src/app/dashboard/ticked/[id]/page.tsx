@@ -95,7 +95,7 @@ function extractAssignedUsers(
       if (typeof user === "string") return user;
       return user.fullname || user.name || "Usuario";
     })
-    .join(", ");
+    .join(",");
 }
 
 export default function TicketList() {

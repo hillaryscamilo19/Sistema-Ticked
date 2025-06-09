@@ -2,14 +2,23 @@
 
 import { useState, useEffect } from "react"
 import { TicketIcon } from "@heroicons/react/24/outline"
+import { data } from "react-router-dom"
 
 type Ticket = {
   _id: string
-  titulo: string
-  estado: string
-  fecha_creacion: string
-  creado_por: string
-  departamento: string
+  title: string
+  status: string
+  createdAt: string
+  created_user:[
+    id: string,
+    fullname: string,
+    email: string,
+    phone_ext: string,
+  ]
+  departamento: [
+    id:string,
+    name: string
+  ]
 }
 
 export default function AdminTickets() {
@@ -26,9 +35,12 @@ export default function AdminTickets() {
 
   useEffect(() => {
     const fetchTickets = async () => {
+      console.log(data);
       try {
+        
+        
         const token = localStorage.getItem("token")
-        const response = await fetch("http://localhost:8000/tickets", {
+        const response = await fetch("http://localhost:8000/tickets/", {
           headers: { Authorization: `Bearer ${token}` },
         })
 
@@ -168,27 +180,21 @@ export default function AdminTickets() {
                   </tr>
                 </thead>
                 <tbody>
-                  {tickets.slice(0, 10).map((ticket) => (
+                  {tickets.slice(0,3000).map((ticket) => (
                     <tr key={ticket._id}>
-                      <td>{ticket.titulo}</td>
+                      <td>{ticket.title}</td>
                       <td>
                         <span
                           className={`badge ${
-                            ticket.estado === "Completado"
-                              ? "bg-success"
-                              : ticket.estado === "En Proceso"
-                                ? "bg-warning"
-                                : ticket.estado === "Cancelado"
-                                  ? "bg-danger"
-                                  : "bg-primary"
+                            ticket.status === "Completado" ? "bg-success" : ticket.status === "En Proceso" ? "bg-warning" : ticket.status === "Cancelado" ? "bg-danger": ticket.status === "Espera" ? "bg-danger": ticket.status === "Abiertos" ? "bg-warning" :""
                           }`}
                         >
-                          {ticket.estado}
+                          {ticket.status}
                         </span>
                       </td>
-                      <td>{new Date(ticket.fecha_creacion).toLocaleDateString()}</td>
-                      <td>{ticket.creado_por}</td>
-                      <td>{ticket.departamento}</td>
+                      <td>{new Date(ticket.createdAt).toLocaleDateString()}</td>
+                      <td>{ticket.created_user.fullname}</td>
+                      <td>{ticket.assigned_department.name}</td>
                       <td>
                         <button className="btn btn-sm btn-outline-primary me-2">Ver</button>
                         <button className="btn btn-sm btn-outline-secondary">Editar</button>

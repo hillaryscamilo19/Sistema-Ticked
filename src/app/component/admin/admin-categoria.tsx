@@ -7,48 +7,52 @@ import {
   TrashIcon,
 } from "@heroicons/react/24/outline";
 
-type Departamento = {
+type Categoria = {
   _id: string;
   name: string;
+  departments: {
+    _id: string;
+    name: string;
+  }[];
 };
 
-export default function AdminDepartamentos() {
-  const [departamentos, setDepartamentos] = useState<Departamento[]>([]);
+export default function AdminCategoria() {
+  const [categoria, setCategoria] = useState<Categoria[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    const fetchDepartamentos = async () => {
+    const fetchCategoria = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch("http://localhost:8000/departments", {
+        const response = await fetch("http://localhost:8000/categories", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         if (response.ok) {
           const data = await response.json();
-          setDepartamentos(data);
+          setCategoria(data);
         }
       } catch (error) {
-        console.error("Error al cargar departamentos:", error);
+        console.error("Error al cargar categirias:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchDepartamentos();
+    fetchCategoria();
   }, []);
 
-  const filteredDepartamentos = departamentos.filter((departamento) =>
-    departamento.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredDepartamentos = categoria.filter((categoria) =>
+    categoria.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="p-4">
       <div className="d-flex align-items-center justify-content-between mb-3">
         <div>
-          <h2 className="mb-0">Departamentos</h2>
-          <p className="text-muted">Listado de todos los departamentos.</p>
+          <h2 className="mb-0">Categoria</h2>
+          <p className="text-muted">Listado de todas las categorias.</p>
         </div>
 
         {/*Boton crear nuevo departamento */}
@@ -78,7 +82,7 @@ export default function AdminDepartamentos() {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Crear departamento
+                Crear Categoria
               </h1>
               <button
                 type="button"
@@ -90,7 +94,7 @@ export default function AdminDepartamentos() {
             <div className="modal-body">
               <input
                 type="text"
-                placeholder="Escriba el nombre del departamento"
+                placeholder="Escriba el nombre de la categoria"
               ></input>
             </div>
             <div className="modal-footer">
@@ -120,7 +124,7 @@ export default function AdminDepartamentos() {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="staticBackdropLabel">
-                Crear departamento
+                Editar Categoria
               </h1>
               <button
                 className="btn-close"
@@ -159,7 +163,7 @@ export default function AdminDepartamentos() {
             <input
               type="text"
               className="form-control border-start-0"
-              placeholder="Buscar departamento..."
+              placeholder="Buscar Categoria..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -175,13 +179,19 @@ export default function AdminDepartamentos() {
         </div>
       ) : (
         <div className="row g-4">
-          {filteredDepartamentos.map((departamento) => (
-            <div key={departamento._id} className="col-md-6 col-lg-3">
+          {filteredDepartamentos.map((categoria) => (
+            <div key={categoria._id} className="col-md-6 col-lg-3">
               <div className="card h-100">
                 <div className="card-body">
-                  <h5 className="card-title">{departamento.name}</h5>
+                  <h5 className="card-title">{categoria.name}</h5>
                 </div>
-                
+                <div>
+                  {categoria.departments.map((dep) => (
+                    <small key={dep._id} className=" me-2  border border-success rounded bg-success">
+                      {dep.name}
+                    </small>
+                  ))}
+                </div>
                 <div className="card-footer bg-white d-flex justify-content-between">
                   <button className="btn btn-sm btn-outline-danger">
                     <i className="bi bi-trash me-1">
@@ -193,7 +203,7 @@ export default function AdminDepartamentos() {
                     Eliminar
                   </button>
                   <button
-                    className="btn  btn-success"
+                    className="btn-sm btn-outline-danger"
                     data-bs-toggle="modal"
                     data-bs-target="#staticBackdrop"
                   >
