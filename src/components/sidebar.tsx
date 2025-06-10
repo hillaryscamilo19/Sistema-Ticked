@@ -6,9 +6,25 @@ import { useState, useEffect } from "react"
 import { Moon } from "lucide-react"
 import tyz from "../img/tyz.png"
 
+type Usuario = {
+  fullname:string;
+  phone_ext:string;
+  role:0;
+  email:string;
+ departments: {
+    _id: string;
+    name: string;
+  }[];
+  username:string;
+  status: string;
+  _id: string;
+  name: string;
+};
+
+
 export function Sidebar() {
   const [darkMode, setDarkMode] = useState(true)
-  const [usuario, setUsuario] = useState(null)
+  const [usuario, setUsuario] = useState<Usuario[]>([]);
   const [collapsed, setCollapsed] = useState(false)
   const closeMobileSidebar = () => setMobileSidebarOpen(false)
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
@@ -62,7 +78,7 @@ export function Sidebar() {
   // Luego cargar departamentos cuando ya tenemos el usuario
   useEffect(() => {
     const fetchDepartamentos = async () => {
-      if (!usuario?.department_id) return
+      if (usuario?.department_id) return
 
       try {
         const token = localStorage.getItem("token")
@@ -79,7 +95,7 @@ export function Sidebar() {
         setDepartamentos(data)
 
         // Buscar el departamento del usuario
-        const userDepartamento = data.find((d) => d._id === usuario.department_id || d.id === usuario.department_id)
+        const userDepartamento = data.find((d) => d._id === usuario.name || d.id === usuario.department_id)
 
         setDepartamento(userDepartamento || null)
 
@@ -276,7 +292,7 @@ export function Sidebar() {
                 <div className="text-end me-3">
                   <div className="fw-bold text-dark mb-0">{loading ? "Cargando..." : usuario?.fullname || ""}</div>
                   <div className="text-muted small">
-                    {loading ? "Cargando..." : usuario?.department_id|| departamento?.department_id| ""}
+                    {loading ? "Cargando..." : usuario?.department_id || departamento?.department_id| ""}
                   </div>
                 </div>
                 <UserCircleIcon className="text-muted me-2" style={{ width: "32px", height: "32px" }} />
