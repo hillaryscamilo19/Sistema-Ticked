@@ -1,5 +1,4 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import {
   UserIcon,
@@ -23,9 +22,9 @@ export default function AdminUsuarios() {
     fullname: "",
     username: "",
     email: "",
-    department_id: 0,
-    phone_ext: 0,
-    role: 0,
+    department_id: "",
+    phone_ext: "",
+    role: "",
     status: true,
   })
   const [passwordData, setPasswordData] = useState({
@@ -89,9 +88,9 @@ export default function AdminUsuarios() {
       fullname: usuario.fullname || "",
       username: usuario.username || "",
       email: usuario.email || "",
-      department_id: usuario.department_id || 0,
-      phone_ext: usuario.phone_ext || 0,
-      role: usuario.role || 0,
+      department_id: usuario.department_id || "",
+      phone_ext: usuario.phone_ext || "",
+      role: usuario.role || "User",
       status: usuario.status !== false,
     })
   }
@@ -212,6 +211,65 @@ export default function AdminUsuarios() {
     }
   }
 
+  // Función para cambiar el estado del usuario (activar/desactivar) - CORREGIDA
+  const handleToggleUserStatus = async (usuario) => {
+    setLoadingAction(true)
+    try {
+      const token = localStorage.getItem("token")
+      const newStatus = !usuario.status
+
+      console.log(`Cambiando estado de usuario ${usuario.username} a ${newStatus}`)
+
+      const response = await fetch(`http://localhost:8000/usuarios/${usuario._id || usuario.id}/toggle-status`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          status: newStatus,
+        }),
+      })
+
+      console.log("Response status:", response.status)
+
+      if (response.ok) {
+        const result = await response.json()
+        console.log("Response data:", result)
+
+        // Actualizar el estado local del usuario
+        setUsuarios((prev) => prev.map((user) => (user._id === usuario._id ? { ...user, status: newStatus } : user)))
+
+        // Mostrar notificación
+        const statusText = newStatus ? "activado" : "desactivado"
+        alert(`Usuario ${usuario.username} ${statusText} correctamente`)
+      } else {
+        // Manejo mejorado de errores
+        let errorMessage = "Error desconocido"
+        try {
+          const errorData = await response.json()
+          console.log("Error data:", errorData)
+
+          if (typeof errorData === "object") {
+            errorMessage = errorData.detail || errorData.message || JSON.stringify(errorData)
+          } else {
+            errorMessage = String(errorData)
+          }
+        } catch (parseError) {
+          console.error("Error al parsear respuesta de error:", parseError)
+          errorMessage = `Error HTTP ${response.status}: ${response.statusText}`
+        }
+
+        alert(`Error al cambiar estado del usuario: ${errorMessage}`)
+      }
+    } catch (error) {
+      console.error("Error al cambiar estado del usuario:", error)
+      alert(`Error de conexión: ${error.message || "Error desconocido"}`)
+    } finally {
+      setLoadingAction(false)
+    }
+  }
+
   return (
     <div className="p-4">
       <div className="d-flex align-items-center justify-content-between mb-4">
@@ -219,7 +277,10 @@ export default function AdminUsuarios() {
           <h2 className="mb-0">Usuarios</h2>
           <p className="text-muted">Listado de todos los usuarios del sistema.</p>
         </div>
-     
+        <button className="btn btn-success">
+          <PlusIcon className="me-2" style={{ width: "16px", height: "16px" }} />
+          Nuevo Usuario
+        </button>
       </div>
 
       {/* Barra de búsqueda */}
@@ -247,10 +308,10 @@ export default function AdminUsuarios() {
           </div>
         </div>
       ) : (
-        <div className="row g-4">
+        <div className="row g-2">
           {filteredUsuarios.map((usuario) => (
-            <div key={usuario._id} className="col-md-6 col-lg-4">
-              <div className="card h-100">
+            <div key={usuario._id} className="col-md-4 col-lg-2">
+              <div className="card h-20">
                 <div className="card-body">
                   <h5 className="card-title text-center mb-3">{usuario.fullname || usuario.username}</h5>
                   <div className="mb-3">
@@ -272,13 +333,39 @@ export default function AdminUsuarios() {
                       <BuildingOfficeIcon className="me-2" style={{ width: "16px", height: "16px" }} />
                       {getDepartmentName(usuario.department_id)}
                     </small>
-                    <small className={`d-block ${usuario.status ? "text-success" : "text-danger"}`}>
-                      <StopCircleIcon className="me-2" style={{ width: "16px", height: "16px" }} />
+                  </div>
+
+                  {/* Toggle de estado del usuario */}
+                  <div className="d-flex justify-content-between align-items-center ">
+                    <div className="form-check form-switch d-flex align-items-center">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id={`userStatus-${usuario._id}`}
+                        checked={usuario.status}
+                        onChange={() => handleToggleUserStatus(usuario)}
+                        disabled={loadingAction}
+                        style={{
+                          backgroundColor: usuario.status ? "#73E85B" : "#E2EFDF",
+                          borderColor: usuario.status ? "#198754" : "#6c757d",
+                        }}
+                      />
+                      <label className="form-check-label" htmlFor={`userStatus-${usuario._id}`}>
+                        {usuario.status ? "Activo" : "Inactivo"}
+                      </label>
+                    </div>
+
+                   
+
+                      <small className={`${usuario.status ? "text-success" : "text-danger"}`}>
+                      <StopCircleIcon className="me-1" style={{ width: "16px", height: "16px" }} />
                       {usuario.status ? "Activo" : "Inactivo"}
                     </small>
                   </div>
+
                   <div className="text-center">
-                    <span className="badge bg-primary rounded-pill">{usuario.role || "User"}</span>
+                    <span className="badge bg-primary rounded-pill">{usuario.role || "User65"}</span>
                   </div>
                 </div>
                 <div className="card-footer bg-white d-flex justify-content-between">
@@ -350,10 +437,10 @@ export default function AdminUsuarios() {
               </div>
             </div>
             <div className="modal-footer">
-              <button  className="btn btn-secondary" data-bs-dismiss="modal">
+              <button className="btn btn-secondary" data-bs-dismiss="modal">
                 Cancelar
               </button>
-              <button type="button" className="btn btn-warning" onClick={handleResetPassword} disabled={loadingAction}>
+              <button className="btn btn-warning" onClick={handleResetPassword} disabled={loadingAction}>
                 {loadingAction ? (
                   <>
                     <span className="spinner-border spinner-border-sm me-2"></span>
@@ -473,10 +560,10 @@ export default function AdminUsuarios() {
         </div>
         <div className="offcanvas-footer p-3 border-top">
           <div className="d-flex justify-content-end gap-2">
-            <button className="btn btn-secondary" data-bs-dismiss="offcanvas">
+            <button type="button" className="btn btn-secondary" data-bs-dismiss="offcanvas">
               Cancelar
             </button>
-            <button  className="btn btn-success" onClick={handleSaveUser} disabled={loadingAction}>
+            <button type="button" className="btn btn-primary" onClick={handleSaveUser} disabled={loadingAction}>
               {loadingAction ? (
                 <>
                   <span className="spinner-border spinner-border-sm me-2"></span>
