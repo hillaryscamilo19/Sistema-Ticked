@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom
 import { authService } from "./lib/api/auth-service"
 import { LoginForm } from "./components/login-form"
 
+
 // Importa tus páginas/componentes existentes
 import Dashboard from "./app/dashboard/page"
 import RegisterPage from "./app/registro/page"

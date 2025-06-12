@@ -25,10 +25,8 @@ import {
   WrenchScrewdriverIcon,
   DocumentMagnifyingGlassIcon,
   CheckCircleIcon,
-  UserPlusIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
-import { Delta } from "quill";
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 import "../asignacion/style.css";
 
@@ -112,14 +110,25 @@ interface Ticket {
   requested_by: string;
   assigned_to?: string;
   departamento_id: string;
-  categoria?: {
+  created_user: {
+    id: string;
+    fullname: string;
+    email: string;
+    phone_ext: string;
+    department: {
+      id: string;
+      name: string;
+    };
+  };
+  category?: {
     id: string;
     name: string;
   };
   assigned_user: {
     id: string;
-    name: string;
+    fullname: string;
     email: string;
+    phone_ext: string;
   };
   comments?: Comment[];
 }
@@ -131,18 +140,15 @@ interface Comment {
   createdAt: string;
 }
 
-interface Departamento {
-  id: string;
-  name: string;
-}
-
 interface Message {
-  id: string;
+  id: number;
   content: string;
-  sender: string;
-  timestamp: string;
+  created_at: string;
+  user: {
+    id: number;
+    fullname: string;
+  };
 }
-
 const statusMap: Record<string, { label: string; color: string }> = {
   abierto: { label: "Abierto", color: "bg-green-100 text-green-800" },
   "en progreso": { label: "En Proceso", color: "bg-blue-100 text-blue-800" },
@@ -255,18 +261,76 @@ const TicketDetail = () => {
     }
   }, [id, navigate]);
 
-  const handleSendMessage = () => {
-    if (newMessage.trim()) {
-      const message: Message = {
-        id: Date.now().toString(),
-        content: newMessage,
-        sender: "Usuario Actual",
-        timestamp: new Date().toISOString(),
-      };
-      setMessages([...messages, message]);
-      setNewMessage("");
+useEffect(() => {
+  const fetchMessages = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token || !id) return;
+
+      // Asumiendo que hay un endpoint para obtener mensajes por ticket_id
+      const response = await fetch(`http://localhost:8000/tickets/${id}/messages`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setMessages(data);
+      } else {
+        console.error("Error al obtener mensajes:", response.status);
+      }
+    } catch (err) {
+      console.error("Error al cargar mensajes:", err);
     }
   };
+
+  if (id) {
+    fetchMessages();
+  }
+}, [id]);
+
+const handleSendMessage = async () => {
+  if (newMessage.trim() && id && ticket) {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://localhost:8000/messages/`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: newMessage,
+          ticket_id: Number(id)
+        }),
+      });
+
+      if (response.ok) {
+        // Recargar el ticket para obtener los mensajes actualizados
+        const ticketResponse = await fetch(`http://localhost:8000/tickets/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (ticketResponse.ok) {
+          const updatedTicket = await ticketResponse.json();
+          setTicket(updatedTicket);
+        }
+
+        // Limpiar el campo de entrada
+        setNewMessage("");
+      } else {
+        console.error("Error al crear mensaje:", response.status);
+      }
+    } catch (err) {
+      console.error("Error al enviar mensaje:", err);
+    }
+  }
+};
 
   const handleStatusChange = async (newStatus: string) => {
     try {
@@ -409,96 +473,122 @@ const TicketDetail = () => {
 
         {/* Header Card */}
         <div className="ticket-card">
-          <div className="ticket-icon">
-            <TicketIcon className="tickedPrin" />
-          </div>
-          <div className="ticket-content">
-            <div className="ticket-header">
-              <span
-                className={`status completed${
-                  statusMap[ticket.status]?.color || ""
-                }`}
-              >
-                <TicketIcon className="ticked"></TicketIcon>
-                Completado
-              </span>
-              <span className="ticket-number">{ticket.id}</span>
+          {/* Icono del ticket */}
+          <div className="ticket-info">
+            <div className="ticket-icon">
+              <TicketIcon className="ticket-icon-inner" />
             </div>
-
-            <div className="ticket-info">
-              <div className="label">
-                <h1 className="text">{ticket.title}</h1>
-              </div>
-
-              <div className="category">
-                <TagIcon className="icoTag" />
-                <span>{ticket.categoria?.name || "Sin categoría"}</span>
-              </div>
-            </div>
-
-            <div className="container-asigne">
-              <div className="EstatuComp">
-                <span
-                  onClick={() => setShowStatusDropdown(!showStatusDropdown)}
-                  className="EstadoModal"
-                >
-                  Estado
-                  <ChevronDownIcon className="icnoestado" />
+            <div>
+              <div className="ticket-meta">
+                <span className="ticket-badge">
+                  <TicketIcon className="ticket-badge-icon" />
+                  Completado
                 </span>
-                {showStatusDropdown && (
-                  <>
-                    <div
-                      className="fixed inset-0 z-10"
-                      onClick={() => setShowStatusDropdown(false)}
-                    />
-                    <div>
-                      <div className="dropdown-container">
-                        {statusOptions.map((option) => {
-                          const IconComponent = option.icon;
-                          const isSelected = ticket.status === option.key;
-
-                          return (
-                            <button
-                              key={option.key}
-                              onClick={() => handleStatusChange(option.key)}
-                              className={`dropdown-option ${
-                                isSelected ? "selected" : ""
-                              }`}
-                            >
-                              <div className={`icon-container ${option.color}`}>
-                                <IconComponent className="icon" />
-                              </div>
-                              <div className="content-container">
-                                <div className="label-badge">
-                                  <p className="option-label">{option.label}</p>
-                                  {option.badge && (
-                                    <span className="badge">
-                                      {option.badge}
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="option-description">
-                                  {option.description}
-                                </p>
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </>
-                )}
+                <span className="ticket-id">{ticket.id}</span>
               </div>
-              <div className="relative">
-                <button
-                  className="botonasignar"
-                  onClick={() => setShowAssignModal(true)}
-                >
-                  <CursorArrowRaysIcon className="icouser" />
-                  Asignar
-                </button>
+              <h2 className="ticket-title">{ticket.title}</h2>
+              <div className="ticket-category">
+                <TagIcon className="ticket-category-icon" />
+                {ticket.category?.name || "Sin categoría"}
               </div>
             </div>
+          </div>
+
+          {/* Estado + botón Asignar */}
+          <div className="ticket-actions">
+            <div className="status-dropdown-wrapper">
+              <button
+                onClick={() => setShowStatusDropdown(!showStatusDropdown)}
+                className="status-toggle"
+              >
+                Estado
+                <ChevronDownIcon className="dropdown-icon" />
+              </button>
+              {showStatusDropdown && (
+                <>
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={() => setShowStatusDropdown(false)}
+                  />
+                  <div>
+                    <div className="dropdown-container">
+                      {statusOptions.map((option) => {
+                        const IconComponent = option.icon;
+                        const isSelected = ticket.status === option.key;
+
+                        return (
+                          <button
+                            key={option.key}
+                            onClick={() => handleStatusChange(option.key)}
+                            className={`dropdown-option ${
+                              isSelected ? "selected" : ""
+                            }`}
+                          >
+                            <div className={`icon-container ${option.color}`}>
+                              <IconComponent className="icon" />
+                            </div>
+                            <div className="content-container">
+                              <div className="label-badge">
+                                <p className="option-label">{option.label}</p>
+                                {option.badge && (
+                                  <span className="badge">{option.badge}</span>
+                                )}
+                              </div>
+                              <p className="option-description">
+                                {option.description}
+                              </p>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {showStatusDropdown && (
+                <>
+                  <div
+                    className="dropdown-overlay"
+                    onClick={() => setShowStatusDropdown(false)}
+                  />
+                  <div className="dropdown-menu">
+                    {statusOptions.map((option) => {
+                      const IconComponent = option.icon;
+                      const isSelected = ticket.status === option.key;
+                      return (
+                        <button
+                          key={option.key}
+                          onClick={() => handleStatusChange(option.key)}
+                          className={`dropdown-item ${
+                            isSelected ? "selected" : ""
+                          }`}
+                        >
+                          <div
+                            className={`dropdown-icon-wrapper ${option.color}`}
+                          >
+                            <IconComponent className="dropdown-icon-inside" />
+                          </div>
+                          <div className="dropdown-content">
+                            <p className="dropdown-title">{option.label}</p>
+                            {option.description && (
+                              <p className="dropdown-desc">
+                                {option.description}
+                              </p>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+            </div>
+
+            <button onClick={() => setShowAssignModal(true)} className="assign">
+              <CursorArrowRaysIcon className="assign-icon" />
+              Asignar
+            </button>
           </div>
         </div>
         <div className="container-twoCard">
@@ -510,7 +600,7 @@ const TicketDetail = () => {
                 className={`btonDepar${statusMap[ticket.status]?.color || ""}`}
               >
                 <BuildingOfficeIcon className="ticked"></BuildingOfficeIcon>
-                Contabilidad
+                {ticket.created_user.department.name || ""}
               </span>
             </div>
 
@@ -519,18 +609,20 @@ const TicketDetail = () => {
               <div className="flex items-center">
                 <UserCircleIcon className="icoBuild" />
                 <span className="text-sm text-gray-900">
-                  Nikatherin Elizabeth Torres Reyes
+                  {ticket.created_user?.fullname || "Usuario"}
                 </span>
               </div>
               <div className="flex items-center">
                 <EnvelopeOpenIcon className="icoBuild" />
                 <span className="text-sm text-gray-600">
-                  contabilidad@ssv.com.do
+                  {ticket.created_user.email || ""}
                 </span>
               </div>
               <div className="flex items-center">
                 <PhoneIcon className="icoBuild" />
-                <span className="text-sm text-gray-600">2001</span>
+                <span className="text-sm text-gray-600">
+                  {ticket.created_user.phone_ext || ""}
+                </span>
               </div>
             </div>
             <div className="linea"></div>
@@ -582,20 +674,22 @@ const TicketDetail = () => {
                   <div>
                     <p className="text-sm font-medium text-gray-900">
                       <UserIcon className="icoBuild" />
-                      {ticket.assigned_to || "Jason"}
                     </p>
                     <p className="text-sm text-gray-500">
-                      {ticket.assigned_to || "jhernandez@ssv.com.do"}
-                      #3903 - jhernandez@ssv.com.do
+                      {ticket.assigned_user?.fullname || "Jason"}
+                      {ticket.assigned_user?.phone_ext || "Jason"}
+                      {ticket.assigned_user?.email || "Jason"}
                     </p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-900">
                       <UserIcon className="icoBuild" />
-                      {ticket.assigned_to || "Hillarys Camilo"}
+                      {ticket.assigned_user?.fullname || "Hillarys Camilo"}
                     </p>
                     <p className="text-sm text-gray-500">
-                      #3904 - hcamilo@ssv.com.do
+                      {ticket.assigned_user?.fullname || "Jason"}
+                      {ticket.assigned_user?.phone_ext || "Jason"}
+                      {ticket.assigned_user?.email || "Jason"}
                     </p>
                   </div>
                 </div>
@@ -634,36 +728,36 @@ const TicketDetail = () => {
 
           <div className="linea3"></div>
 
-          {/* Messages List */}
-          <div className="px-6 py-4 min-h-[200px] max-h-[400px] overflow-y-auto">
-            {messages.length === 0 ? (
-              <div className="text-center py-8">
-                <ChatBubbleLeftRightIcon className="icoBuild" />
-                <p className="text-gray-500">No hay mensajes aún</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {messages.map((message) => (
-                  <div key={message.id} className="flex items-start space-x-3">
-                    <UserCircleIcon className="icoBuild" />
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-sm font-medium text-gray-900">
-                          {message.sender}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          {formatDate(message.timestamp)}
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-700 mt-1">
-                        {message.content}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+      {/* Messages List */}
+<div className="px-6 py-4 min-h-[200px] max-h-[400px] overflow-y-auto">
+  {!ticket.messages || ticket.messages.length === 0 ? (
+    <div className="text-center py-8">
+      <ChatBubbleLeftRightIcon className="icoBuild" />
+      <p className="text-gray-500">No hay mensajes aún</p>
+    </div>
+  ) : (
+    <div className="space-y-4">
+      {ticket.messages.map((message) => (
+        <div key={message.id} className="flex items-start space-x-3">
+          <UserCircleIcon className="icoBuild" />
+          <div className="flex-1">
+            <div className="flex items-center space-x-2">
+              <span className="text-sm font-medium text-gray-900">
+                {message.user.fullname}
+              </span>
+              <span className="text-xs text-gray-500">
+                {formatDate(message.created_at)}
+              </span>
+            </div>
+            <p className="text-sm text-gray-700 mt-1">
+              {message.content}
+            </p>
           </div>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
 
           <div className="linea3"></div>
           {/* Message Input */}
@@ -699,14 +793,12 @@ const TicketDetail = () => {
           onClick={() => setShowAssignModal(false)}
         >
           <div className="modal-contet" onClick={(e) => e.stopPropagation()}>
-           
             <div className="contenertext">
               <UserGroupIcon className="icouser"></UserGroupIcon>
               <h2 className="TextAsignacio">Asignar Usuarios</h2>
             </div>
-             <div className="linea4"></div>
+            <div className="linea4"></div>
             <div className="user-list">
-
               {mockUsers.map((user) => {
                 const isSelected = selectedUsers.includes(user.id);
                 return (
@@ -732,7 +824,7 @@ const TicketDetail = () => {
                 );
               })}
             </div>
-             <div className="linea4"></div>
+            <div className="linea4"></div>
             <div className="modal-footer">
               <button
                 className="botonCerrar"
