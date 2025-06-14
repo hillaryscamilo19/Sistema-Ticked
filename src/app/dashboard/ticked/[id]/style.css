@@ -262,16 +262,23 @@
   text-transform: uppercase;
 }
 /* Container principal */
-.ticket-list-container {
+.container-Usuario {
+    margin-top: 118px;
     margin-left: 65px;
     width: 92%;
     min-height: 56vh;
     background-color: #ffffff;
-    margin-top: 103px;
+}
+
+.TitlePrinUsuario{
+  font-size: 25px;
+  margin-left: 156px;
+  font-family: none;
+  padding: 24px;
 }
 
 .ticket-list-content {
-     width: 78%;
+    width: 78%;
     /* max-width: 1328px; */
     margin: 0 auto;
     padding: 32px 24px;
@@ -436,7 +443,7 @@ width: 89%;
   margin-bottom: 8px;
 }
 
-.ticket-title {
+.ticket-titulo {
   font-size: 16px;
   font-weight: 500;
   color: #111827;

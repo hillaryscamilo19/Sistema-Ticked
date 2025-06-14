@@ -1,3 +1,7 @@
+"use client";
+
+import type React from "react";
+
 import { useEffect, useState } from "react";
 import {
   BuildingOfficeIcon,
@@ -24,11 +28,13 @@ interface Ticket {
   id: number;
   title: string;
   status: string;
-  createdAt: string;
+  created_at: string;
   created_user?: TicketUser | string;
   assigned_department?: TicketDepartment | string;
   assigned_users?: TicketUser[] | string[];
-  category?: string;
+  category: {
+    name: string;
+  };
 }
 
 const statusMap: Record<string, { label: string; color: string }> = {
@@ -102,6 +108,9 @@ export default function TicketList() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [activeTab, setActiveTab] = useState<string>("5");
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -115,14 +124,16 @@ export default function TicketList() {
           }
         );
         const data = await res.json();
-        console.log("Tickets desde API:", data);
+
         setTickets(data);
+        // Calculate total pages
+        setTotalPages(Math.ceil(data.length / itemsPerPage));
       } catch (err) {
         console.error("Error al cargar los tickets:", err);
       }
     };
     fetchTickets();
-  }, []);
+  }, [itemsPerPage]);
 
   const statusCounts = getStatusCounts(tickets);
   const filteredTickets = tickets.filter((ticket) => {
@@ -137,10 +148,28 @@ export default function TicketList() {
     return matchesStatus && matchesSearch;
   });
 
+  // Pagination logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredTickets.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Change page
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  // Handle items per page change
+  const handleItemsPerPageChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setItemsPerPage(Number(e.target.value));
+    setCurrentPage(1); // Reset to first page when changing items per page
+    setTotalPages(Math.ceil(filteredTickets.length / Number(e.target.value)));
+  };
+
   return (
     <>
-      <></>
-      <div className="ticket-list-container">
+
+    <div className="TitlePrinUsuario">Mis Asignados</div>
+         <div className="container-Usuario">
         <div>
           <div className="ticket-list-content">
             {/* Header */}
@@ -160,7 +189,10 @@ export default function TicketList() {
                     return (
                       <button
                         key={key}
-                        onClick={() => setActiveTab(key)}
+                        onClick={() => {
+                          setActiveTab(key);
+                          setCurrentPage(1); // Reset to first page when changing tab
+                        }}
                         className={`status-tab ${isActive ? "active" : ""}`}
                       >
                         <UsersIcon className="tab-icon" />
@@ -175,17 +207,20 @@ export default function TicketList() {
                 </nav>
 
                 {/* Search bar */}
-                    <div className="search-container">
-                <div className="search-icon-container">
-                  <MagnifyingGlassIcon className="search-icon" />
+                <div className="search-container">
+                  <div className="search-icon-container">
+                    <MagnifyingGlassIcon className="search-icon" />
+                  </div>
+                  <input
+                    placeholder="Buscar ticket"
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      setCurrentPage(1); // Reset to first page when searching
+                    }}
+                    className="search-input"
+                  />
                 </div>
-                <input
-                  placeholder="Buscar ticket"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="search-input"
-                />
-              </div>
               </div>
             </div>
 
@@ -194,7 +229,7 @@ export default function TicketList() {
 
             {/* Tickets List */}
             <div className="tickets-container">
-              {filteredTickets.length === 0 ? (
+              {currentItems.length === 0 ? (
                 <div className="empty-state">
                   <ClipboardDocumentListIcon className="empty-icon" />
                   <h3 className="empty-title">No hay tickets</h3>
@@ -205,13 +240,13 @@ export default function TicketList() {
                   </p>
                 </div>
               ) : (
-                filteredTickets.map((ticket) => (
+                currentItems.map((ticket) => (
                   <div key={ticket.id} className="ticket-row">
                     <div className="ticket-content">
                       {/* Left section - Title and metadata */}
                       <div className="ticket-main-info">
                         <div className="ticket-title-section">
-                          <h3 className="ticket-title">{ticket.title}</h3>
+                          <h3 className="ticket-titulo ">{ticket.title}</h3>
                           <span
                             className={`status-badge ${
                               statusMap[ticket.status]?.color ||
@@ -245,7 +280,7 @@ export default function TicketList() {
                           </span>
                         </div>
                         <div className="relative-date">
-                          {formatRelativeDate(ticket.createdAt)}
+                          {formatRelativeDate(ticket.created_at)}
                         </div>
                       </div>
 
@@ -260,7 +295,7 @@ export default function TicketList() {
                         <div className="ticket-category">
                           <TagIcon className="category-icon" />
                           <span className="category-name">
-                            {ticket.category.name || "Otros"}
+                            {ticket.category?.name || "Otros"}
                           </span>
                         </div>
                       </div>
@@ -285,15 +320,29 @@ export default function TicketList() {
               <div className="pagination-container">
                 <div className="pagination-info">
                   <span className="pagination-text">Mostrar</span>
-                  <select className="pagination-select">
-                    <option value="20">20</option>
+                  <select
+                    className="pagination-select"
+                    value={itemsPerPage}
+                    onChange={handleItemsPerPageChange}
+                  >
+                    <option value="20">10</option>
                     <option value="50">50</option>
                     <option value="100">100</option>
                   </select>
                   <span className="pagination-text">elementos por página</span>
                 </div>
                 <div className="pagination-controls">
-                  <button className="page-button active">1</button>
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <button
+                      key={i + 1}
+                      onClick={() => paginate(i + 1)}
+                      className={`page-button ${
+                        currentPage === i + 1 ? "active" : ""
+                      }`}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
                 </div>
               </div>
             )}

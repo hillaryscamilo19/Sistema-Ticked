@@ -6,30 +6,28 @@ import { useState, useEffect } from "react"
 import { Moon } from "lucide-react"
 import tyz from "../img/tyz.png"
 
-type Usuario = {
-  fullname:string;
-  phone_ext:string;
-  role:0;
-  email:string;
- departments: {
-    _id: string;
-    name: string;
-  }[];
-  username:string;
-  status: string;
-  _id: string;
-  name: string;
-};
-
+interface Usuario {
+  fullname: string
+  phone_ext: string
+  role: 0
+  email: string
+  department?: {
+    id: string
+    name: string
+  }
+  username: string
+  status: string
+  _id: string
+}
 
 export function Sidebar() {
   const [darkMode, setDarkMode] = useState(true)
-  const [usuario, setUsuario] = useState<Usuario[]>([]);
-  const [collapsed, setCollapsed] = useState(false)
+  const [usuario, setUsuario] = useState<Usuario | null>(null)
+  const [collapsed,] = useState(false)
   const closeMobileSidebar = () => setMobileSidebarOpen(false)
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
-  const [departamento, setDepartamento] = useState(null)
-  const [departamentos, setDepartamentos] = useState([])
+  const [,setDepartamento] = useState(null)
+  const [,setDepartamentos] = useState([])
   const [loading, setLoading] = useState(true)
   const [isTechUser, setIsTechUser] = useState(false)
   const navigate = useNavigate()
@@ -78,7 +76,8 @@ export function Sidebar() {
   // Luego cargar departamentos cuando ya tenemos el usuario
   useEffect(() => {
     const fetchDepartamentos = async () => {
-      if (usuario?.department_id) return
+      // Check if usuario exists and has departments with a name property
+      if (usuario?.department?.name) return
 
       try {
         const token = localStorage.getItem("token")
@@ -94,8 +93,11 @@ export function Sidebar() {
         const data = await response.json()
         setDepartamentos(data)
 
-        // Buscar el departamento del usuario
-        const userDepartamento = data.find((d) => d._id === usuario.name || d.id === usuario.department_id)
+        // Buscar el departamento del usuario - safely check for departments
+        const userDepartamento = data.find(
+          (d: { _id: string | undefined; id: string | undefined }) =>
+            d._id === usuario?._id || d.id === usuario?.department?.id,
+        )
 
         setDepartamento(userDepartamento || null)
 
@@ -259,7 +261,7 @@ export function Sidebar() {
       {/* MAIN CONTENT */}
       <div className="flex-fill d-flex flex-column">
         {/* HEADER */}
-        <nav className="navbar navbar-light bg-white border-bottom px-4" style={{ height: "70px" }}>
+        <nav className="navbar navbar-light bg-white border-bottom px-4" style={{ height: "90px" }}>
           <div className="d-flex justify-content-between align-items-center w-100">
             {/* Toggle Switch */}
             <div className="d-flex align-items-center">
@@ -291,11 +293,9 @@ export function Sidebar() {
               >
                 <div className="text-end me-3">
                   <div className="fw-bold text-dark mb-0">{loading ? "Cargando..." : usuario?.fullname || ""}</div>
-                  <div className="text-muted small">
-                    {loading ? "Cargando..." : usuario?.department_id || departamento?.department_id| ""}
-                  </div>
+                  <div className="text-muted small">{loading ? "Cargando..." : usuario?.department?.name || "sin departamento"}</div>
                 </div>
-                <UserCircleIcon className="text-muted me-2" style={{ width: "32px", height: "32px" }} />
+                <UserCircleIcon className="text-muted me-2" style={{ width: "50px", height: "50px" }} />
                 <span className="text-muted">▼</span>
               </button>
 

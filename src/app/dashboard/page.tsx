@@ -131,7 +131,7 @@ export default function Dashboard() {
         </div>
 
         <div className="foorted">
-          <h2>Colaboradores Activos del Departamento</h2>
+          <h2>Colaboradores  del Departamento</h2>
           {loadingColaboradores ? (
             <div className="text-center p-4">
               <div className="spinner-border text-primary" role="status">

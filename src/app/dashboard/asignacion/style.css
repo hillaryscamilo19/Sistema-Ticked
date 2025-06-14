@@ -59,6 +59,17 @@
   font-family: system-ui;
 }
 
+.menssageConteiner {
+  color: #000000;
+  height: 90px;
+  width: 67%;
+  gap: 5px;
+  padding: 7px;
+  display: block;
+  border-radius: 17px;
+  background-color: rgb(198 198 198 / 49%);
+}
+
 .estatud {
   display: flex;
   width: 9%;
@@ -76,6 +87,7 @@
   width: 25px;
 }
 .ticked {
+  font-size: 15px;
   margin-left: 9px;
   width: 21px;
 }
@@ -109,7 +121,7 @@
 
 .ticket-card {
   margin-left: 1%;
-  width: 98% ;
+  width: 98%;
   height: 146px;
   display: flex;
   justify-content: space-between;
@@ -139,7 +151,6 @@
 }
 
 .assign-icon {
-
   width: 16px;
   height: 16px;
   margin-right: 0.25rem;
@@ -150,10 +161,14 @@
   color: #4b5563;
 }
 
+.titlo-statud {
+  font-size: 15px;
+}
+
 .ticket-title {
-  font-size: 1rem;
+  font-size: 113%;
   font-weight: 600;
-  color: #1f2937;
+  color: #0f0f0f;
 }
 
 .ticket-category {
@@ -163,27 +178,36 @@
   color: #6b7280;
 }
 
+.bottonAsignar {
+  color: #daebee;
+  background-color:#15803d;
+  display: flex;
+  gap: 31px;
+  border-radius: 15px;
+  align-items: flex-end;
+}
+
 .ticket-badge {
   display: flex;
   align-items: center;
   background-color: #e0e7ff;
-  color: #4338ca;
+  color: #0b53da;
   font-size: 0.75rem;
   padding: 0.25rem 0.5rem;
-  border-radius: 9999px;
+  border-radius: 5px;
   font-weight: 500;
 }
 
 .ticket-badge-icon {
-  width: 16px;
-  height: 16px;
+  width: 37px;
+  height: 31px;
   margin-right: 0.25rem;
 }
 
 .ticket-icon-inner {
-  width: 32px;
-  height: 32px;
-  color: #4f46e5;
+  width: 81px;
+  height: 70px;
+  color: #357eb3;
 }
 
 .ticket-meta {
@@ -193,19 +217,13 @@
 }
 
 .ticket-icon {
-  width: 56px;
-  height: 56px;
+  width: 100px;
+  height: 93px;
   border-radius: 50%;
-  border: 4px solid #6366f1;
+  border: 4px solid #2962cc;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.ticket-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #1f2937;
 }
 
 .ticket-category {
@@ -216,8 +234,8 @@
 }
 
 .ticket-category-icon {
-  width: 16px;
-  height: 16px;
+  width: 25px;
+  height: 38px;
   margin-right: 0.25rem;
 }
 
@@ -242,7 +260,7 @@
 }
 
 .status-toggle:hover {
-  color: #4338ca;
+  color: #3883ca;
 }
 
 .dropdown-icon {
@@ -441,14 +459,15 @@
 }
 
 .botonCerrar {
-  width: 78px;
-  height: 34px;
-  background-color: rgb(255, 255, 255);
-  border-radius: 7px;
-  color: black;
-  border: 1px solid rgb(190, 192, 197);
-  font-size: 12px;
-  font-family: sans-serif;
+    width: 94px;
+    gap: 9px;
+    height: 41px;
+    background-color: rgb(255, 255, 255);
+    border-radius: 18px;
+    color: black;
+    border: 1px solid rgb(190, 192, 197);
+    font-size: 12px;
+    font-family: sans-serif;
 }
 
 .modalCreate {
@@ -489,15 +508,20 @@
   background-color: #ffffff;
 }
 
+.titledepartam {
+  font-size: 15px;
+}
+
 .btonDepar {
-width: 145px;
-    height: 35px;
-    background-color: #a8a9af29;
-    color: rgb(101, 162, 6);
-    padding: 4px;
-    gap: 9px;
-    border: 1px solid rgb(101, 162, 6);
-    border-radius: 7px;
+  font-size: 11px;
+  width: 190px;
+  height: 33px;
+  background-color: #a8a9af29;
+  color: rgb(101, 162, 6);
+  padding: 8px;
+  gap: 9px;
+  border: 1px solid rgb(101, 162, 6);
+  border-radius: 7px;
 }
 
 .container-fecha {

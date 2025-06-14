@@ -31,9 +31,70 @@ import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 import "../asignacion/style.css";
 
 function deltaToHTML(deltaJson: any): string {
-  const converter = new QuillDeltaToHtmlConverter(deltaJson.ops, {});
-  return converter.convert();
+  try {
+    // If deltaJson is already an object, use it directly
+    const delta =
+      typeof deltaJson === "string" ? JSON.parse(deltaJson) : deltaJson;
+
+    // Check if it has the expected structure
+    if (delta && delta.ops) {
+      const converter = new QuillDeltaToHtmlConverter(delta.ops, {});
+      return converter.convert();
+    } else {
+      // If it doesn't have the expected structure, return the content as plain text
+      return typeof deltaJson === "string"
+        ? deltaJson
+        : JSON.stringify(deltaJson);
+    }
+  } catch (error) {
+    console.error("Failed to parse delta JSON:", error);
+    // Return the original content as plain text if parsing fails
+    return typeof deltaJson === "string" ? deltaJson : String(deltaJson);
+  }
 }
+
+// Function to convert numeric status to text
+function getStatusText(statusNumber: string | number): string {
+  const statusMap: Record<string, string> = {
+    "1": "Abierto",
+    "2": "Proceso",
+    "3": "Revisión",
+    "4": "Espera",
+    "5": "Completado",
+    "6": "Cancelado",
+  };
+
+  return statusMap[String(statusNumber)] || `Estado ${statusNumber}`;
+}
+
+// Function to get status color based on status number
+function getStatusColor(statusNumber: string | number): string {
+  const colorMap: Record<string, string> = {
+    "1": "text-blue-600",
+    "2": "text-orange-600",
+    "3": "text-purple-600",
+    "4": "text-yellow-600",
+    "5": "text-green-600",
+    "6": "text-red-600",
+  };
+
+  return colorMap[String(statusNumber)] || "text-gray-600";
+}
+
+// Function to convert status text to numeric ID
+function getStatusId(statusText: string): number {
+  const statusMap: Record<string, number> = {
+    abierto: 1,
+    proceso: 2,
+    revision: 3,
+    espera: 4,
+    completado: 5,
+    cancelado: 6,
+  };
+
+  return statusMap[statusText.toLowerCase()] || 1;
+}
+
 interface StatusOption {
   key: string;
   label: string;
@@ -142,6 +203,7 @@ interface Comment {
 
 interface Message {
   id: number;
+  messages: string;
   content: string;
   created_at: string;
   user: {
@@ -177,42 +239,60 @@ const TicketDetail = () => {
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [statusChangeSuccess, setStatusChangeSuccess] = useState(false);
+  const [assignSuccess, setAssignSuccess] = useState(false);
+  const [departmentUsers, setDepartmentUsers] = useState<User[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
 
   // Mock users data
-  const mockUsers: User[] = [
-    {
-      id: "1",
-      name: "Randy Alejandro Gomez Garcia",
-      email: "asistentesistema@ssv.com.do",
-      employeeId: "3901",
-      isAvailable: true,
-      isAssigned: selectedUsers.includes("1"),
-    },
-    {
-      id: "2",
-      name: "Jairo Perdomo",
-      email: "jairoperdomo43@gmail.com",
-      employeeId: "3902",
-      isAvailable: true,
-      isAssigned: selectedUsers.includes("2"),
-    },
-    {
-      id: "3",
-      name: "Hillarys Camilo",
-      email: "hcamilo@ssv.com.do",
-      employeeId: "3904",
-      isAvailable: true,
-      isAssigned: selectedUsers.includes("3"),
-    },
-    {
-      id: "4",
-      name: "Ignacio Martinez",
-      email: "isantiago@ssv.com.do",
-      employeeId: "3903",
-      isAvailable: true,
-      isAssigned: selectedUsers.includes("4"),
-    },
-  ];
+  // Remove the mockUsers array completely
+
+  useEffect(() => {
+    const fetchDepartmentUsers = async () => {
+      if (!showAssignModal) return;
+
+      setLoadingUsers(true);
+      try {
+        const token = localStorage.getItem("token");
+
+        // Fetch users from the logged user's department
+        const response = await fetch(
+          "http://localhost:8000/usuarios/departamento/colaboradores",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (response.ok) {
+          const users = await response.json();
+          // Transform the API response to match our User interface
+          const transformedUsers = users.map((user: any) => ({
+            id: user._id || user.id,
+            name: user.fullname || user.name,
+            email: user.email,
+            employeeId: user.phone_ext || user.employee_id || "N/A",
+            isAvailable: user.status === "true" || user.status === "true ",
+            isAssigned: selectedUsers.includes(user._id || user.id),
+          }));
+          setDepartmentUsers(transformedUsers);
+        } else {
+          console.error(
+            "Error al obtener usuarios del departamento:",
+            response.status
+          );
+        }
+      } catch (err) {
+        console.error("Error al cargar usuarios del departamento:", err);
+      } finally {
+        setLoadingUsers(false);
+      }
+    };
+
+    fetchDepartmentUsers();
+  }, [showAssignModal, selectedUsers]);
 
   useEffect(() => {
     const fetchTicket = async () => {
@@ -261,94 +341,222 @@ const TicketDetail = () => {
     }
   }, [id, navigate]);
 
-useEffect(() => {
-  const fetchMessages = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token || !id) return;
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token || !id) return;
 
-      // Asumiendo que hay un endpoint para obtener mensajes por ticket_id
-      const response = await fetch(`http://localhost:8000/tickets/${id}/messages`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+        // Fix: Changed the endpoint to match the API structure
+        const response = await fetch(
+          `http://localhost:8000/messages/ticket/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
-      if (response.ok) {
-        const data = await response.json();
-        setMessages(data);
-      } else {
-        console.error("Error al obtener mensajes:", response.status);
+        if (response.ok) {
+          const data = await response.json();
+          setMessages(data);
+        } else {
+          console.error("Error al obtener mensajes:", response.status);
+        }
+      } catch (err) {
+        console.error("Error al cargar mensajes:", err);
       }
-    } catch (err) {
-      console.error("Error al cargar mensajes:", err);
+    };
+
+    if (id) {
+      fetchMessages();
     }
-  };
+  }, [id]);
 
-  if (id) {
-    fetchMessages();
-  }
-}, [id]);
 
-const handleSendMessage = async () => {
-  if (newMessage.trim() && id && ticket) {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:8000/messages/`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: newMessage,
-          ticket_id: Number(id)
-        }),
-      });
 
-      if (response.ok) {
-        // Recargar el ticket para obtener los mensajes actualizados
-        const ticketResponse = await fetch(`http://localhost:8000/tickets/${id}`, {
+
+
+
+     const handleSendattachments = async () => {
+    if (newMessage.trim() && id && ticket) {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(`http://localhost:8000/ticket/${id}/attachments`, {
+          method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({
+            file : newMessage,
+            ticket_id: Number(id),
+          }),
         });
 
-        if (ticketResponse.ok) {
-          const updatedTicket = await ticketResponse.json();
-          setTicket(updatedTicket);
+        if (response.ok) {
+          // Recargar el ticket para obtener los mensajes actualizados
+          const ticketResponse = await fetch(
+            `http://localhost:8000/tickets/${id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (ticketResponse.ok) {
+            const updatedTicket = await ticketResponse.json();
+            setTicket(updatedTicket);
+          }
+
+          // Fetch updated messages
+          const messagesResponse = await fetch(
+            `http://localhost:8000/messages/ticket/${id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (messagesResponse.ok) {
+            const updatedMessages = await messagesResponse.json();
+            setMessages(updatedMessages);
+          }
+
+          // Limpiar el campo de entrada
+          setNewMessage("");
+        } else {
+          console.error("Error al crear mensaje:", response.status);
         }
-
-        // Limpiar el campo de entrada
-        setNewMessage("");
-      } else {
-        console.error("Error al crear mensaje:", response.status);
+      } catch (err) {
+        console.error("Error al enviar mensaje:", err);
       }
-    } catch (err) {
-      console.error("Error al enviar mensaje:", err);
     }
-  }
-};
+  };
+   
 
-  const handleStatusChange = async (newStatus: string) => {
+
+
+
+
+
+  const handleSendMessage = async () => {
+    if (newMessage.trim() && id && ticket) {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(`http://localhost:8000/ticket/${id}/mensajes`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            message: newMessage,
+            ticket_id: Number(id),
+          }),
+        });
+
+        if (response.ok) {
+          // Recargar el ticket para obtener los mensajes actualizados
+          const ticketResponse = await fetch(
+            `http://localhost:8000/tickets/${id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (ticketResponse.ok) {
+            const updatedTicket = await ticketResponse.json();
+            setTicket(updatedTicket);
+          }
+
+          // Fetch updated messages
+          const messagesResponse = await fetch(
+            `http://localhost:8000/messages/ticket/${id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (messagesResponse.ok) {
+            const updatedMessages = await messagesResponse.json();
+            setMessages(updatedMessages);
+          }
+
+          // Limpiar el campo de entrada
+          setNewMessage("");
+        } else {
+          console.error("Error al crear mensaje:", response.status);
+        }
+      } catch (err) {
+        console.error("Error al enviar mensaje:", err);
+      }
+    }
+  };
+
+  const handleStatusChange = async (statusKey: string) => {
     try {
+      const statusId = getStatusId(statusKey);
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:8000/tickets/${id}`, {
+
+      console.log(`Changing status for ticket ${id} to status ID ${statusId}`);
+
+      // FIX: Send estado_id as a query parameter, not in the body
+      const url = `http://localhost:8000/tickets/${id}/estado?estado_id=${statusId}`;
+
+      const response = await fetch(url, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ status: newStatus }),
+        // Empty body since we're using query parameters
       });
 
       if (response.ok) {
-        setTicket((prev) => (prev ? { ...prev, status: newStatus } : null));
+        // Show success message
+        setStatusChangeSuccess(true);
+        setTimeout(() => setStatusChangeSuccess(false), 3000);
+
+        // Update ticket in state with the new status ID as string
+        setTicket((prev) =>
+          prev ? { ...prev, status: String(statusId) } : null
+        );
+
+        // Refresh ticket data
+        const refreshResponse = await fetch(
+          `http://localhost:8000/tickets/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (refreshResponse.ok) {
+          const updatedTicket = await refreshResponse.json();
+          setTicket(updatedTicket);
+        }
+      } else {
+        const errorText = await response.text();
+        console.error("Error al cambiar estado:", response.status, errorText);
+        alert(`Error al cambiar el estado del ticket: ${response.status}`);
       }
     } catch (err) {
       console.error("Error al cambiar estado:", err);
+      alert("Error al cambiar el estado del ticket");
     }
     setShowStatusDropdown(false);
   };
@@ -364,28 +572,63 @@ const handleSendMessage = async () => {
   };
 
   const handleAssignUsers = async () => {
+    if (selectedUsers.length === 0) {
+      alert("Por favor seleccione al menos un usuario para asignar");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
+
+      // FIX: Send the user IDs as an array directly, not wrapped in an object
+      // Convert string IDs to numbers if needed
+      const userIds = selectedUsers.map((id) => Number(id));
+
       const response = await fetch(
-        `http://localhost:8000/tickets/${id}/assign`,
+        `http://localhost:8000/tickets/${id}/asignar-usuarios`,
         {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ user_ids: selectedUsers }),
+          body: JSON.stringify(userIds), // Send as a direct array
         }
       );
 
       if (response.ok) {
-        // Actualizar el ticket con los usuarios asignados
-        console.log("Usuarios asignados correctamente");
+        // Show success message
+        setAssignSuccess(true);
+        setTimeout(() => setAssignSuccess(false), 3000);
+
+        // Refresh ticket data
+        const refreshResponse = await fetch(
+          `http://localhost:8000/tickets/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (refreshResponse.ok) {
+          const updatedTicket = await refreshResponse.json();
+          setTicket(updatedTicket);
+        }
+
+        // Clear selected users
+        setSelectedUsers([]);
+        setShowAssignModal(false);
+      } else {
+        const errorText = await response.text();
+        console.error("Error al asignar usuarios:", response.status, errorText);
+        alert(`Error al asignar usuarios al ticket: ${response.status}`);
       }
     } catch (err) {
       console.error("Error al asignar usuarios:", err);
+      alert("Error al asignar usuarios al ticket");
     }
-    setShowAssignModal(false);
   };
 
   const formatDate = (dateString: string) => {
@@ -471,6 +714,31 @@ const handleSendMessage = async () => {
           Volver a la lista
         </Link>
 
+        {/* Status notifications */}
+        {statusChangeSuccess && (
+          <div
+            className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4"
+            role="alert"
+          >
+            <strong className="font-bold">¡Éxito! </strong>
+            <span className="block sm:inline">
+              El estado del ticket ha sido actualizado.
+            </span>
+          </div>
+        )}
+
+        {assignSuccess && (
+          <div
+            className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4"
+            role="alert"
+          >
+            <strong className="font-bold">¡Éxito! </strong>
+            <span className="block sm:inline">
+              Los usuarios han sido asignados al ticket.
+            </span>
+          </div>
+        )}
+
         {/* Header Card */}
         <div className="ticket-card">
           {/* Icono del ticket */}
@@ -480,9 +748,13 @@ const handleSendMessage = async () => {
             </div>
             <div>
               <div className="ticket-meta">
-                <span className="ticket-badge">
+                <span
+                  className={`ticket-badge ${getStatusColor(ticket.status)}`}
+                >
                   <TicketIcon className="ticket-badge-icon" />
-                  Completado
+                  <span className="titlo-statud">
+                    {getStatusText(ticket.status)}
+                  </span>
                 </span>
                 <span className="ticket-id">{ticket.id}</span>
               </div>
@@ -514,7 +786,8 @@ const handleSendMessage = async () => {
                     <div className="dropdown-container">
                       {statusOptions.map((option) => {
                         const IconComponent = option.icon;
-                        const isSelected = ticket.status === option.key;
+                        const statusId = getStatusId(option.key);
+                        const isSelected = ticket.status === String(statusId);
 
                         return (
                           <button
@@ -555,7 +828,8 @@ const handleSendMessage = async () => {
                   <div className="dropdown-menu">
                     {statusOptions.map((option) => {
                       const IconComponent = option.icon;
-                      const isSelected = ticket.status === option.key;
+                      const statusId = getStatusId(option.key);
+                      const isSelected = ticket.status === String(statusId);
                       return (
                         <button
                           key={option.key}
@@ -608,9 +882,7 @@ const handleSendMessage = async () => {
             <div className="space-y-3">
               <div className="flex items-center">
                 <UserCircleIcon className="icoBuild" />
-                <span className="text-sm text-gray-900">
-                  {ticket.created_user?.fullname || "Usuario"}
-                </span>
+                <span>{ticket.created_user?.fullname || "Usuario"}</span>
               </div>
               <div className="flex items-center">
                 <EnvelopeOpenIcon className="icoBuild" />
@@ -676,20 +948,20 @@ const handleSendMessage = async () => {
                       <UserIcon className="icoBuild" />
                     </p>
                     <p className="text-sm text-gray-500">
-                      {ticket.assigned_user?.fullname || "Jason"}
-                      {ticket.assigned_user?.phone_ext || "Jason"}
-                      {ticket.assigned_user?.email || "Jason"}
+                      {ticket.assigned_user?.fullname || ""}
+                      {ticket.assigned_user?.phone_ext || ""}
+                      {ticket.assigned_user?.email || ""}
                     </p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-900">
                       <UserIcon className="icoBuild" />
-                      {ticket.assigned_user?.fullname || "Hillarys Camilo"}
+                      {ticket.assigned_user?.fullname || ""}
                     </p>
                     <p className="text-sm text-gray-500">
-                      {ticket.assigned_user?.fullname || "Jason"}
-                      {ticket.assigned_user?.phone_ext || "Jason"}
-                      {ticket.assigned_user?.email || "Jason"}
+                      {ticket.assigned_user?.fullname || ""}
+                      {ticket.assigned_user?.phone_ext || ""}
+                      {ticket.assigned_user?.email || ""}
                     </p>
                   </div>
                 </div>
@@ -704,7 +976,26 @@ const handleSendMessage = async () => {
                 <div
                   className="prose max-w-none text-gray-700"
                   dangerouslySetInnerHTML={{
-                    __html: deltaToHTML(JSON.parse(ticket.description)),
+                    __html: (() => {
+                      try {
+                        // Fix: Check if the description is already a string and not JSON
+                        if (
+                          typeof ticket.description === "string" &&
+                          !ticket.description.startsWith("{")
+                        ) {
+                          return ticket.description;
+                        }
+                        // Try to parse as JSON if it looks like JSON
+                        return deltaToHTML(JSON.parse(ticket.description));
+                      } catch (error) {
+                        console.error(
+                          "Error parsing description as JSON:",
+                          error
+                        );
+                        // If parsing fails, treat it as plain text
+                        return ticket.description;
+                      }
+                    })(),
                   }}
                 />
               </div>
@@ -728,36 +1019,35 @@ const handleSendMessage = async () => {
 
           <div className="linea3"></div>
 
-      {/* Messages List */}
-<div className="px-6 py-4 min-h-[200px] max-h-[400px] overflow-y-auto">
-  {!ticket.messages || ticket.messages.length === 0 ? (
-    <div className="text-center py-8">
-      <ChatBubbleLeftRightIcon className="icoBuild" />
-      <p className="text-gray-500">No hay mensajes aún</p>
-    </div>
-  ) : (
-    <div className="space-y-4">
-      {ticket.messages.map((message) => (
-        <div key={message.id} className="flex items-start space-x-3">
-          <UserCircleIcon className="icoBuild" />
-          <div className="flex-1">
-            <div className="flex items-center space-x-2">
-              <span className="text-sm font-medium text-gray-900">
-                {message.user.fullname}
-              </span>
-              <span className="text-xs text-gray-500">
-                {formatDate(message.created_at)}
-              </span>
-            </div>
-            <p className="text-sm text-gray-700 mt-1">
-              {message.content}
-            </p>
+          {/* Messages List */}
+          <div className="px-6 py-4 min-h-[200px] max-h-[400px] overflow-y-auto">
+            {!messages || messages.length === 0 ? (
+              <div className="text-center py-8">
+                <ChatBubbleLeftRightIcon className="icoBuild" />
+                <p className="text-gray-500">No hay mensajes aún</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {messages.map((message) => (
+                  <div key={message.id} className="flex items-start space-x-3">
+                    <div className="flex-1">
+                      <div className="">
+                        <span className="text-sm font-medium text-gray-900">
+                          <UserIcon className="icoBuild" />
+                          {message.user.fullname}
+                        </span>
+                      </div>
+                      <p className="menssageConteiner">{message.content}</p>
+
+                      <span className="text-xs text-gray-500">
+                        {formatDate(message.created_at)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        </div>
-      ))}
-    </div>
-  )}
-</div>
 
           <div className="linea3"></div>
           {/* Message Input */}
@@ -799,33 +1089,54 @@ const handleSendMessage = async () => {
             </div>
             <div className="linea4"></div>
             <div className="user-list">
-              {mockUsers.map((user) => {
-                const isSelected = selectedUsers.includes(user.id);
-                return (
-                  <div key={user.id} className="user-item">
-                    <div>
-                      <strong>{user.name}</strong> - #{user.employeeId} -{" "}
-                      {user.email}
+              {loadingUsers ? (
+                <div className="text-center py-4">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                  <p className="mt-2 text-gray-600">
+                    Cargando usuarios del departamento...
+                  </p>
+                </div>
+              ) : departmentUsers.length === 0 ? (
+                <div className="text-center py-4">
+                  <p className="text-gray-500">
+                    No hay usuarios activos en el departamento
+                  </p>
+                </div>
+              ) : (
+                departmentUsers.map((user) => {
+                  const isSelected = selectedUsers.includes(user.id);
+                  return (
+                    <div key={user.id} className="user-item">
+                      <div>
+                        <strong>{user.name}</strong> - #{user.employeeId} -{" "}
+                        {user.email}
+                      </div>
+                      <button
+                        onClick={() => handleUserToggle(user.id)}
+                        disabled={user.isAvailable && !isSelected}
+                        className={`user-toggle ${
+                          isSelected
+                            ? "selected"
+                            : user.isAvailable
+                            ? ""
+                            : "disabled"
+                        }`}
+                      >
+                        {isSelected ? "Quitar" : "Asignar"}
+                      </button>
                     </div>
-                    <button
-                      onClick={() => handleUserToggle(user.id)}
-                      disabled={!user.isAvailable && !isSelected}
-                      className={`user-toggle ${
-                        isSelected
-                          ? "selected"
-                          : user.isAvailable
-                          ? ""
-                          : "disabled"
-                      }`}
-                    >
-                      {isSelected ? "Quitar" : "Asignar"}
-                    </button>
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </div>
             <div className="linea4"></div>
             <div className="modal-footer">
+              <button
+                className="bottonAsignar"
+                onClick={handleAssignUsers}
+              >
+                Asignar Usuario
+              </button>
               <button
                 className="botonCerrar"
                 onClick={() => setShowAssignModal(false)}

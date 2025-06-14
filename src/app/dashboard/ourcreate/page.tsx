@@ -23,11 +23,13 @@ interface Ticket {
   id: number;
   title: string;
   status: string;
-  createdAt: string;
+  created_at: string;
   created_user?: TicketUser | string;
   assigned_department?: TicketDepartment | string;
   assigned_users?: TicketUser[] | string[];
-  category?: string;
+  category: {
+    name: string;
+  };
 }
 
 const statusMap: Record<string, { label: string; color: string }> = {
@@ -114,7 +116,6 @@ export default function NuestroCreado() {
           }
         );
         const data = await res.json();
-        console.log("Tickets desde API:", data);
         setTickets(data);
       } catch (err) {
         console.error("Error al cargar los tickets:", err);
@@ -138,7 +139,7 @@ export default function NuestroCreado() {
 
   return (
     <>
-      <></>
+      <div className="TextPrinci">Nuestros Creados</div>
       <div className="ticket-list-container">
         <div>
           <div className="ticket-list-content">
@@ -174,17 +175,17 @@ export default function NuestroCreado() {
                 </nav>
 
                 {/* Search bar */}
-              <div className="search-container">
-                <div className="search-icon-container">
-                  <MagnifyingGlassIcon className="search-icon" />
+                <div className="search-container">
+                  <div className="search-icon-container">
+                    <MagnifyingGlassIcon className="search-icon" />
+                  </div>
+                  <input
+                    placeholder="Buscar ticket"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="search-input"
+                  />
                 </div>
-                <input
-                  placeholder="Buscar ticket"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="search-input"
-                />
-              </div>
               </div>
             </div>
 
@@ -244,7 +245,7 @@ export default function NuestroCreado() {
                           </span>
                         </div>
                         <div className="relative-date">
-                          {formatRelativeDate(ticket.createdAt)}
+                          {formatRelativeDate(ticket.created_at)}
                         </div>
                       </div>
 
@@ -259,7 +260,7 @@ export default function NuestroCreado() {
                         <div className="ticket-category">
                           <TagIcon className="category-icon" />
                           <span className="category-name">
-                            {ticket.category.name || "Otros"}
+                            {ticket.category?.name || "Otros"}
                           </span>
                         </div>
                       </div>
