@@ -1,0 +1,18 @@
+.ticket-title{
+    font-size: 9px;
+    color: brown;
+}
+
+.searc-input{
+    height: 27px;
+    width: 198%;
+    padding: 7px 12px 8px 40px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: #ffffff;
+    color: #111827;
+    outline: none;
+    transition: all 0.2s ease;
+
+}

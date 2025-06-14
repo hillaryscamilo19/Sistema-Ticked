@@ -12,21 +12,7 @@ export default function DashboardLayout({
   return (
     <AuthCheck>
       <div className="flex h-screen">
-        {/* Sidebar fijo a la izquierda */}
-        <Sidebar children={undefined} name={""} departmentName={""} onLogout={function (): void {
-          throw new Error("Function not implemented.");
-        } } />
-        
-        {/* Contenido principal */}
-        <div className="flex flex-col flex-1 overflow-hidden">
-          {/* Header fijo arriba */}
-          <Header />
-          
-          {/* Área de contenido que cambia según la ruta */}
-          <main className="flex-1 overflow-y-auto p-6">
-            <Outlet />
-          </main>
-        </div>
+       
       </div>
     </AuthCheck>
   )

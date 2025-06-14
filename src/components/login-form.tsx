@@ -5,11 +5,9 @@ import {
   LockClosedIcon,
   ArrowRightStartOnRectangleIcon,
 } from "@heroicons/react/24/outline";
-import { AlertTitle } from "../components/ui/alert";
-import { AlertCircle } from "lucide-react";
 import tyz from "../img/tyz.png";
 import logo from "../img/logo2.png";
-import "../style.css";
+import "../app/styles/stylesLogin.css";
 import { authService } from "../lib/api/auth-service";
 import { useNavigate, useSearchParams } from "react-router-dom";
 export function LoginForm() {
@@ -76,24 +74,14 @@ export function LoginForm() {
         {/* Columna Derecha */}
         <div className="col-md-6 login-right p-5">
           <div className="w-full p-4 sm:p-12.5 xl:p-17.5">
-            <h2 className="mb-1.5 block font-medium TextSeccion">Inicio de sesión</h2>
-            <h1 className="TextTYZ">
-              Iniciar sesión en TYZ
-            </h1>
 
-            {/* Mensaje de error */}
-            {errorMessage && (
-              <div className="error mb-4 text-center p-3 bg-red-100 text-red-700 rounded-lg ">
-                <div>
-                  <AlertCircle />
-                  <AlertTitle className="titleError">Error</AlertTitle>
-                </div>
-                {errorMessage}
-              </div>
-            )}
 
-            {/* Input Usuario */}
-            <div className="mb-6 relative">
+            
+            <div className="Container-input">
+                        <h3 className="TextSeccion">Inicio de sesión</h3>
+          <h3 className="TextTYZ">Iniciar sesión en TYZ</h3>
+              {/* Input Usuario */}
+              <div className="mb-6 relative">
               <span className="block mb-1 text-gray-600">Usuario</span>
               <div className="relative">
                 <input
@@ -117,7 +105,7 @@ export function LoginForm() {
                   id="password"
                   type="password"
                   placeholder="Escriba su contraseña"
-                  className="InputUsuario"
+                  className="InputContrasena"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -125,10 +113,8 @@ export function LoginForm() {
                 />
                 <LockClosedIcon className="iconoClose  h-5 absolute left-3 top-2.5 text-gray-400" />
               </div>
-              
             </div>
-
-            {/* Botón Entrar */}
+                       {/* Botón Entrar */}
             <button
               onClick={login}
               type="submit"
@@ -146,6 +132,11 @@ export function LoginForm() {
                 Registrarse
               </a>
             </p>
+
+            </div>
+    
+
+ 
           </div>
         </div>
       </div>

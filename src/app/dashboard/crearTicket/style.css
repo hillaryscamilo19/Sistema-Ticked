@@ -7,13 +7,21 @@ html {
 }
 
 .Container {
-    width: 135%;
-    margin-left: 2%;
-    padding: 15px;
-    margin-top: 7%;
-    background-color: #ffffff;
-    border-radius: 0px;
-    box-shadow: 0 8px 20px rgb(0 0 0 / 27%);
+  width: 86%;
+  margin-left: 10%;
+  padding: 15px;
+  background-color: #ffffff;
+  border-radius: 0px;
+  box-shadow: 0 8px 20px rgb(0 0 0 / 27%);
+}
+
+.TextPrinci {
+  margin-left: 156px;
+
+  font-family: none;
+  padding: 24px;
+
+  font-size: 31px;
 }
 
 .Title-1 {
@@ -30,11 +38,25 @@ html {
   margin-bottom: 1.5rem;
 }
 
+.categoria {
+  height: 63px;
+}
+
+.Depatamento {
+  width: 99%;
+  height: 63px;
+}
+
+.asunto {
+  height: 63px;
+}
+
 .container-Input {
   display: flex;
   flex-direction: row;
   gap: 1rem;
   margin-bottom: 1rem;
+  justify-content: space-between;
 }
 
 input[type="text"],
