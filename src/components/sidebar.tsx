@@ -52,7 +52,7 @@ export function Sidebar() {
     const fetchUsuario = async () => {
       try {
         const token = localStorage.getItem("token")
-        const res = await fetch("http://localhost:8000/usuarios/me", {
+        const res = await fetch("http://10.0.0.15:8000/usuarios/me", {
           headers: { Authorization: `Bearer ${token}` },
         })
 
@@ -81,7 +81,7 @@ export function Sidebar() {
 
       try {
         const token = localStorage.getItem("token")
-        const response = await fetch("http://localhost:8000/departments", {
+        const response = await fetch("http://10.0.0.15:8000/departments", {
           headers: { Authorization: `Bearer ${token}` },
         })
 

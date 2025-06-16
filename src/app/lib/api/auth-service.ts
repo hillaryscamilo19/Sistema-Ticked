@@ -34,7 +34,7 @@ export const authService = {
   // Iniciar sesión
 login: async ({ username, password }: LoginCredentials) => {
   try {
-    const response = await fetch("http://localhost:8000/token", {
+    const response = await fetch("http://10.0.0.15:8000/token", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded", // importante para FastAPI

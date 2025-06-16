@@ -257,7 +257,7 @@ const TicketDetail = () => {
 
         // Fetch users from the logged user's department
         const response = await fetch(
-          "http://localhost:8000/usuarios/departamento/colaboradores",
+          "http://10.0.0.15:8000/usuarios/departamento/colaboradores",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -305,7 +305,7 @@ const TicketDetail = () => {
           return;
         }
 
-        const response = await fetch(`http://localhost:8000/tickets/${id}`, {
+        const response = await fetch(`http://10.0.0.15:8000/tickets/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -349,7 +349,7 @@ const TicketDetail = () => {
 
         // Fix: Changed the endpoint to match the API structure
         const response = await fetch(
-          `http://localhost:8000/messages/ticket/${id}`,
+          `http://10.0.0.15:8000/messages/ticket/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -374,31 +374,29 @@ const TicketDetail = () => {
     }
   }, [id]);
 
-
-
-
-
-
-     const handleSendattachments = async () => {
+  const handleSendattachments = async () => {
     if (newMessage.trim() && id && ticket) {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch(`http://localhost:8000/ticket/${id}/attachments`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            file : newMessage,
-            ticket_id: Number(id),
-          }),
-        });
+        const response = await fetch(
+          `http://10.0.0.15:8000/ticket/${id}/attachments`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              file: newMessage,
+              ticket_id: Number(id),
+            }),
+          }
+        );
 
         if (response.ok) {
           // Recargar el ticket para obtener los mensajes actualizados
           const ticketResponse = await fetch(
-            `http://localhost:8000/tickets/${id}`,
+            `http://10.0.0.15:8000/tickets/${id}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -414,7 +412,7 @@ const TicketDetail = () => {
 
           // Fetch updated messages
           const messagesResponse = await fetch(
-            `http://localhost:8000/messages/ticket/${id}`,
+            `http://10.0.0.15:8000/messages/ticket/${id}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -438,33 +436,30 @@ const TicketDetail = () => {
       }
     }
   };
-   
-
-
-
-
-
 
   const handleSendMessage = async () => {
     if (newMessage.trim() && id && ticket) {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch(`http://localhost:8000/ticket/${id}/mensajes`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            message: newMessage,
-            ticket_id: Number(id),
-          }),
-        });
+        const response = await fetch(
+          `http://10.0.0.15:8000/ticket/${id}/mensajes`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              message: newMessage,
+              ticket_id: Number(id),
+            }),
+          }
+        );
 
         if (response.ok) {
           // Recargar el ticket para obtener los mensajes actualizados
           const ticketResponse = await fetch(
-            `http://localhost:8000/tickets/${id}`,
+            `http://10.0.0.15:8000/tickets/${id}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -480,7 +475,7 @@ const TicketDetail = () => {
 
           // Fetch updated messages
           const messagesResponse = await fetch(
-            `http://localhost:8000/messages/ticket/${id}`,
+            `http://10.0.0.15:8000/messages/ticket/${id}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -513,7 +508,7 @@ const TicketDetail = () => {
       console.log(`Changing status for ticket ${id} to status ID ${statusId}`);
 
       // FIX: Send estado_id as a query parameter, not in the body
-      const url = `http://localhost:8000/tickets/${id}/estado?estado_id=${statusId}`;
+      const url = `http://10.0.0.15:8000/tickets/${id}/estado?estado_id=${statusId}`;
 
       const response = await fetch(url, {
         method: "PUT",
@@ -536,7 +531,7 @@ const TicketDetail = () => {
 
         // Refresh ticket data
         const refreshResponse = await fetch(
-          `http://localhost:8000/tickets/${id}`,
+          `http://10.0.0.15:8000/tickets/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -585,7 +580,7 @@ const TicketDetail = () => {
       const userIds = selectedUsers.map((id) => Number(id));
 
       const response = await fetch(
-        `http://localhost:8000/tickets/${id}/asignar-usuarios`,
+        `http://10.0.0.15:8000/tickets/${id}/asignar-usuarios`,
         {
           method: "POST",
           headers: {
@@ -603,7 +598,7 @@ const TicketDetail = () => {
 
         // Refresh ticket data
         const refreshResponse = await fetch(
-          `http://localhost:8000/tickets/${id}`,
+          `http://10.0.0.15:8000/tickets/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -1131,10 +1126,7 @@ const TicketDetail = () => {
             </div>
             <div className="linea4"></div>
             <div className="modal-footer">
-              <button
-                className="bottonAsignar"
-                onClick={handleAssignUsers}
-              >
+              <button className="bottonAsignar" onClick={handleAssignUsers}>
                 Asignar Usuario
               </button>
               <button

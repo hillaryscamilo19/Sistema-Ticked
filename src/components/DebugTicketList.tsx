@@ -10,7 +10,7 @@ export default function DebugTicketList() {
     const fetchTickets = async () => {
       try {
         const token = localStorage.getItem("token")
-        const res = await fetch("http://localhost:8000/tickets/", {
+        const res = await fetch("http://10.0.0.15:8000/tickets/", {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",

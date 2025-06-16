@@ -65,8 +65,6 @@ export function RegisterForm() {
       return
     }
 
-    console.log("Departamento seleccionado:", departamentos, "Tipo:", typeof departamentos, "Parsed:", deptId)
-
     const payload = {
       fullname: name.trim(),
       email: email.trim(),
@@ -79,7 +77,7 @@ export function RegisterForm() {
     }
 
     try {
-      const response = await fetch("http://localhost:8000/register", {
+      const response = await fetch("http://10.0.0.15:8000/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -107,27 +105,21 @@ export function RegisterForm() {
   useEffect(() => {
     const fetchDepartamentos = async () => {
       try {
-        const response = await fetch("http://localhost:8000/departments")
+        const response = await fetch("http://10.0.0.15:8000/departments")
         if (!response.ok) throw new Error(`Error: ${response.status}`)
         const data = await response.json()
-
-        // Debug completo: ver la estructura de los datos
-        console.log("Datos de departamentos recibidos:", data)
-        console.log("Primer departamento:", data[0])
-        console.log("Claves del primer departamento:", data[0] ? Object.keys(data[0]) : "No hay departamentos")
-
         // Intentar diferentes estructuras posibles
         let validDepartments = []
 
         if (data && data.length > 0) {
           // Verificar si usa _id
           if (data[0]._id !== undefined) {
-            console.log("Usando _id")
+    
             validDepartments = data.filter((dept) => dept._id != null)
           }
           // Verificar si usa id
           else if (data[0].id !== undefined) {
-            console.log("Usando id")
+ 
             validDepartments = data.filter((dept) => dept.id != null)
             // Convertir id a _id para mantener compatibilidad
             validDepartments = validDepartments.map((dept) => ({
@@ -142,10 +134,9 @@ export function RegisterForm() {
           }
         }
 
-        console.log("Departamentos válidos:", validDepartments)
         setDepartamentoList(validDepartments)
       } catch (error) {
-        console.error("Error al cargar departamentos:", error)
+     
       }
     }
     fetchDepartamentos()
@@ -223,7 +214,6 @@ export function RegisterForm() {
                     className="Inputdepartamento"
                     value={departamentos}
                     onChange={(e) => {
-                      console.log("Valor seleccionado:", e.target.value, "Tipo:", typeof e.target.value)
                       setDepartamentos(e.target.value)
                       if (error || validationError) {
                         setError("")

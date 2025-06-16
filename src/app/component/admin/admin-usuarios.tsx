@@ -40,10 +40,10 @@ export default function AdminUsuarios() {
         const token = localStorage.getItem("token")
 
         const [usuariosResponse, departamentosResponse] = await Promise.all([
-          fetch("http://localhost:8000/usuarios", {
+          fetch("http://10.0.0.15:8000/usuarios", {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch("http://localhost:8000/departments", {
+          fetch("http://10.0.0.15:8000/departments", {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ])
@@ -129,7 +129,7 @@ export default function AdminUsuarios() {
     setLoadingAction(true)
     try {
       const token = localStorage.getItem("token")
-      const response = await fetch(`http://localhost:8000/usuarios/${selectedUser._id}`, {
+      const response = await fetch(`http://10.0.0.15:8000/usuarios/${selectedUser._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -179,7 +179,7 @@ export default function AdminUsuarios() {
     try {
       const token = localStorage.getItem("token")
       const response = await fetch(
-        `http://localhost:8000/usuarios/${selectedUser._id || selectedUser.id}/reset-password`,
+        `http://10.0.0.15:8000/usuarios/${selectedUser._id || selectedUser.id}/reset-password`,
         {
           method: "PUT",
           headers: {
@@ -220,7 +220,7 @@ export default function AdminUsuarios() {
 
       console.log(`Cambiando estado de usuario ${usuario.username} a ${newStatus}`)
 
-      const response = await fetch(`http://localhost:8000/usuarios/${usuario._id || usuario.id}/toggle-status`, {
+      const response = await fetch(`http://10.0.0.15:8000/usuarios/${usuario._id || usuario.id}/toggle-status`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

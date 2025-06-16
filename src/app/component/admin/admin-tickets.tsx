@@ -39,7 +39,7 @@ export default function AdminTickets() {
     const fetchTickets = async () => {
       try {
         const token = localStorage.getItem("token")
-        const response = await fetch("http://localhost:8000/tickets", {
+        const response = await fetch("http://10.0.0.15:8000/tickets", {
           headers: { Authorization: `Bearer ${token}` },
         })
 

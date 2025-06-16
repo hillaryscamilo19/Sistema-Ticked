@@ -1,9 +1,11 @@
 "use client"
-
+import React from 'react';
 import { useState, useEffect } from "react"
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom"
 import { authService } from "./lib/api/auth-service"
 import { LoginForm } from "./components/login-form"
+
+
 
 
 // Importa tus páginas/componentes existentes
@@ -35,40 +37,39 @@ const TechAdminRoute = () => {
 
   useEffect(() => {
     const checkTechDepartment = async () => {
-      console.log("TechAdminRoute: Verificando acceso de tecnología...")
 
       try {
         const token = localStorage.getItem("token")
         if (!token) {
-          console.log("TechAdminRoute: No hay token")
+
           setLoading(false)
           return
         }
 
         // Obtener datos del usuario
-        const userResponse = await fetch("http://localhost:8000/usuarios/me", {
+        const userResponse = await fetch("http://10.0.0.15:8000/usuarios/me", {
           headers: { Authorization: `Bearer ${token}` },
         })
 
         if (userResponse.ok) {
           const userData = await userResponse.json()
-          console.log("TechAdminRoute: Datos del usuario:", userData)
+       
 
           if (userData.department_id) {
             // Obtener datos del departamento
-            const deptResponse = await fetch("http://localhost:8000/departments", {
+            const deptResponse = await fetch("http://10.0.0.15:8000/departments", {
               headers: { Authorization: `Bearer ${token}` },
             })
 
             if (deptResponse.ok) {
               const departments = await deptResponse.json()
-              console.log("TechAdminRoute: Departamentos:", departments)
+    
 
               const userDepartment = departments.find(
                 (dept) => dept._id === userData.department_id || dept.id === userData.department_id,
               )
 
-              console.log("TechAdminRoute: Departamento del usuario:", userDepartment)
+              
 
               // Verificar si el departamento es "Tecnología"
               if (
@@ -78,16 +79,16 @@ const TechAdminRoute = () => {
                   userDepartment.nombre?.toLowerCase() === "tecnología" ||
                   userDepartment.nombre?.toLowerCase() === "tecnologia")
               ) {
-                console.log("TechAdminRoute: Usuario autorizado para admin")
+              
                 setIsTechUser(true)
               } else {
-                console.log("TechAdminRoute: Usuario NO autorizado para admin")
+               
               }
             }
           }
         }
       } catch (error) {
-        console.error("TechAdminRoute: Error verificando departamento de tecnología:", error)
+       
       } finally {
         setLoading(false)
       }
@@ -96,7 +97,7 @@ const TechAdminRoute = () => {
     checkTechDepartment()
   }, [])
 
-  console.log("TechAdminRoute: loading =", loading, "isTechUser =", isTechUser)
+
 
   if (loading) {
     return (
@@ -109,11 +110,11 @@ const TechAdminRoute = () => {
   }
 
   if (!isTechUser) {
-    console.log("TechAdminRoute: Redirigiendo a dashboard - usuario no autorizado")
+    
     return <Navigate to="/dashboard" />
   }
 
-  console.log("TechAdminRoute: Renderizando Outlet - usuario autorizado")
+
   return <Outlet />
 }
 

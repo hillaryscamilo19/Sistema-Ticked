@@ -7,6 +7,7 @@ import {
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
+import "../ourcreate/styles.css";
 
 interface TicketUser {
   id: number;
@@ -32,12 +33,15 @@ interface Ticket {
   };
 }
 
-const statusMap: Record<string, { label: string; color: string }> = {
-  "1": { label: "Abierto", color: "border border-success text-success" },
-  "2": { label: "Proceso", color: "bg-blue-100 text-blue-700" },
-  "3": { label: "Espera", color: "border border-warning text-warning" },
-  "4": { label: "Revisión", color: "bg-purple-100 text-purple-700" },
-  "5": { label: "Completado", color: "border border-info text-info" },
+const statusMap: Record<
+  string,
+  { label: string; color: string; hasIndicator?: boolean }
+> = {
+  "1": { label: "Abierto", color: "status-abierto", hasIndicator: false },
+  "2": { label: "Proceso", color: "status-proceso", hasIndicator: false },
+  "3": { label: "Espera", color: "status-espera", hasIndicator: true },
+  "4": { label: "Revisión", color: "status-revision", hasIndicator: false },
+  "5": { label: "Completado", color: "status-completado", hasIndicator: true },
 };
 
 function formatRelativeDate(createdAt: string): string {
@@ -101,24 +105,38 @@ function extractAssignedUsers(
 
 export default function NuestroCreado() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
-  const [activeTab, setActiveTab] = useState<string>("5");
+  const [activeTab, setActiveTab] = useState<string>("1"); // Abierto por defecto
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [itemsPerPage, setItemsPerPage] = useState(20);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchTickets = async () => {
       try {
+        setIsLoading(true);
+        setError(null);
         const res = await fetch(
-          "http://localhost:8000/tickets/todos-creados-por-mi-departamento/",
+          "http://10.0.0.15:8000/tickets/asignados-departamento/",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
           }
         );
+
+        if (!res.ok) {
+          throw new Error(`Error ${res.status}: ${res.statusText}`);
+        }
+
         const data = await res.json();
         setTickets(data);
       } catch (err) {
         console.error("Error al cargar los tickets:", err);
+        setError(err instanceof Error ? err.message : "Error desconocido");
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchTickets();
@@ -137,169 +155,300 @@ export default function NuestroCreado() {
     return matchesStatus && matchesSearch;
   });
 
-  return (
-    <>
-      <div className="TextPrinci">Nuestros Creados</div>
-      <div className="ticket-list-container">
-        <div>
-          <div className="ticket-list-content">
-            {/* Header */}
-            <div className="header-section">
-              <h1 className="main-title">
-                Listado de tickets creados por el departamento.
-              </h1>
+  // Pagination logic
+  const totalFilteredPages = Math.ceil(filteredTickets.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredTickets.slice(indexOfFirstItem, indexOfLastItem);
 
-              {/* Status tabs and search */}
-              <div className="tabs-search-container">
-                {/* Status tabs */}
-                <nav className="status-tabs" aria-label="Tabs">
-                  {Object.entries(statusMap).map(([key, { label }]) => {
-                    const isActive = activeTab === key;
-                    const count = statusCounts[key] || 0;
+  const handleItemsPerPageChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const newItemsPerPage = Number(e.target.value);
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+  };
 
-                    return (
-                      <button
-                        key={key}
-                        onClick={() => setActiveTab(key)}
-                        className={`status-tab ${isActive ? "active" : ""}`}
-                      >
-                        <UsersIcon className="tab-icon" />
-                        <span className="tab-label">{label}</span>
-                        <span className="tab-count">{count}</span>
-                        {isActive && count > 0 && (
-                          <div className="active-indicator"></div>
-                        )}
-                      </button>
-                    );
-                  })}
-                </nav>
+  const handleTabChange = (tabKey: string) => {
+    setActiveTab(tabKey);
+    setCurrentPage(1);
+  };
 
-                {/* Search bar */}
-                <div className="search-container">
-                  <div className="search-icon-container">
-                    <MagnifyingGlassIcon className="search-icon" />
-                  </div>
-                  <input
-                    placeholder="Buscar ticket"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="search-input"
-                  />
-                </div>
-              </div>
-            </div>
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
 
-            {/* Divider */}
-            <div className="divider"></div>
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-            {/* Tickets List */}
-            <div className="tickets-container">
-              {filteredTickets.length === 0 ? (
-                <div className="empty-state">
-                  <ClipboardDocumentListIcon className="empty-icon" />
-                  <h3 className="empty-title">No hay tickets</h3>
-                  <p className="empty-description">
-                    {searchTerm
-                      ? `No se encontraron tickets que coincidan con "${searchTerm}"`
-                      : `No hay tickets con estado "${statusMap[activeTab]?.label}"`}
-                  </p>
-                </div>
-              ) : (
-                filteredTickets.map((ticket) => (
-                  <div key={ticket.id} className="ticket-row">
-                    <div className="ticket-content">
-                      {/* Left section - Title and metadata */}
-                      <div className="ticket-main-info">
-                        <div className="ticket-title-section">
-                          <h3 className="ticket-title">{ticket.title}</h3>
-                          <span
-                            className={`status-badge ${
-                              statusMap[ticket.status]?.color ||
-                              "status-default"
-                            }`}
-                          >
-                            {statusMap[ticket.status]?.label || ticket.status}
-                          </span>
-                        </div>
-                        <div className="ticket-metadata">
-                          <span>
-                            Fecha:{" "}
-                            {new Date(ticket.created_at).toLocaleDateString(
-                              "es-ES"
-                            )}
-                          </span>
-                          <span className="metadata-separator">•</span>
-                          <span>
-                            Creado por: {extractUserName(ticket.created_user)}
-                          </span>
-                        </div>
-                      </div>
+  const renderPaginationButtons = () => {
+    const buttons = [];
+    const maxVisiblePages = 5;
+    const totalPages = totalFilteredPages;
 
-                      {/* Center section - Department */}
-                      <div className="ticket-department">
-                        <div className="department-info">
-                          <BuildingOfficeIcon className="department-icon" />
-                          <span className="department-name">
-                            {" "}
-                            {extractDepartmentName(ticket.assigned_department)}
-                          </span>
-                        </div>
-                        <div className="relative-date">
-                          {formatRelativeDate(ticket.created_at)}
-                        </div>
-                      </div>
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        buttons.push(
+          <button
+            key={i}
+            onClick={() => paginate(i)}
+            className={`page-button ${currentPage === i ? "active" : ""}`}
+          >
+            {i}
+          </button>
+        );
+      }
+    } else {
+      const startPage = Math.max(1, currentPage - 2);
+      const endPage = Math.min(totalPages, currentPage + 2);
 
-                      {/* Right section - Assigned user and category */}
-                      <div className="ticket-assignment">
-                        <div className="assigned-user">
-                          <UsersIcon className="user-icon" />
-                          <span>
-                            {extractAssignedUsers(ticket.assigned_users)}
-                          </span>
-                        </div>
-                        <div className="ticket-category">
-                          <TagIcon className="category-icon" />
-                          <span className="category-name">
-                            {ticket.category?.name || "Otros"}
-                          </span>
-                        </div>
-                      </div>
+      for (let i = startPage; i <= endPage; i++) {
+        buttons.push(
+          <button
+            key={i}
+            onClick={() => paginate(i)}
+            className={`page-button ${currentPage === i ? "active" : ""}`}
+          >
+            {i}
+          </button>
+        );
+      }
+    }
 
-                      {/* Action button */}
-                      <div className="ticket-actions">
-                        <Link to={`/dashboard/tickets/${ticket.id}`}>
-                          <button className="detail-button">
-                            <ClipboardDocumentListIcon className="button-icon" />
-                            Ver detalles
-                          </button>
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
+    return buttons;
+  };
 
-            {/* Pagination */}
-            {filteredTickets.length > 0 && (
-              <div className="pagination-container">
-                <div className="pagination-info">
-                  <span className="pagination-text">Mostrar</span>
-                  <select className="pagination-select">
-                    <option value="20">20</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                  </select>
-                  <span className="pagination-text">elementos por página</span>
-                </div>
-                <div className="pagination-controls">
-                  <button className="page-button active">1</button>
-                </div>
-              </div>
-            )}
+  if (isLoading) {
+    return (
+      <div className="page-container">
+        <div className="page-header">
+          <h1 className="page-title">Nuestros Creados</h1>
+          <div className="breadcrumb">
+            <span className="breadcrumb-link">Inicio</span>
+            <span className="breadcrumb-separator">/</span>
+            <span className="breadcrumb-current">Nuestros Creados</span>
+          </div>
+        </div>
+        <div className="main-container">
+          <div className="loading-content">
+            <div className="spinner"></div>
+            <p className="loading-text">Cargando tickets...</p>
           </div>
         </div>
       </div>
-    </>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="page-container">
+        <div className="page-header">
+          <h1 className="page-title">Nuestros Creados</h1>
+          <div className="breadcrumb">
+            <span className="breadcrumb-link">Inicio</span>
+            <span className="breadcrumb-separator">/</span>
+            <span className="breadcrumb-current">Nuestros Creados</span>
+          </div>
+        </div>
+        <div className="main-container">
+          <div className="error-content">
+            <p className="error-text">Error al cargar los tickets: {error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="retry-button"
+            >
+              Reintentar
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="page-container">
+      {/* Header con breadcrumb */}
+      <div className="page-header">
+        <h1 className="page-title">Nuestros Creados</h1>
+        <div className="breadcrumb">
+          <span className="breadcrumb-link">Inicio</span>
+          <span className="breadcrumb-separator">/</span>
+          <span className="breadcrumb-current">Nuestros Creados</span>
+        </div>
+      </div>
+
+      {/* Contenedor principal */}
+      <div className="main-container">
+        <div className="content-header">
+          <h2 className="content-title">
+            Listado de tickets creados por el departamento.
+          </h2>
+        </div>
+
+        {/* Tabs y búsqueda */}
+        <div className="tabs-search-section">
+          <div className="status-tabs-container">
+            {Object.entries(statusMap).map(([key, { label, hasIndicator }]) => {
+              const isActive = activeTab === key;
+              const count = statusCounts[key] || 0;
+
+              return (
+                <button
+                  key={key}
+                  onClick={() => handleTabChange(key)}
+                  className={`status-tab ${isActive ? "active" : ""}`}
+                  aria-pressed={isActive}
+                >
+                  <UsersIcon className="tab-icon" />
+                  <span className="tab-label">{label}</span>
+                  <span className="tab-count">{count}</span>
+                  {hasIndicator && count > 0 && (
+                    <div className="tab-indicator"></div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="search-section">
+            <div className="search-container">
+              <MagnifyingGlassIcon className="search-icon" />
+              <input
+                type="text"
+                placeholder="Buscar ticket"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                className="search-input"
+                aria-label="Buscar tickets"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Lista de tickets */}
+        <div className="tickets-section">
+          {currentItems.length === 0 ? (
+            <div className="empty-state">
+              <ClipboardDocumentListIcon className="empty-icon" />
+              <h3 className="empty-title">No hay tickets</h3>
+              <p className="empty-description">
+                {searchTerm
+                  ? `No se encontraron tickets que coincidan con "${searchTerm}"`
+                  : `No hay tickets con estado "${statusMap[activeTab]?.label}"`}
+              </p>
+            </div>
+          ) : (
+            currentItems.map((ticket) => (
+              <article key={ticket.id} className="ticket-item">
+                <div className="ticket-content">
+                  <div className="ticket-main-info">
+                    <div className="ticket-title-section">
+                      <h3 className="ticket-title">{ticket.title}</h3>
+                      <span
+                        className={`status-badge ${
+                          statusMap[ticket.status]?.color || "status-default"
+                        }`}
+                      >
+                        {statusMap[ticket.status]?.label || ticket.status}
+                      </span>
+                    </div>
+                    <div className="ticket-metadata">
+                      <span>
+                        Fecha:{" "}
+                        {new Date(ticket.created_at).toLocaleDateString(
+                          "es-ES"
+                        )}
+                      </span>
+                      <span className="metadata-separator">•</span>
+                      <span>
+                        Creado por: {extractUserName(ticket.created_user)}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="ticket-department">
+                    <div className="department-info">
+                      <BuildingOfficeIcon className="department-icon" />
+                      <span className="department-name">
+                        {extractDepartmentName(ticket.assigned_department)}
+                      </span>
+                    </div>
+                    <div className="relative-date">
+                      {formatRelativeDate(ticket.created_at)}
+                    </div>
+                  </div>
+
+                  <div className="ticket-actions">
+                    <Link
+                      to={`/dashboard/tickets/${ticket.id}`}
+                      className="detail-button"
+                    >
+                      <ClipboardDocumentListIcon className="button-icon" />
+                      Ver detalles
+                    </Link>
+                  </div>
+                </div>
+              </article>
+            ))
+          )}
+        </div>
+
+        {/* Paginación inferior */}
+        {filteredTickets.length > 0 && (
+          <div className="pagination-container">
+            <div className="pagination-info">
+              <span className="pagination-text">Mostrar</span>
+              <select
+                className="pagination-select"
+                value={itemsPerPage}
+                onChange={handleItemsPerPageChange}
+                aria-label="Elementos por página"
+              >
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+              <span className="pagination-text">elementos por página</span>
+            </div>
+
+            <div className="pagination-controls">
+              {/* Previous button */}
+              {currentPage > 1 && (
+                <button
+                  onClick={() => paginate(currentPage - 1)}
+                  className="page-button nav-button"
+                  aria-label="Página anterior"
+                >
+                  ‹
+                </button>
+              )}
+
+              {/* Page numbers */}
+              {renderPaginationButtons()}
+
+              {/* Next button */}
+              {currentPage < totalFilteredPages && (
+                <button
+                  onClick={() => paginate(currentPage + 1)}
+                  className="page-button nav-button"
+                  aria-label="Página siguiente"
+                >
+                  ›
+                </button>
+              )}
+            </div>
+
+            <div className="pagination-summary">
+              <span className="pagination-text">
+                Mostrando {indexOfFirstItem + 1}-
+                {Math.min(indexOfLastItem, filteredTickets.length)} de{" "}
+                {filteredTickets.length} tickets
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
