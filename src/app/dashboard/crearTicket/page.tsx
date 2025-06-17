@@ -1,32 +1,36 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useEffect, useState } from "react"
-import { TicketIcon, PaperClipIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline"
-import TiptapEditor from "../../../components/TiptapEditor"
-import "../crearTicket/style.css"
+import { useEffect, useState } from "react";
+import {
+  TicketIcon,
+  PaperClipIcon,
+  ExclamationTriangleIcon,
+} from "@heroicons/react/24/outline";
+import TiptapEditor from "../../../components/TiptapEditor";
+import "../crearTicket/style.css";
 
 interface Department {
-  _id?: string
-  id?: string
-  name?: string
-  nombre?: string
+  _id?: string;
+  id?: string;
+  name?: string;
+  nombre?: string;
 }
 
 interface Category {
-  _id?: string
-  id?: string
-  name?: string
-  nombre?: string
+  _id?: string;
+  id?: string;
+  name?: string;
+  nombre?: string;
 }
 
 interface FormData {
-  title: string
-  description: string
-  category_id: string
-  assigned_department_id: string
-  status: string
+  title: string;
+  description: string;
+  category_id: string;
+  assigned_department_id: string;
+  status: string;
 }
 
 const STATUS_OPTIONS = [
@@ -36,16 +40,16 @@ const STATUS_OPTIONS = [
   { value: "4", label: "En Espera" },
   { value: "5", label: "Completado" },
   { value: "6", label: "Cancelado" },
-]
+];
 
 export default function CrearNuevoTicket() {
-  const [departamentoList, setDepartamentoList] = useState<Department[]>([])
-  const [categoriaList, setCategoriaList] = useState<Category[]>([])
-  const [loading, setLoading] = useState(false)
-  const [archivo, setArchivo] = useState<File | null>(null)
-  const [descripcionHTML, setDescripcionHTML] = useState("")
-  const [errors, setErrors] = useState<Record<string, string>>({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [departamentoList, setDepartamentoList] = useState<Department[]>([]);
+  const [categoriaList, setCategoriaList] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [archivo, setArchivo] = useState<File | null>(null);
+  const [descripcionHTML, setDescripcionHTML] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Formulario unificado con los nombres de campos correctos
   const [formData, setFormData] = useState<FormData>({
@@ -54,14 +58,14 @@ export default function CrearNuevoTicket() {
     category_id: "",
     assigned_department_id: "",
     status: "1", // Por defecto "Abierto"
-  })
+  });
 
   // Cargar departamentos y categorías
   useEffect(() => {
     const fetchDatos = async () => {
       try {
-        setLoading(true)
-        const token = localStorage.getItem("token")
+        setLoading(true);
+        const token = localStorage.getItem("token");
 
         const [resDept, resCat] = await Promise.all([
           fetch("http://10.0.0.15:8000/departments", {
@@ -76,137 +80,144 @@ export default function CrearNuevoTicket() {
               "Content-Type": "application/json",
             },
           }),
-        ])
+        ]);
 
         if (!resDept.ok || !resCat.ok) {
-          throw new Error("Error al cargar datos")
+          throw new Error("Error al cargar datos");
         }
 
-        const [dataDept, dataCat] = await Promise.all([resDept.json(), resCat.json()])
+        const [dataDept, dataCat] = await Promise.all([
+          resDept.json(),
+          resCat.json(),
+        ]);
 
-        setDepartamentoList(dataDept)
-        setCategoriaList(dataCat)
+        setDepartamentoList(dataDept);
+        setCategoriaList(dataCat);
       } catch (error) {
-        console.error("Error al cargar datos:", error)
-        setErrors({ general: "Error al cargar departamentos y categorías" })
+        console.error("Error al cargar datos:", error);
+        setErrors({ general: "Error al cargar departamentos y categorías" });
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchDatos()
-  }, [])
+    fetchDatos();
+  }, []);
+
+  // Función para enviar notificaciones usando el nuevo endpoint
 
   // Manejar cambios en los campos del formulario
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }))
+    }));
 
     // Limpiar error del campo cuando el usuario empiece a escribir
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
         [name]: "",
-      }))
+      }));
     }
-  }
+  };
 
   // Manejar cambios en el editor de texto enriquecido
   const handleEditorChange = (html: string) => {
-    setDescripcionHTML(html)
+    setDescripcionHTML(html);
     setFormData((prev) => ({
       ...prev,
       description: html,
-    }))
+    }));
 
     // Limpiar error de descripción
     if (errors.description) {
       setErrors((prev) => ({
         ...prev,
         description: "",
-      }))
+      }));
     }
-  }
+  };
 
   // Manejar cambio de archivo
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null
-    setArchivo(file)
-  }
+    const file = e.target.files?.[0] || null;
+    setArchivo(file);
+  };
 
   // Función para extraer el ID del usuario del token JWT
   function parseJwt(token: string) {
     try {
-      const base64Url = token.split(".")[1]
-      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/")
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
       const jsonPayload = decodeURIComponent(
         atob(base64)
           .split("")
           .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-          .join(""),
-      )
-      return JSON.parse(jsonPayload)
+          .join("")
+      );
+      return JSON.parse(jsonPayload);
     } catch (e) {
-      console.error("Error al parsear token:", e)
-      return null
+      console.error("Error al parsear token:", e);
+      return null;
     }
   }
 
   // Validar formulario
   const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {}
+    const newErrors: Record<string, string> = {};
 
     if (!formData.title.trim()) {
-      newErrors.title = "El asunto es obligatorio"
+      newErrors.title = "El asunto es obligatorio";
     }
 
     if (!formData.description.trim()) {
-      newErrors.description = "La descripción es obligatoria"
+      newErrors.description = "La descripción es obligatoria";
     }
 
     if (!formData.category_id) {
-      newErrors.category_id = "Debe seleccionar una categoría"
+      newErrors.category_id = "Debe seleccionar una categoría";
     }
 
     if (!formData.assigned_department_id) {
-      newErrors.assigned_department_id = "Debe seleccionar un departamento"
+      newErrors.assigned_department_id = "Debe seleccionar un departamento";
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   // Manejar envío del formulario
   const handleSubmit = async () => {
-    if (!validateForm()) {
-      return
-    }
+    if (!validateForm()) return;
 
-    const token = localStorage.getItem("token")
-
+    const token = localStorage.getItem("token");
     if (!token) {
-      setErrors({ general: "Token no encontrado. Por favor, inicie sesión nuevamente." })
-      return
+      setErrors({
+        general: "Token no encontrado. Por favor, inicie sesión nuevamente.",
+      });
+      return;
     }
 
-    const payload = parseJwt(token)
-
+    const payload = parseJwt(token);
     if (!payload) {
-      setErrors({ general: "Token inválido. Por favor, inicie sesión nuevamente." })
-      return
+      setErrors({
+        general: "Token inválido. Por favor, inicie sesión nuevamente.",
+      });
+      return;
     }
 
-    const userId = payload.sub || payload.user_id || payload.id || null
-
+    const userId = payload.sub || payload.user_id || payload.id || null;
     if (!userId) {
-      setErrors({ general: "Usuario no autenticado. Por favor, inicie sesión nuevamente." })
-      return
+      setErrors({
+        general: "Usuario no autenticado. Por favor, inicie sesión nuevamente.",
+      });
+      return;
     }
 
-    // Preparar datos para enviar con la estructura correcta
     const ticketData = {
       title: formData.title,
       description: formData.description,
@@ -214,11 +225,11 @@ export default function CrearNuevoTicket() {
       assigned_department_id: Number(formData.assigned_department_id),
       created_user_id: Number(userId),
       status: formData.status,
-    }
+    };
 
     try {
-      setIsSubmitting(true)
-      setErrors({})
+      setIsSubmitting(true);
+      setErrors({});
 
       const res = await fetch("http://10.0.0.15:8000/tickets", {
         method: "POST",
@@ -227,9 +238,12 @@ export default function CrearNuevoTicket() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(ticketData),
-      })
+      });
 
       if (res.ok) {
+        const createdTicket = await res.json();
+        console.log("Ticket creado:", createdTicket);
+
         // Resetear formulario
         setFormData({
           title: "",
@@ -237,24 +251,30 @@ export default function CrearNuevoTicket() {
           category_id: "",
           assigned_department_id: "",
           status: "1",
-        })
-        setDescripcionHTML("")
-        setArchivo(null)
+        });
+        setDescripcionHTML("");
+        setArchivo(null);
 
-        // Mostrar mensaje de éxito
-        alert("Ticket creado correctamente.")
+        alert(
+          "Ticket creado correctamente. Las notificaciones se enviaron automáticamente."
+        );
       } else {
-        const errorData = await res.json()
-        console.error("Error respuesta API:", errorData)
-        setErrors({ general: "Error al crear ticket. Por favor, intente nuevamente." })
+        const errorData = await res.json();
+        console.error("Error respuesta API:", errorData);
+        setErrors({
+          general: "Error al crear ticket. Por favor, intente nuevamente.",
+        });
       }
     } catch (error) {
-      console.error("Error al enviar ticket:", error)
-      setErrors({ general: "Error de conexión. Por favor, verifique su conexión a internet." })
+      console.error("Error al enviar ticket:", error);
+      setErrors({
+        general:
+          "Error de conexión. Por favor, verifique su conexión a internet.",
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -274,7 +294,7 @@ export default function CrearNuevoTicket() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -296,7 +316,9 @@ export default function CrearNuevoTicket() {
             <TicketIcon className="form-icon" />
             <div>
               <h2 className="form-title">Formulario de creación de ticket</h2>
-              <p className="form-subtitle">Complete todos los campos para crear un nuevo ticket</p>
+              <p className="form-subtitle">
+                Complete todos los campos para crear un nuevo ticket
+              </p>
             </div>
           </div>
         </div>
@@ -324,19 +346,26 @@ export default function CrearNuevoTicket() {
               value={formData.title}
               onChange={handleChange}
             />
-            {errors.title && <span className="error-message">{errors.title}</span>}
+            {errors.title && (
+              <span className="error-message">{errors.title}</span>
+            )}
           </div>
 
           {/* Campos en fila */}
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="assigned_department_id" className="form-label required">
+              <label
+                htmlFor="assigned_department_id"
+                className="form-label required"
+              >
                 Departamento
               </label>
               <select
                 id="assigned_department_id"
                 name="assigned_department_id"
-                className={`form-select ${errors.assigned_department_id ? "error" : ""}`}
+                className={`form-select ${
+                  errors.assigned_department_id ? "error" : ""
+                }`}
                 value={formData.assigned_department_id}
                 onChange={handleChange}
               >
@@ -347,7 +376,11 @@ export default function CrearNuevoTicket() {
                   </option>
                 ))}
               </select>
-              {errors.assigned_department_id && <span className="error-message">{errors.assigned_department_id}</span>}
+              {errors.assigned_department_id && (
+                <span className="error-message">
+                  {errors.assigned_department_id}
+                </span>
+              )}
             </div>
 
             <div className="form-group">
@@ -368,14 +401,22 @@ export default function CrearNuevoTicket() {
                   </option>
                 ))}
               </select>
-              {errors.category_id && <span className="error-message">{errors.category_id}</span>}
+              {errors.category_id && (
+                <span className="error-message">{errors.category_id}</span>
+              )}
             </div>
 
             <div className="form-group">
               <label htmlFor="status" className="form-label">
                 Estado
               </label>
-              <select id="status" name="status" className="form-select" value={formData.status} onChange={handleChange}>
+              <select
+                id="status"
+                name="status"
+                className="form-select"
+                value={formData.status}
+                onChange={handleChange}
+              >
                 {STATUS_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
@@ -390,14 +431,20 @@ export default function CrearNuevoTicket() {
             <label htmlFor="description" className="form-label required">
               Descripción
             </label>
-            <div className={`editor-container ${errors.description ? "error" : ""}`}>
+            <div
+              className={`editor-container ${
+                errors.description ? "error" : ""
+              }`}
+            >
               <TiptapEditor
                 value={descripcionHTML}
                 onChange={handleEditorChange}
                 placeholder="Describe detalladamente tu solicitud o problema..."
               />
             </div>
-            {errors.description && <span className="error-message">{errors.description}</span>}
+            {errors.description && (
+              <span className="error-message">{errors.description}</span>
+            )}
           </div>
 
           {/* Campo Archivo */}
@@ -415,7 +462,9 @@ export default function CrearNuevoTicket() {
               />
               <div className="file-input-info">
                 <PaperClipIcon className="file-icon" />
-                <span className="file-text">{archivo ? archivo.name : "Seleccionar archivo (opcional)"}</span>
+                <span className="file-text">
+                  {archivo ? archivo.name : "Seleccionar archivo (opcional)"}
+                </span>
               </div>
             </div>
           </div>
@@ -440,5 +489,5 @@ export default function CrearNuevoTicket() {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -108,7 +108,7 @@ export function Sidebar() {
   return (
     <div className="d-flex vh-100">
       {/* SIDEBAR */}
-      <div className="bg-dark text-white p-3" style={{ width: "280px", overflowY: "auto" }}>
+      <div className="bg-dark text-white p-3" style={{ width: "280px"}}>
         <div className="text-center mb-4">
           <img
             src={tyz}

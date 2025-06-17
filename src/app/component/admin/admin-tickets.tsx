@@ -2,26 +2,24 @@
 
 import { useState, useEffect } from "react"
 import { TicketIcon, EllipsisVerticalIcon, TagIcon, BuildingOfficeIcon } from "@heroicons/react/24/outline"
-
-
+import "../style/style.adminticked.css"
 
 type Ticket = {
   _id: string
   title: string
   status: string
   createdAt: string
-  created_user:{
-    id: string,
-    fullname: string,
-    email: string,
-    phone_ext: string,
+  created_user: {
+    id: string
+    fullname: string
+    email: string
+    phone_ext: string
   }[]
   departamento: {
-    id:string,
+    id: string
     name: string
   }[]
 }
-
 
 export default function AdminTickets() {
   const [tickets, setTickets] = useState<Ticket[]>([])
@@ -45,7 +43,6 @@ export default function AdminTickets() {
 
         if (response.ok) {
           const data = await response.json()
-          console.log("Tickets cargados:", data) // Para depuración
           setTickets(data)
 
           // Calcular estadísticas
@@ -103,25 +100,24 @@ export default function AdminTickets() {
   }, [])
 
   const getStatusBadge = (status) => {
-    // Convertir a string si no lo es
     const statusStr = typeof status === "string" ? status : String(status)
 
     const statusMap = {
-      Completado: { class: "bg-success", text: "Completado" },
-      5: { class: "bg-success", text: "Completado" },
-      "En Proceso": { class: "bg-warning", text: "Proceso" },
-      2: { class: "bg-warning", text: "Proceso" },
-      "En Revisión": { class: "bg-info", text: "Revisión" },
-      3: { class: "bg-info", text: "Revisión" },
-      "En Espera": { class: "bg-secondary", text: "Espera" },
-      4: { class: "bg-secondary", text: "Espera" },
-      Cancelado: { class: "bg-danger", text: "Cancelado" },
-      6: { class: "bg-danger", text: "Cancelado" },
-      Abierto: { class: "bg-primary", text: "Abierto" },
-      1: { class: "bg-primary", text: "Abierto" },
+      Completado: { class: "status-completado", text: "Completado" },
+      5: { class: "status-completado", text: "Completado" },
+      "En Proceso": { class: "status-proceso", text: "Proceso" },
+      2: { class: "status-proceso", text: "Proceso" },
+      "En Revisión": { class: "status-revision", text: "Revisión" },
+      3: { class: "status-revision", text: "Revisión" },
+      "En Espera": { class: "status-espera", text: "Espera" },
+      4: { class: "status-espera", text: "Espera" },
+      Cancelado: { class: "status-cancelado", text: "Cancelado" },
+      6: { class: "status-cancelado", text: "Cancelado" },
+      Abierto: { class: "status-abierto", text: "Abierto" },
+      1: { class: "status-abierto", text: "Abierto" },
     }
 
-    return statusMap[statusStr] || { class: "bg-secondary", text: "Sin estado" }
+    return statusMap[statusStr] || { class: "status-default", text: "Sin estado" }
   }
 
   const formatDate = (dateString) => {
@@ -137,151 +133,114 @@ export default function AdminTickets() {
     }
   }
 
-  // Función para extraer texto seguro de propiedades que podrían ser objetos
   const safeText = (value) => {
     if (value === null || value === undefined) return "No disponible"
     if (typeof value === "object") {
-      // Si es un objeto, intentamos obtener una propiedad de nombre
       return value.name || value.nombre || JSON.stringify(value)
     }
     return String(value)
   }
 
   return (
-    <div className="p-4">
+    <div className="admin-page-container">
       {/* Header */}
-      <div className="d-flex align-items-center mb-3">
-        <TicketIcon className="me-2" style={{ width: "24px", height: "24px" }} />
-        <h2 className="mb-0">Tickets</h2>
+      <div className="admin-page-header">
+        <div className="admin-header-content">
+          <TicketIcon className="admin-header-icon" />
+          <div>
+            <h1 className="admin-page-title">Tickets</h1>
+            <p className="admin-page-subtitle">Listado de todos los tickets realizados por los usuarios.</p>
+          </div>
+        </div>
       </div>
 
-      <p className="text-muted mb-4">Listado de todos los tickets realizados por los usuarios.</p>
-
       {/* Estadísticas */}
-      <div className="row mb-5">
-        <div className="col-md-2">
-          <div className="text-center">
-            <h4 className="text-muted mb-1">Abiertos</h4>
-            <h2 className="fw-bold">{stats.abiertos}</h2>
+      <div className="admin-stats-container">
+        <div className="admin-stats-grid">
+          <div className="admin-stat-card">
+            <h3 className="admin-stat-label">Abiertos</h3>
+            <p className="admin-stat-number">{stats.abiertos}</p>
           </div>
-        </div>
-        <div className="col-md-2">
-          <div className="text-center">
-            <h4 className="text-muted mb-1">Proceso</h4>
-            <h2 className="fw-bold">{stats.proceso}</h2>
+          <div className="admin-stat-card">
+            <h3 className="admin-stat-label">Proceso</h3>
+            <p className="admin-stat-number">{stats.proceso}</p>
           </div>
-        </div>
-        <div className="col-md-2">
-          <div className="text-center">
-            <h4 className="text-muted mb-1">Revisión</h4>
-            <h2 className="fw-bold">{stats.revision}</h2>
+          <div className="admin-stat-card">
+            <h3 className="admin-stat-label">Revisión</h3>
+            <p className="admin-stat-number">{stats.revision}</p>
           </div>
-        </div>
-        <div className="col-md-2">
-          <div className="text-center">
-            <h4 className="text-muted mb-1">Espera</h4>
-            <h2 className="fw-bold">{stats.espera}</h2>
+          <div className="admin-stat-card">
+            <h3 className="admin-stat-label">Espera</h3>
+            <p className="admin-stat-number">{stats.espera}</p>
           </div>
-        </div>
-        <div className="col-md-2">
-          <div className="text-center">
-            <h4 className="text-muted mb-1">Completados</h4>
-            <h2 className="fw-bold">{stats.completados}</h2>
+          <div className="admin-stat-card">
+            <h3 className="admin-stat-label">Completados</h3>
+            <p className="admin-stat-number">{stats.completados}</p>
           </div>
-        </div>
-        <div className="col-md-2">
-          <div className="text-center">
-            <h4 className="text-muted mb-1">Cancelados</h4>
-            <h2 className="fw-bold">{stats.cancelados}</h2>
+          <div className="admin-stat-card">
+            <h3 className="admin-stat-label">Cancelados</h3>
+            <p className="admin-stat-number">{stats.cancelados}</p>
           </div>
         </div>
       </div>
 
       {/* Actividad de tickets */}
-      <div className="mb-4">
-        <h4 className="mb-4">Actividad de tickets</h4>
+      <div className="admin-content-section">
+        <h2 className="admin-section-title">Actividad de tickets</h2>
 
         {loading ? (
-          <div className="text-center p-5">
-            <div className="spinner-border text-primary" role="status">
-              <span className="visually-hidden">Cargando...</span>
-            </div>
+          <div className="admin-loading-container">
+            <div className="admin-spinner"></div>
+            <p className="admin-loading-text">Cargando tickets...</p>
           </div>
         ) : (
-          <div className="d-flex flex-column gap-3">
+          <div className="admin-tickets-list">
             {tickets.slice(0, 60).map((ticket) => {
               const statusInfo = getStatusBadge(ticket.status || ticket.status)
               return (
-                <div key={ticket._id || ticket._id} className="card border-0 shadow-sm">
-                  <div className="card-body">
-                    <div className="d-flex justify-content-between align-items-start">
-                      <div className="flex-grow-1">
-                        <div className="d-flex align-items-center gap-3 mb-2">
-                          <h5 className="mb-0 fw-bold text-uppercase">{safeText(ticket.title || ticket.title)}</h5>
-                          <span className={`badge ${statusInfo.class} rounded-pill`}>{statusInfo.text}</span>
-                        </div>
-
-                        <div className="text-muted small">
-                          <span className="me-3">
-                            <strong>Fecha creación:</strong> {formatDate(ticket.createdAt || ticket.createdAt)}
-                          </span>
-                          <span>
-                            <strong>Creado por:</strong> {safeText(ticket.created_user || ticket.created_user)}
-                          </span>
-                        </div>
+                <article key={ticket._id || ticket._id} className="admin-ticket-card">
+                  <div className="admin-ticket-content">
+                    <div className="admin-ticket-header">
+                      <div className="admin-ticket-title-section">
+                        <h3 className="admin-ticket-title">{safeText(ticket.title || ticket.title)}</h3>
+                        <span className={`admin-status-badge ${statusInfo.class}`}>{statusInfo.text}</span>
                       </div>
-
-                      <div className="d-flex align-items-center gap-3">
-                        <div className="d-flex flex-column align-items-end gap-1">
-                          <div className="d-flex align-items-center text-muted small">
-                            <TagIcon className="me-1" style={{ width: "14px", height: "14px" }} />
-                            {safeText(ticket.category || ticket.category)}
-                          </div>
-                          <div className="d-flex align-items-center text-muted small">
-                            <BuildingOfficeIcon className="me-1" style={{ width: "14px", height: "14px" }} />
-                            {safeText(ticket.departamento || ticket.departamento)}
-                          </div>
-                        </div>
-
-                        <div className="dropdown">
-                          <button
-                            className="btn btn-link text-muted p-1"
-                            
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false"
-                          >
-                            <EllipsisVerticalIcon style={{ width: "20px", height: "20px" }} />
-                          </button>
-                          <ul className="dropdown-menu dropdown-menu-end">
-                            <li>
-                              <button className="dropdown-item">
-                                Ver detalles
-                              </button>
-                            </li>
-                            <li>
-                              <button className="dropdown-item" >
-                                Editar
-                              </button>
-                            </li>
-                            <li>
-                              <button className="dropdown-item" >
-                                Asignar
-                              </button>
-                            </li>
-                            <li>
-                              <hr className="dropdown-divider" />
-                            </li>
-                            <li>
-                              <button className="dropdown-item text-danger" >
-                                Eliminar
-                              </button>
-                            </li>
-                          </ul>
+                      <div className="admin-ticket-menu">
+                        <button className="admin-menu-button" aria-label="Opciones del ticket">
+                          <EllipsisVerticalIcon className="admin-menu-icon" />
+                        </button>
+                        <div className="admin-dropdown-menu">
+                          <button className="admin-dropdown-item">Ver detalles</button>
+                          <button className="admin-dropdown-item">Editar</button>
+                          <button className="admin-dropdown-item">Asignar</button>
+                          <div className="admin-dropdown-divider"></div>
+                          <button className="admin-dropdown-item danger">Eliminar</button>
                         </div>
                       </div>
                     </div>
+
+                    <div className="admin-ticket-metadata">
+                      <span className="admin-metadata-item">
+                        <strong>Fecha creación:</strong> {formatDate(ticket.createdAt || ticket.createdAt)}
+                      </span>
+                      <span className="admin-metadata-separator">•</span>
+                      <span className="admin-metadata-item">
+                        <strong>Creado por:</strong> {safeText(ticket.created_user || ticket.created_user)}
+                      </span>
+                    </div>
+
+                    <div className="admin-ticket-details">
+                      <div className="admin-ticket-category">
+                        <TagIcon className="admin-detail-icon" />
+                        <span>{safeText(ticket.category || ticket.category)}</span>
+                      </div>
+                      <div className="admin-ticket-department">
+                        <BuildingOfficeIcon className="admin-detail-icon" />
+                        <span>{safeText(ticket.departamento || ticket.departamento)}</span>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                </article>
               )
             })}
           </div>

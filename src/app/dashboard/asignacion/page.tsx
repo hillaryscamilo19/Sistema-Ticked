@@ -30,55 +30,24 @@ import {
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 import "../asignacion/style.css";
 
+//Functio para convertir la descripcion en Negrita o otro formato
 function deltaToHTML(deltaJson: any): string {
   try {
-    // If deltaJson is already an object, use it directly
     const delta =
       typeof deltaJson === "string" ? JSON.parse(deltaJson) : deltaJson;
 
-    // Check if it has the expected structure
     if (delta && delta.ops) {
       const converter = new QuillDeltaToHtmlConverter(delta.ops, {});
       return converter.convert();
     } else {
-      // If it doesn't have the expected structure, return the content as plain text
       return typeof deltaJson === "string"
         ? deltaJson
         : JSON.stringify(deltaJson);
     }
   } catch (error) {
     console.error("Failed to parse delta JSON:", error);
-    // Return the original content as plain text if parsing fails
     return typeof deltaJson === "string" ? deltaJson : String(deltaJson);
   }
-}
-
-// Function to convert numeric status to text
-function getStatusText(statusNumber: string | number): string {
-  const statusMap: Record<string, string> = {
-    "1": "Abierto",
-    "2": "Proceso",
-    "3": "Revisión",
-    "4": "Espera",
-    "5": "Completado",
-    "6": "Cancelado",
-  };
-
-  return statusMap[String(statusNumber)] || `Estado ${statusNumber}`;
-}
-
-// Function to get status color based on status number
-function getStatusColor(statusNumber: string | number): string {
-  const colorMap: Record<string, string> = {
-    "1": "text-blue-600",
-    "2": "text-orange-600",
-    "3": "text-purple-600",
-    "4": "text-yellow-600",
-    "5": "text-green-600",
-    "6": "text-red-600",
-  };
-
-  return colorMap[String(statusNumber)] || "text-gray-600";
 }
 
 // Function to convert status text to numeric ID
@@ -112,53 +81,6 @@ interface User {
   isAvailable: boolean;
   isAssigned: boolean;
 }
-
-const statusOptions: StatusOption[] = [
-  {
-    key: "cancelado",
-    label: "Cancelado",
-    description: "Cancelado por el creador.",
-    icon: XMarkIcon,
-    color: "text-red-600",
-  },
-  {
-    key: "abierto",
-    label: "Abierto",
-    description: "El ticket esta creado pero si empezar a trabajar.",
-    icon: ClipboardDocumentListIcon,
-    color: "text-blue-600",
-    badge: "Ideal",
-  },
-  {
-    key: "proceso",
-    label: "Proceso",
-    description: "El departamento asignado ya esta trabajando el ticket.",
-    icon: WrenchScrewdriverIcon,
-    color: "text-orange-600",
-  },
-  {
-    key: "espera",
-    label: "Espera",
-    description: "Ticket en espera.",
-    icon: ClockIcon,
-    color: "text-yellow-600",
-  },
-  {
-    key: "revision",
-    label: "Revisión",
-    description:
-      "El creador del ticket procedera a revisar que se haya realizado.",
-    icon: DocumentMagnifyingGlassIcon,
-    color: "text-purple-600",
-  },
-  {
-    key: "completado",
-    label: "Completado",
-    description: "Completado marcado por el creado.",
-    icon: CheckCircleIcon,
-    color: "text-green-600",
-  },
-];
 
 interface Ticket {
   id: string;
@@ -211,8 +133,86 @@ interface Message {
     fullname: string;
   };
 }
+
+// Function to convert numeric status to text
+function getStatusText(statusNumber: string | number): string {
+  const statusMap: Record<string, string> = {
+    "1": "Abierto",
+    "2": "Proceso",
+    "3": "Revisión",
+    "4": "Espera",
+    "5": "Completado",
+    "6": "Cancelado",
+  };
+
+  return statusMap[String(statusNumber)] || `Estado ${statusNumber}`;
+}
+
+// Function to get status color based on status number
+function getStatusColor(statusNumber: string | number): string {
+  const colorMap: Record<string, string> = {
+    "1": "text-blue-600",
+    "2": "text-orange-600",
+    "3": "text-purple-600",
+    "4": "text-yellow-600",
+    "5": "text-green-600",
+    "6": "text-red-600",
+  };
+
+  return colorMap[String(statusNumber)] || "text-gray-600";
+}
+
+//Condicion para el estado
+const statusOptions: StatusOption[] = [
+  {
+    key: "cancelado",
+    label: "Cancelado",
+    description: "Cancelado por el creador.",
+    icon: XMarkIcon,
+    color: "text-red-50",
+  },
+  {
+    key: "abierto",
+    label: "Abierto",
+    description: "El ticket esta creado pero si empezar a trabajar.",
+    icon: ClipboardDocumentListIcon,
+    color: "text-blue-600",
+    badge: "Ideal",
+  },
+  {
+    key: "proceso",
+    label: "Proceso",
+    description: "El departamento asignado ya esta trabajando el ticket.",
+    icon: WrenchScrewdriverIcon,
+    color: "text-orange-600",
+  },
+  {
+    key: "espera",
+    label: "Espera",
+    description: "Ticket en espera.",
+    icon: ClockIcon,
+    color: "text-yellow-600",
+  },
+  {
+    key: "revision",
+    label: "Revisión",
+    description:
+      "El creador del ticket procedera a revisar que se haya realizado.",
+    icon: DocumentMagnifyingGlassIcon,
+    color: "text-purple-600",
+  },
+  {
+    key: "completado",
+    label: "Completado",
+    description: "Completado marcado por el creado.",
+    icon: CheckCircleIcon,
+    color: "text-green-600",
+  },
+];
+
+//Codicion para los diferente estado
 const statusMap: Record<string, { label: string; color: string }> = {
-  abierto: { label: "Abierto", color: "bg-green-100 text-green-800" },
+  abierto: { label: "Abierto", color: "bg-green-100 text-success" },
   "en progreso": { label: "En Proceso", color: "bg-blue-100 text-blue-800" },
   "en espera": { label: "En Espera", color: "bg-yellow-100 text-yellow-800" },
   resuelto: { label: "Resuelto", color: "bg-purple-100 text-purple-800" },
@@ -244,9 +244,7 @@ const TicketDetail = () => {
   const [departmentUsers, setDepartmentUsers] = useState<User[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
 
-  // Mock users data
-  // Remove the mockUsers array completely
-
+  // Peticion para Extrar los colaboradores de cada departamento
   useEffect(() => {
     const fetchDepartmentUsers = async () => {
       if (!showAssignModal) return;
@@ -294,6 +292,7 @@ const TicketDetail = () => {
     fetchDepartmentUsers();
   }, [showAssignModal, selectedUsers]);
 
+  //peticion para mostrar los ticked por ID
   useEffect(() => {
     const fetchTicket = async () => {
       try {
@@ -341,6 +340,7 @@ const TicketDetail = () => {
     }
   }, [id, navigate]);
 
+  //Peticion para mandar mensaje
   useEffect(() => {
     const fetchMessages = async () => {
       try {
@@ -374,6 +374,7 @@ const TicketDetail = () => {
     }
   }, [id]);
 
+  //Peticion para mandar achivos
   const handleSendattachments = async () => {
     if (newMessage.trim() && id && ticket) {
       try {
@@ -437,6 +438,7 @@ const TicketDetail = () => {
     }
   };
 
+  //Peticion PAra mandar un nuevo mensaje
   const handleSendMessage = async () => {
     if (newMessage.trim() && id && ticket) {
       try {
@@ -500,6 +502,7 @@ const TicketDetail = () => {
     }
   };
 
+  //Peticion para cambiar de estado
   const handleStatusChange = async (statusKey: string) => {
     try {
       const statusId = getStatusId(statusKey);
@@ -507,7 +510,6 @@ const TicketDetail = () => {
 
       console.log(`Changing status for ticket ${id} to status ID ${statusId}`);
 
-      // FIX: Send estado_id as a query parameter, not in the body
       const url = `http://10.0.0.15:8000/tickets/${id}/estado?estado_id=${statusId}`;
 
       const response = await fetch(url, {
@@ -516,20 +518,16 @@ const TicketDetail = () => {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        // Empty body since we're using query parameters
       });
 
       if (response.ok) {
-        // Show success message
         setStatusChangeSuccess(true);
         setTimeout(() => setStatusChangeSuccess(false), 3000);
 
-        // Update ticket in state with the new status ID as string
         setTicket((prev) =>
           prev ? { ...prev, status: String(statusId) } : null
         );
 
-        // Refresh ticket data
         const refreshResponse = await fetch(
           `http://10.0.0.15:8000/tickets/${id}`,
           {
@@ -566,17 +564,14 @@ const TicketDetail = () => {
     });
   };
 
+  //Peticion para Asignar un nuevo usuario
   const handleAssignUsers = async () => {
     if (selectedUsers.length === 0) {
       alert("Por favor seleccione al menos un usuario para asignar");
       return;
     }
-
     try {
       const token = localStorage.getItem("token");
-
-      // FIX: Send the user IDs as an array directly, not wrapped in an object
-      // Convert string IDs to numbers if needed
       const userIds = selectedUsers.map((id) => Number(id));
 
       const response = await fetch(
@@ -587,16 +582,13 @@ const TicketDetail = () => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(userIds), // Send as a direct array
+          body: JSON.stringify(userIds),
         }
       );
 
       if (response.ok) {
-        // Show success message
         setAssignSuccess(true);
         setTimeout(() => setAssignSuccess(false), 3000);
-
-        // Refresh ticket data
         const refreshResponse = await fetch(
           `http://10.0.0.15:8000/tickets/${id}`,
           {
@@ -606,13 +598,10 @@ const TicketDetail = () => {
             },
           }
         );
-
         if (refreshResponse.ok) {
           const updatedTicket = await refreshResponse.json();
           setTicket(updatedTicket);
         }
-
-        // Clear selected users
         setSelectedUsers([]);
         setShowAssignModal(false);
       } else {
@@ -626,6 +615,7 @@ const TicketDetail = () => {
     }
   };
 
+  //Formateo de fecha
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("es-ES", {
@@ -637,6 +627,7 @@ const TicketDetail = () => {
     });
   };
 
+  //Formateo de Calculo de Dias
   const calculateDaysAgo = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -645,6 +636,7 @@ const TicketDetail = () => {
     return diffDays;
   };
 
+  //Condicion para Cargar mas rapida de los ticked
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -771,6 +763,8 @@ const TicketDetail = () => {
                 Estado
                 <ChevronDownIcon className="dropdown-icon" />
               </button>
+
+              {/* Modal de asignacion de estados*/}
               {showStatusDropdown && (
                 <>
                   <div
@@ -792,7 +786,7 @@ const TicketDetail = () => {
                               isSelected ? "selected" : ""
                             }`}
                           >
-                            <div className={`icon-container ${option.color}`}>
+                            <div className={`icon-container ${option}`}>
                               <IconComponent className="icon" />
                             </div>
                             <div className="content-container">
@@ -973,21 +967,18 @@ const TicketDetail = () => {
                   dangerouslySetInnerHTML={{
                     __html: (() => {
                       try {
-                        // Fix: Check if the description is already a string and not JSON
                         if (
                           typeof ticket.description === "string" &&
                           !ticket.description.startsWith("{")
                         ) {
                           return ticket.description;
                         }
-                        // Try to parse as JSON if it looks like JSON
                         return deltaToHTML(JSON.parse(ticket.description));
                       } catch (error) {
                         console.error(
                           "Error parsing description as JSON:",
                           error
                         );
-                        // If parsing fails, treat it as plain text
                         return ticket.description;
                       }
                     })(),
