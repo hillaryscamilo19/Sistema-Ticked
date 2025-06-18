@@ -83,6 +83,7 @@ interface User {
 }
 
 interface Ticket {
+  attachment: any;
   id: string;
   title: string;
   description: string;
@@ -966,6 +967,18 @@ const TicketDetail = () => {
                   className="prose max-w-none text-gray-700"
                   dangerouslySetInnerHTML={{
                     __html: (() => {
+                      {
+                        ticket.attachment && (
+                          <a
+                            href={ticket.attachment}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 underline"
+                          >
+                            Ver archivo adjunto
+                          </a>
+                        );
+                      }
                       try {
                         if (
                           typeof ticket.description === "string" &&
