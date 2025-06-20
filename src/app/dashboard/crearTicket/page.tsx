@@ -104,7 +104,99 @@ export default function CrearNuevoTicket() {
     fetchDatos();
   }, []);
 
-  // Función para enviar notificaciones usando el nuevo endpoint
+  // Función para subir archivo adjunto
+  const uploadAttachment = async (
+    ticketId: number,
+    file: File
+  ): Promise<boolean> => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Token no encontrado");
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch(
+        `http://10.0.0.15:8000/tickets/${ticketId}/attachments`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Error al subir archivo:", errorData);
+        return false;
+      }
+
+      const result = await response.json();
+      console.log("Archivo subido exitosamente:", result);
+      return true;
+    } catch (error) {
+      console.error("Error al subir archivo:", error);
+      return false;
+    }
+  };
+
+  // Función para subir imagen desde el editor y obtener URL
+  const uploadImageFromEditor = async (
+    ticketId: number,
+    imageFile: File
+  ): Promise<string | null> => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Token no encontrado");
+      }
+
+      const formData = new FormData();
+      formData.append("file", imageFile);
+
+      const response = await fetch(
+        `http://10.0.0.15:8000/tickets/${ticketId}/attachments`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Error al subir imagen:", errorData);
+        return null;
+      }
+
+      const result = await response.json();
+      console.log("Respuesta del servidor para imagen:", result);
+
+   // Basándome en tu respuesta, el backend devuelve file_path
+    // Construir la URL completa para acceder a la imagen
+    const baseUrl = "http://10.0.0.15:8000";
+    const filePath = result.file_path;
+    
+    if (filePath) {
+      // Construir la URL completa - el file_path ya incluye /uploads/
+      const imageUrl = `${baseUrl}${filePath}`;
+      console.log("URL de imagen construida:", imageUrl);
+      return imageUrl;
+    }
+    
+    console.error("No se encontró file_path en la respuesta");
+    return null;
+  } catch (error) {
+    console.error("Error al subir imagen:", error);
+    return null;
+  }
+};
 
   // Manejar cambios en los campos del formulario
   const handleChange = (
@@ -146,6 +238,69 @@ export default function CrearNuevoTicket() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     setArchivo(file);
+  };
+
+  // Función para procesar imágenes en la descripción HTML
+  const processImagesInDescription = async (
+    ticketId: number,
+    htmlContent: string
+  ): Promise<string> => {
+    // Buscar todas las imágenes en base64 en el HTML
+    const base64ImageRegex =
+      /<img[^>]+src="data:image\/[^;]+;base64,([^"]+)"[^>]*>/g;
+    let updatedHtml = htmlContent;
+    const matches = Array.from(htmlContent.matchAll(base64ImageRegex));
+
+    console.log(
+      `Encontradas ${matches.length} imágenes en base64 para procesar`
+    );
+
+    for (const match of matches) {
+      const fullImgTag = match[0];
+      const base64Data = match[1];
+
+      try {
+        // Convertir base64 a File
+        const byteCharacters = atob(base64Data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+
+        // Determinar el tipo de imagen
+        const imageType = fullImgTag.match(/data:image\/([^;]+)/)?.[1] || "png";
+        const fileName = `image_${Date.now()}_${Math.random()
+          .toString(36)
+          .substr(2, 9)}.${imageType}`;
+
+        const imageFile = new File([byteArray], fileName, {
+          type: `image/${imageType}`,
+        });
+
+        console.log(`Subiendo imagen: ${fileName}`);
+
+        // Subir la imagen
+        const imageUrl = await uploadImageFromEditor(ticketId, imageFile);
+
+        if (imageUrl) {
+          console.log(`Imagen subida exitosamente: ${imageUrl}`);
+          // Reemplazar la imagen base64 con la URL del servidor
+          const newImgTag = fullImgTag.replace(
+            /src="data:image\/[^"]+"/,
+            `src="${imageUrl}"`
+          );
+          updatedHtml = updatedHtml.replace(fullImgTag, newImgTag);
+        } else {
+          console.error(`Error al subir imagen: ${fileName}`);
+        }
+      } catch (error) {
+        console.error("Error procesando imagen:", error);
+      }
+    }
+
+    console.log("HTML actualizado con URLs de imágenes:", updatedHtml);
+    return updatedHtml;
   };
 
   // Función para extraer el ID del usuario del token JWT
@@ -190,276 +345,161 @@ export default function CrearNuevoTicket() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Manejar envío del formulario
-  const handleSubmit = async () => {
-    if (!validateForm()) return;
+  // Función actualizada handleSubmit
+const handleSubmit = async () => {
+  if (!validateForm()) return;
 
-    const token = localStorage.getItem("token");
-    if (!token) {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    setErrors({
+      general: "Token no encontrado. Por favor, inicie sesión nuevamente.",
+    });
+    return;
+  }
+
+  const payload = parseJwt(token);
+  if (!payload) {
+    setErrors({
+      general: "Token inválido. Por favor, inicie sesión nuevamente.",
+    });
+    return;
+  }
+
+  const userId = payload.sub || payload.user_id || payload.id || null;
+  if (!userId) {
+    setErrors({
+      general: "Usuario no autenticado. Por favor, inicie sesión nuevamente.",
+    });
+    return;
+  }
+
+  try {
+    setIsSubmitting(true);
+    setErrors({});
+
+    console.log("Iniciando creación de ticket...");
+    console.log("Descripción original:", formData.description);
+    console.log("HTML del editor:", descripcionHTML);
+
+    // Verificar si hay imágenes en base64 en la descripción
+    const hasBase64Images = descripcionHTML.includes('data:image/');
+    console.log("¿Tiene imágenes en base64?", hasBase64Images);
+
+    // Decidir qué descripción usar inicialmente
+    const initialDescription = hasBase64Images ? "Procesando contenido..." : (descripcionHTML || formData.description);
+
+    // Crear el ticket
+    const ticketData = {
+      title: formData.title,
+      description: initialDescription,
+      category_id: Number(formData.category_id),
+      assigned_department_id: Number(formData.assigned_department_id),
+      created_user_id: Number(userId),
+      status: formData.status,
+    };
+
+    const res = await fetch("http://10.0.0.15:8000/tickets", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(ticketData),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      console.error("Error respuesta API:", errorData);
       setErrors({
-        general: "Token no encontrado. Por favor, inicie sesión nuevamente.",
+        general: "Error al crear ticket. Por favor, intente nuevamente.",
       });
       return;
     }
 
-    const payload = parseJwt(token);
-    if (!payload) {
-      setErrors({
-        general: "Token inválido. Por favor, inicie sesión nuevamente.",
-      });
-      return;
-    }
+    const createdTicket = await res.json();
+    const ticketId = createdTicket.id;
+    console.log("Ticket creado con ID:", ticketId);
 
-    const userId = payload.sub || payload.user_id || payload.id || null;
-    if (!userId) {
-      setErrors({
-        general: "Usuario no autenticado. Por favor, inicie sesión nuevamente.",
-      });
-      return;
-    }
-
-    try {
-      setIsSubmitting(true);
-      setErrors({});
-
-      // Primero crear el ticket
-      const ticketData = {
-        title: formData.title,
-        description: formData.description, // Descripción temporal
-        category_id: Number(formData.category_id),
-        assigned_department_id: Number(formData.assigned_department_id),
-        created_user_id: Number(userId),
-        status: formData.status,
-      };
-      // Función para subir archivo adjunto
-      const uploadAttachment = async (
-        ticketId: number,
-        file: File
-      ): Promise<boolean> => {
-        try {
-          const token = localStorage.getItem("token");
-          if (!token) {
-            throw new Error("Token no encontrado");
-          }
-
-          const formData = new FormData();
-          formData.append("file", file);
-
-          const response = await fetch(
-            `http://10.0.0.15:8000/tickets/${ticketId}/attachments`,
-            {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-              body: formData,
-            }
-          );
-
-          if (!response.ok) {
-            const errorData = await response.json();
-            console.error("Error al subir archivo:", errorData);
-            return false;
-          }
-
-          const result = await response.json();
-          console.log("Archivo subido exitosamente:", result);
-          return true;
-        } catch (error) {
-          console.error("Error al subir archivo:", error);
-          return false;
-        }
-      };
-
-      // Función para subir imagen desde el editor y obtener URL
-      const uploadImageFromEditor = async (
-        ticketId: number,
-        imageFile: File
-      ): Promise<string | null> => {
-        try {
-          const token = localStorage.getItem("token");
-          if (!token) {
-            throw new Error("Token no encontrado");
-          }
-
-          const formData = new FormData();
-          formData.append("file", imageFile);
-
-          const response = await fetch(
-            `http://10.0.0.15:8000/tickets/${ticketId}/attachments`,
-            {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-              body: formData,
-            }
-          );
-
-          if (!response.ok) {
-            const errorData = await response.json();
-            console.error("Error al subir imagen:", errorData);
-            return null;
-          }
-
-          const result = await response.json();
-          // Asumiendo que la respuesta contiene una URL o path del archivo
-          return result.file_url || result.path || result.url;
-        } catch (error) {
-          console.error("Error al subir imagen:", error);
-          return null;
-        }
-      };
-
-      // Función para procesar imágenes en la descripción HTML
-      const processImagesInDescription = async (
-        ticketId: number,
-        htmlContent: string
-      ): Promise<string> => {
-        // Buscar todas las imágenes en base64 en el HTML
-        const base64ImageRegex =
-          /<img[^>]+src="data:image\/[^;]+;base64,([^"]+)"[^>]*>/g;
-        let updatedHtml = htmlContent;
-        let match;
-
-        while ((match = base64ImageRegex.exec(htmlContent)) !== null) {
-          const fullImgTag = match[0];
-          const base64Data = match[1];
-
-          try {
-            // Convertir base64 a File
-            const byteCharacters = atob(base64Data);
-            const byteNumbers = new Array(byteCharacters.length);
-            for (let i = 0; i < byteCharacters.length; i++) {
-              byteNumbers[i] = byteCharacters.charCodeAt(i);
-            }
-            const byteArray = new Uint8Array(byteNumbers);
-
-            // Determinar el tipo de imagen
-            const imageType =
-              fullImgTag.match(/data:image\/([^;]+)/)?.[1] || "png";
-            const fileName = `image_${Date.now()}.${imageType}`;
-
-            const imageFile = new File([byteArray], fileName, {
-              type: `image/${imageType}`,
-            });
-
-            // Subir la imagen
-            const imageUrl = await uploadImageFromEditor(ticketId, imageFile);
-
-            if (imageUrl) {
-              // Reemplazar la imagen base64 con la URL del servidor
-              const newImgTag = fullImgTag.replace(
-                /src="data:image\/[^"]+"/,
-                `src="${imageUrl}"`
-              );
-              updatedHtml = updatedHtml.replace(fullImgTag, newImgTag);
-            }
-          } catch (error) {
-            console.error("Error procesando imagen:", error);
-          }
-        }
-
-        return updatedHtml;
-      };
-
-      const res = await fetch("http://10.0.0.15:8000/tickets", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(ticketData),
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        console.error("Error respuesta API:", errorData);
-        setErrors({
-          general: "Error al crear ticket. Por favor, intente nuevamente.",
-        });
-        return;
-      }
-
-      const createdTicket = await res.json();
-      const ticketId = createdTicket.id;
-      console.log("Ticket creado:", createdTicket);
-
-      // Procesar imágenes en la descripción
-      let finalDescription = formData.description;
-      if (descripcionHTML.includes("data:image/")) {
-        finalDescription = await processImagesInDescription(
-          ticketId,
-          descripcionHTML
-        );
-
-        const base64Regex =
-          /<img[^>]+src="data:image\/[^;]+;base64,([^"]+)"[^>]*>/;
-        if (base64Regex.test(descripcionHTML)) {
-          finalDescription = await processImagesInDescription(
-            ticketId,
-            descripcionHTML
-          );
-          // ...
-        }
-
-        // Actualizar la descripción del ticket con las URLs de las imágenes
-        await fetch(`http://10.0.0.15:8000/tickets/${ticketId}`, {
+    // Procesar imágenes si existen
+    let finalDescription = descripcionHTML || formData.description;
+    
+    if (hasBase64Images) {
+      console.log("Procesando imágenes en la descripción...");
+      finalDescription = await processImagesInDescription(ticketId, descripcionHTML);
+      console.log("Descripción procesada:", finalDescription);
+      
+      // Actualizar la descripción del ticket con las imágenes procesadas
+      try {
+        const updateResponse = await fetch(`http://10.0.0.15:8000/tickets/${ticketId}`, {
           method: "PUT",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            ...ticketData,
-            id: ticketId,
+            title: formData.title,
             description: finalDescription,
+            category_id: Number(formData.category_id),
+            assigned_department_id: Number(formData.assigned_department_id),
+            status: formData.status,
           }),
         });
-      }
 
-      // Subir archivo adjunto si existe
-      if (archivo) {
-        const uploadSuccess = await uploadAttachment(ticketId, archivo);
-        if (!uploadSuccess) {
-          console.warn(
-            "El ticket se creó pero hubo un error al subir el archivo adjunto"
-          );
+        if (!updateResponse.ok) {
+          const updateError = await updateResponse.json();
+          console.error("Error al actualizar descripción:", updateError);
+          console.error("Status:", updateResponse.status);
+        } else {
+          console.log("Descripción del ticket actualizada exitosamente");
         }
+      } catch (updateError) {
+        console.error("Error en la actualización:", updateError);
       }
-
-      // Resetear formulario
-      setFormData({
-        title: "",
-        description: "",
-        category_id: "",
-        assigned_department_id: "",
-        status: "1",
-      });
-      setDescripcionHTML("");
-      setArchivo(null);
-
-      // Resetear el input de archivo
-      const fileInput = document.querySelector(
-        'input[type="file"]'
-      ) as HTMLInputElement;
-      if (fileInput) {
-        fileInput.value = "";
-      }
-
-      alert(
-        "Ticket creado correctamente. Las notificaciones se enviaron automáticamente."
-      );
-    } catch (error) {
-      console.error("Error al enviar ticket:", error);
-      setErrors({
-        general:
-          "Error de conexión. Por favor, verifique su conexión a internet.",
-      });
-    } finally {
-      setIsSubmitting(false);
     }
-  };
+
+    // Subir archivo adjunto si existe
+    if (archivo) {
+      console.log("Subiendo archivo adjunto:", archivo.name);
+      const uploadSuccess = await uploadAttachment(ticketId, archivo);
+      if (!uploadSuccess) {
+        console.warn("El ticket se creó pero hubo un error al subir el archivo adjunto");
+      } else {
+        console.log("Archivo adjunto subido exitosamente");
+      }
+    }
+
+    // Resetear formulario
+    setFormData({
+      title: "",
+      description: "",
+      category_id: "",
+      assigned_department_id: "",
+      status: "1",
+    });
+    setDescripcionHTML("");
+    setArchivo(null);
+
+    // Resetear el input de archivo
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = "";
+    }
+
+    alert(
+      "Ticket creado correctamente con archivos adjuntos e imágenes procesadas."
+    );
+
+  } catch (error) {
+    console.error("Error al enviar ticket:", error);
+    setErrors({
+      general:
+        "Error de conexión. Por favor, verifique su conexión a internet.",
+    });
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
 
   if (loading) {
     return (
