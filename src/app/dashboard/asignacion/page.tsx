@@ -30,6 +30,7 @@ import {
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 import "../asignacion/style.css";
 
+
 //Functio para convertir la descripcion en Negrita o otro formato
 function deltaToHTML(deltaJson: any): string {
   try {
@@ -114,6 +115,12 @@ interface Ticket {
     email: string;
     phone_ext: string;
   };
+  attachments: {
+    id?: string,
+    file_name?: string,
+    file_path?: string,
+    file_extension?:string
+  }
   comments?: Comment[];
 }
 
@@ -968,9 +975,9 @@ const TicketDetail = () => {
                   dangerouslySetInnerHTML={{
                     __html: (() => {
                       {
-                        ticket.attachment && (
+                        ticket.attachments && (
                           <a
-                            href={ticket.attachment}
+                            href={ticket.attachments.file_path}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-blue-600 underline"
@@ -992,7 +999,7 @@ const TicketDetail = () => {
                           "Error parsing description as JSON:",
                           error
                         );
-                        return ticket.description;
+                        return ticket.attachments;
                       }
                     })(),
                   }}

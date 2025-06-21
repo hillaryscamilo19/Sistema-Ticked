@@ -49,7 +49,7 @@ const TechAdminRoute = () => {
         }
 
         // Obtener datos del usuario
-        const userResponse = await fetch("http://10.0.0.15:8000/usuarios/me", {
+        const userResponse = await fetch("http://10.0.0.15:8002/usuarios/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
