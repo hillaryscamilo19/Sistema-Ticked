@@ -364,11 +364,10 @@ export function Sidebar() {
                 <span className="text-muted">▼</span>
               </button>
 
-    {/* Bootstrap Collapse Dropdown */}
+              {/* Bootstrap Collapse Dropdown */}
               <div
                 className="collapse position-absolute end-0 mt-2"
                 id="userDropdown"
-              
               >
                 <div className="card shadow-sm" style={{ minWidth: "220px" }}>
                   <div className="card-body p-0">

@@ -6,15 +6,18 @@ import {
   PhoneIcon,
   EnvelopeIcon,
   KeyIcon,
-  StopCircleIcon,
   PencilSquareIcon,
   MagnifyingGlassIcon,
-  PlusIcon,
 } from "@heroicons/react/24/outline";
+
+interface Departamento {
+  id: string;
+  name: string;
+}
 
 export default function AdminUsuarios() {
   const [usuarios, setUsuarios] = useState([]);
-  const [departamentos, setDepartamentos] = useState([]);
+  const [departamentos, setDepartamentos] = useState<Departamento[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
@@ -27,6 +30,7 @@ export default function AdminUsuarios() {
     role: "",
     status: true,
   });
+
   const [passwordData, setPasswordData] = useState({
     newPassword: "",
     confirmPassword: "",
@@ -95,9 +99,9 @@ export default function AdminUsuarios() {
       username: usuario.username || "",
       email: usuario.email || "",
       department_id: usuario.department_id || "",
-      phone_ext: usuario.phone_ext || "",
+      phone_ext: usuario.phone_ext?.toString() || "",
       role: usuario.role || "User",
-      status: usuario.status !== false,
+      status: usuario.status !== false?.toString(),
     });
   };
 
@@ -145,7 +149,18 @@ export default function AdminUsuarios() {
           },
           body: JSON.stringify({
             ...editFormData,
-            department_id: editFormData.department_id || null,
+            fullname: editFormData.fullname,
+            username: editFormData.username,
+            email: editFormData.email,
+            phone_ext: parseInt(editFormData.phone_ext, 10),
+            department_id: parseInt(editFormData.department_id, 10),
+            role:
+              editFormData.role === "Admin"
+                ? 1
+                : editFormData.role === "Moderator"
+                ? 2
+                : 0,
+            status: editFormData.status === true,
           }),
         }
       );
@@ -350,11 +365,7 @@ export default function AdminUsuarios() {
                 <h3 className="admin-user-name">
                   {usuario.fullname || usuario.username}
                 </h3>
-                <span
-                  className={`admin-user-role ${
-                    usuario.role || "user"
-                  }`}
-                >
+                <span className={`admin-user-role ${usuario.role || "user"}`}>
                   {usuario.role || "User"}
                 </span>
               </div>
@@ -410,8 +421,8 @@ export default function AdminUsuarios() {
                 <button
                   className="admin-secondary-button"
                   onClick={() => openPasswordModal(usuario)}
-                   data-bs-toggle="modal"
-                    data-bs-target="#passwordModal"
+                  data-bs-toggle="modal"
+                  data-bs-target="#passwordModal"
                 >
                   <KeyIcon className="admin-button-icon" />
                   Restablecer
@@ -631,15 +642,10 @@ export default function AdminUsuarios() {
         </div>
         <div className="offcanvas-footer p-3 border-top">
           <div className="d-flex justify-content-end gap-2">
-            <button
-             
-              className="btn btn-secondary"
-              data-bs-dismiss="offcanvas"
-            >
+            <button className="btn btn-secondary" data-bs-dismiss="offcanvas">
               Cancelar
             </button>
             <button
-           
               className="btn btn-primary"
               onClick={handleSaveUser}
               disabled={loadingAction}

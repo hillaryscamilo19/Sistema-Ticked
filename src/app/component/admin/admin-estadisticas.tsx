@@ -102,14 +102,28 @@ export default function AdminEstadisticas() {
   const stackedBarChartRef = useRef<HTMLCanvasElement>(null)
   const doughnutChartRef = useRef<HTMLCanvasElement>(null)
 
+
+  useEffect(() => {
+  const simulateLoading = async () => {
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+    setLoading(false)
+    setChartsVisible(true)
+  }
+
+  simulateLoading()
+}, [])
+
+
   useEffect(() => {
     const loadCharts = async () => {
+        console.log("Cargando gráficos...")
       // Simulación de carga de datos
       await new Promise((resolve) => setTimeout(resolve, 1000))
 
       // Importar Chart.js dinámicamente
       const { Chart, registerables } = await import("chart.js")
       Chart.register(...registerables)
+      console.log("lineChartRef:", lineChartRef.current) // 👈 Verifica esto
 
       // Configurar gráfico de líneas
       if (lineChartRef.current) {

@@ -57,7 +57,7 @@ const TechAdminRoute = () => {
           const userData = await userResponse.json();
 
           if (userData.department_id) {
-            // Obtener datos del departamento
+            // Obtener datos del departament
             const deptResponse = await fetch(
               "http://10.0.0.15:8002/departments",
               {

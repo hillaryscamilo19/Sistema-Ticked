@@ -47,6 +47,7 @@
 
 /* Contenido del gráfico */
 .admin-chart-content {
+   height: 300px;
   padding: 2rem;
   position: relative;
 }
@@ -69,8 +70,9 @@
 
 /* Canvas responsivo */
 .admin-chart-content canvas {
+  width: 100% !important;
   max-width: 100%;
-  height: 100% !important;
+  height: 300px !important; /* o más, según el gráfico */
 }
 
 /* Estados de carga específicos para gráficos */
@@ -333,6 +335,6 @@
 
   .admin-chart-placeholder {
     background-color: #374151;
-    color: #9ca3af;
+    color: #416db8;
   }
 }
