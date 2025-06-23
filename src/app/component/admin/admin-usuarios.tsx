@@ -40,10 +40,10 @@ export default function AdminUsuarios() {
         const token = localStorage.getItem("token");
 
         const [usuariosResponse, departamentosResponse] = await Promise.all([
-          fetch("http://10.0.0.15:8000/usuarios", {
+          fetch("http://10.0.0.15:8002/usuarios", {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch("http://10.0.0.15:8000/departments", {
+          fetch("http://10.0.0.15:8002/departments", {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
@@ -136,7 +136,7 @@ export default function AdminUsuarios() {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://10.0.0.15:8000/usuarios/${selectedUser.id}`,
+        `http://10.0.0.15:8002/usuarios/${selectedUser.id}`,
         {
           method: "PUT",
           headers: {
@@ -197,7 +197,7 @@ export default function AdminUsuarios() {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://10.0.0.15:8000/usuarios/${
+        `http://10.0.0.15:8002/usuarios/${
           selectedUser._id || selectedUser.id
         }/reset-password`,
         {
@@ -247,7 +247,7 @@ export default function AdminUsuarios() {
       );
 
       const response = await fetch(
-        `http://10.0.0.15:8000/usuarios/${
+        `http://10.0.0.15:8002/usuarios/${
           usuario._id || usuario.id
         }/toggle-status`,
         {

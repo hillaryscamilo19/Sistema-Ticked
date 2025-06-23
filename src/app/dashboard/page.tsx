@@ -35,7 +35,7 @@ export default function Dashboard() {
     const fetchUsuario = async () => {
       try {
         const token = localStorage.getItem("token")
-        const res = await fetch("http://10.0.0.15:8000/usuarios/me", {
+        const res = await fetch("http://10.0.0.15:8002/usuarios/me", {
           headers: { Authorization: `Bearer ${token}` },
         })
 
@@ -62,7 +62,7 @@ export default function Dashboard() {
         try {
           setIsLoading(true)
           setError(null)
-          const res = await fetch("http://10.0.0.15:8000/tickets/asignados-a-mi/", {
+          const res = await fetch("http://10.0.0.15:8002/tickets/asignados-a-mi/", {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
@@ -89,7 +89,7 @@ export default function Dashboard() {
     const fetchColaboradores = async () => {
       try {
         const token = localStorage.getItem("token")
-        const res = await fetch("http://10.0.0.15:8000/usuarios/departamento/colaboradores", {
+        const res = await fetch("http://10.0.0.15:8002/usuarios/departamento/colaboradores", {
           headers: { Authorization: `Bearer ${token}` },
         })
 

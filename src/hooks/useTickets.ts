@@ -33,7 +33,7 @@ export const useTickets = () => {
       try {
         const token = localStorage.getItem("token");
         const res = await axios.get(
-          "http://10.0.0.15:8000/tickets/asignados-a-mi/",
+          "http://10.0.0.15:8002/tickets/asignados-a-mi/",
           {
             headers: {
               Authorization: `Bearer ${token}`,

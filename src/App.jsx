@@ -59,7 +59,7 @@ const TechAdminRoute = () => {
           if (userData.department_id) {
             // Obtener datos del departamento
             const deptResponse = await fetch(
-              "http://10.0.0.15:8000/departments",
+              "http://10.0.0.15:8002/departments",
               {
                 headers: { Authorization: `Bearer ${token}` },
               }

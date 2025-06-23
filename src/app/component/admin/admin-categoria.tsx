@@ -35,7 +35,7 @@ export default function AdminCategoria() {
     const fetchCategoria = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch("http://10.0.0.15:8000/categories", {
+        const response = await fetch("http://10.0.0.15:8002/categories", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -65,7 +65,7 @@ export default function AdminCategoria() {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://10.0.0.15:8000/departments/${categoriaId}`,
+        `http://10.0.0.15:8002/departments/${categoriaId}`,
         {
           method: "DELETE",
           headers: {
@@ -158,7 +158,7 @@ export default function AdminCategoria() {
 
     try {
       setLoading(true);
-      const res = await fetch("http://10.0.0.15:8000/categories", {
+      const res = await fetch("http://10.0.0.15:8002/categories", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
