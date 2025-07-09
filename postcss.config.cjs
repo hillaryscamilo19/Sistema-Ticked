@@ -5,3 +5,10 @@ module.exports = {
     autoprefixer: {},
   },
 }
+
+module.exports = {
+  plugins: {
+    '@tailwindcss/postcss': {},
+    autoprefixer: {},
+  },
+};

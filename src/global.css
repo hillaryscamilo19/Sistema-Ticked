@@ -214,7 +214,7 @@ height: 100%;
   margin-left: 12px;
 }
 .form-container {
-  max-width: 700px;
+  max-width: 710%;
   margin: 2rem auto;
   padding: 2rem;
   background: white;
@@ -307,7 +307,7 @@ button[type="button"] {
 
 .iconoUser {
   width: 4%;
-  margin: -7px;
+  margin: 19px;
   margin-left: -39px;
 }
 

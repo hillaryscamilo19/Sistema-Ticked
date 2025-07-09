@@ -42,7 +42,7 @@ export function Sidebar() {
     const fetchUsuario = async () => {
       try {
         const token = localStorage.getItem("token")
-        const res = await fetch("http://localhost:8000/usuarios/me", {
+        const res = await fetch("http://10.0.0.15:8002/usuarios/me", {
           headers: { Authorization: `Bearer ${token}` },
         })
 
@@ -70,7 +70,7 @@ export function Sidebar() {
 
       try {
         const token = localStorage.getItem("token")
-        const response = await fetch("http://localhost:8000/departments", {
+        const response = await fetch("http://10.0.0.15:8002/departments", {
           headers: { Authorization: `Bearer ${token}` },
         })
 
@@ -108,7 +108,7 @@ export function Sidebar() {
   return (
     <div className="d-flex vh-100">
       {/* SIDEBAR */}
-      <div className="bg-dark text-white p-3" style={{ width: "280px", overflowY: "auto" }}>
+      <div className="bg-dark text-white p-3" style={{ width: "280px"}}>
         <div className="text-center mb-4">
           <img
             src={tyz}

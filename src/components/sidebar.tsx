@@ -1,105 +1,113 @@
-"use client"
+"use client";
 
-import { UserCircleIcon } from "@heroicons/react/24/outline"
-import { Link, Outlet, useNavigate, useLocation } from "react-router-dom"
-import { useState, useEffect } from "react"
-import { Moon } from "lucide-react"
-import tyz from "../img/tyz.png"
+import { UserCircleIcon } from "@heroicons/react/24/outline";
+import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Moon } from "lucide-react";
+import tyz from "../img/tyz.png";
 
 interface Usuario {
-  fullname: string
-  phone_ext: string
-  role: 0
-  email: string
-  department?: {
-    id: string
-    name: string
-  }
-  username: string
-  status: string
-  _id: string
+  fullname: string;
+  phone_ext: string;
+  role: 0;
+  email: string;
+  department_id?: {
+    id: string;
+    name: string;
+  };
+  username: string;
+  status: string;
+  _id: string;
+}
+
+interface Departamento {
+  id: string;
+  name: string;
 }
 
 export function Sidebar() {
-  const [darkMode, setDarkMode] = useState(true)
-  const [usuario, setUsuario] = useState<Usuario | null>(null)
-  const [collapsed,] = useState(false)
-  const closeMobileSidebar = () => setMobileSidebarOpen(false)
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
-  const [,setDepartamento] = useState(null)
-  const [,setDepartamentos] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [isTechUser, setIsTechUser] = useState(false)
-  const navigate = useNavigate()
-  const location = useLocation()
+  const [darkMode, setDarkMode] = useState(true);
+  const [usuario, setUsuario] = useState<Usuario | null>(null);
+  const [departamento, setDepartamento] = useState<Departamento | null>(null);
+  const [collapsed] = useState(false);
+  const closeMobileSidebar = () => setMobileSidebarOpen(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [isTechUser, setIsTechUser] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const isAdminMenu = ["todotickets", "usuarios", "departamentos", "categorias", "estadisticas"].some((path) =>
-    location.pathname.startsWith(path),
-  )
+  const isAdminMenu = [
+    "todotickets",
+    "usuarios",
+    "departamentos",
+    "categorias",
+    "estadisticas",
+  ].some((path) => location.pathname.startsWith(path));
 
-  const toggleTheme = () => setDarkMode(!darkMode)
+  const toggleTheme = () => setDarkMode(!darkMode);
 
   const handleLogout = () => {
-    localStorage.removeItem("token")
-    localStorage.removeItem("username")
-    localStorage.removeItem("department_name")
-    localStorage.removeItem("user_id")
-    navigate("/login")
-  }
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    localStorage.removeItem("department_name");
+    localStorage.removeItem("user_id");
+    navigate("/login");
+  };
 
   // Primero cargar usuario
   useEffect(() => {
     const fetchUsuario = async () => {
       try {
-        const token = localStorage.getItem("token")
-        const res = await fetch("http://localhost:8000/usuarios/me", {
+        const token = localStorage.getItem("token");
+        const res = await fetch("http://10.0.0.15:8002/usuarios/me", {
           headers: { Authorization: `Bearer ${token}` },
-        })
+        });
 
         if (res.status === 401) {
-          localStorage.removeItem("token")
-          return navigate("/login")
+          localStorage.removeItem("token");
+          return navigate("/login");
         }
 
-        const data = await res.json()
-        setUsuario(data)
+        const data = await res.json();
+        setUsuario(data);
       } catch (error) {
-        console.error("Error al cargar usuario:", error)
+        console.error("Error al cargar usuario:", error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchUsuario()
-  }, [navigate])
+    fetchUsuario();
+  }, [navigate]);
 
   // Luego cargar departamentos cuando ya tenemos el usuario
   useEffect(() => {
     const fetchDepartamentos = async () => {
       // Check if usuario exists and has departments with a name property
-      if (usuario?.department?.name) return
+      if (departamento?.name) return;
 
       try {
-        const token = localStorage.getItem("token")
-        const response = await fetch("http://localhost:8000/departments", {
+        const token = localStorage.getItem("token");
+        const response = await fetch("http://10.0.0.15:8002/departments", {
           headers: { Authorization: `Bearer ${token}` },
-        })
+        });
 
         if (response.status === 401) {
-          localStorage.removeItem("token")
-          return navigate("/login")
+          localStorage.removeItem("token");
+          return navigate("/login");
         }
 
-        const data = await response.json()
-        setDepartamentos(data)
+        const data = await response.json();
+        setDepartamento(data);
 
         // Buscar el departamento del usuario - safely check for departments
         const userDepartamento = data.find(
           (d: { _id: string | undefined; id: string | undefined }) =>
-            d._id === usuario?._id || d.id === usuario?.department?.id,
-        )
+            d._id === departamento?.id || d.id === departamento?.name
+        );
 
-        setDepartamento(userDepartamento || null)
+        setDepartamento(userDepartamento || null);
 
         // Verificar si el usuario pertenece al departamento de Tecnología
         if (
@@ -109,52 +117,76 @@ export function Sidebar() {
             userDepartamento.nombre?.toLowerCase() === "tecnología" ||
             userDepartamento.nombre?.toLowerCase() === "tecnologia")
         ) {
-          setIsTechUser(true)
+          setIsTechUser(true);
         }
       } catch (error) {
-        console.error("Error al cargar departamentos:", error)
+        console.error("Error al cargar departamentos:", error);
       }
-    }
+    };
 
-    fetchDepartamentos()
-  }, [usuario, navigate])
+    fetchDepartamentos();
+  }, [usuario, navigate]);
 
   return (
     <div className="d-flex vh-100">
       {/* SIDEBAR */}
       <div
-        className={`p-3 border-end sidebar-vertical ${collapsed ? "collapsed" : ""} ${mobileSidebarOpen ? "open" : ""}`}
+        className={`p-3 border-end sidebar-vertical ${
+          collapsed ? "collapsed" : ""
+        } ${mobileSidebarOpen ? "open" : ""}`}
       >
         {isAdminMenu ? (
           <>
-            <div className="text-center mb-4">{!collapsed ? <h2>TYZ - Logo</h2> : <h4>TYZ</h4>}</div>
+            <div className="text-center mb-4">
+              {!collapsed ? <h2>TYZ - Logo</h2> : <h4>TYZ</h4>}
+            </div>
             <ul className="nav flex-column">
               <li className="nav-item mb-2">
-                <Link className="nav-link d-flex align-items-center" to="/todotickets" onClick={closeMobileSidebar}>
+                <Link
+                  className="nav-link d-flex align-items-center"
+                  to="/todotickets"
+                  onClick={closeMobileSidebar}
+                >
                   <i className="fa-solid fa-ticket me-2" />
                   {!collapsed && "Tickets"}
                 </Link>
               </li>
               <li className="nav-item mb-2">
-                <Link className="nav-link d-flex align-items-center" to="/usuarios" onClick={closeMobileSidebar}>
+                <Link
+                  className="nav-link d-flex align-items-center"
+                  to="/usuarios"
+                  onClick={closeMobileSidebar}
+                >
                   <i className="fa-solid fa-users me-2" />
                   {!collapsed && "Usuarios"}
                 </Link>
               </li>
               <li className="nav-item mb-2">
-                <Link className="nav-link d-flex align-items-center" to="/departamentos" onClick={closeMobileSidebar}>
+                <Link
+                  className="nav-link d-flex align-items-center"
+                  to="/departamentos"
+                  onClick={closeMobileSidebar}
+                >
                   <i className="fa-solid fa-building me-2" />
                   {!collapsed && "Departamentos"}
                 </Link>
               </li>
               <li className="nav-item mb-2">
-                <Link className="nav-link d-flex align-items-center" to="/categorias" onClick={closeMobileSidebar}>
+                <Link
+                  className="nav-link d-flex align-items-center"
+                  to="/categorias"
+                  onClick={closeMobileSidebar}
+                >
                   <i className="fa-solid fa-tags me-2" />
                   {!collapsed && "Categorías"}
                 </Link>
               </li>
               <li className="nav-item mb-2">
-                <Link className="nav-link d-flex align-items-center" to="/estadisticas" onClick={closeMobileSidebar}>
+                <Link
+                  className="nav-link d-flex align-items-center"
+                  to="/estadisticas"
+                  onClick={closeMobileSidebar}
+                >
                   <i className="fa-solid fa-chart-bar me-2" />
                   {!collapsed && "Estadísticas"}
                 </Link>
@@ -186,7 +218,9 @@ export function Sidebar() {
             </div>
 
             <ul className="nav flex-column ms-2">
-              {!collapsed && <p className="fw-bold text-uppercase small mb-2 mt-5">INICIO</p>}
+              {!collapsed && (
+                <p className="fw-bold text-uppercase small mb-2 mt-5">INICIO</p>
+              )}
               <li className="nav-item mb-1">
                 <Link
                   className={`nav-link d-flex align-items-center ${
@@ -200,11 +234,17 @@ export function Sidebar() {
                 </Link>
               </li>
 
-              {!collapsed && <p className="fw-bold text-uppercase small mb-2 mt-3">TICKETS</p>}
+              {!collapsed && (
+                <p className="fw-bold text-uppercase small mb-2 mt-3">
+                  TICKETS
+                </p>
+              )}
               <li className="nav-item mb-1">
                 <Link
                   className={`nav-link d-flex align-items-center ${
-                    location.pathname === "/dashboard/crear" ? "active-green" : ""
+                    location.pathname === "/dashboard/crear"
+                      ? "active-green"
+                      : ""
                   }`}
                   to="/dashboard/crear"
                   onClick={closeMobileSidebar}
@@ -214,11 +254,17 @@ export function Sidebar() {
                 </Link>
               </li>
 
-              {!collapsed && <p className="fw-bold text-uppercase small mb-2 mt-3">ASIGNADOS</p>}
+              {!collapsed && (
+                <p className="fw-bold text-uppercase small mb-2 mt-3">
+                  ASIGNADOS
+                </p>
+              )}
               <li className="nav-item mb-1">
                 <Link
                   className={`nav-link d-flex align-items-center ${
-                    location.pathname === "/dashboard/asignado" ? "active-green" : ""
+                    location.pathname === "/dashboard/asignado"
+                      ? "active-green"
+                      : ""
                   }`}
                   to="/dashboard/asignado"
                   onClick={closeMobileSidebar}
@@ -231,7 +277,9 @@ export function Sidebar() {
               <li className="nav-item mb-1">
                 <Link
                   className={`nav-link d-flex align-items-center ${
-                    location.pathname === "/dashboard/departamento" ? "active-green" : ""
+                    location.pathname === "/dashboard/departamento"
+                      ? "active-green"
+                      : ""
                   }`}
                   to="/dashboard/departamento"
                   onClick={closeMobileSidebar}
@@ -241,11 +289,17 @@ export function Sidebar() {
                 </Link>
               </li>
 
-              {!collapsed && <p className="fw-bold text-uppercase small mb-2 mt-3">CREADOS</p>}
+              {!collapsed && (
+                <p className="fw-bold text-uppercase small mb-2 mt-3">
+                  CREADOS
+                </p>
+              )}
               <li className="nav-item mb-1">
                 <Link
                   className={`nav-link d-flex align-items-center ${
-                    location.pathname === "/dashboard/ourcreate" ? "active-green" : ""
+                    location.pathname === "/dashboard/ourcreate"
+                      ? "active-green"
+                      : ""
                   }`}
                   to="/dashboard/ourcreate"
                   onClick={closeMobileSidebar}
@@ -261,7 +315,10 @@ export function Sidebar() {
       {/* MAIN CONTENT */}
       <div className="flex-fill d-flex flex-column">
         {/* HEADER */}
-        <nav className="navbar navbar-light bg-white border-bottom px-4" style={{ height: "90px" }}>
+        <nav
+          className="navbar navbar-light bg-white border-bottom px-4"
+          style={{ height: "90px" }}
+        >
           <div className="d-flex justify-content-between align-items-center w-100">
             {/* Toggle Switch */}
             <div className="d-flex align-items-center">
@@ -281,7 +338,6 @@ export function Sidebar() {
               <Moon size={16} color="#6b7280" />
             </div>
 
-            {/* User Dropdown with Bootstrap Collapse */}
             <div className="dropdown">
               <button
                 className="btn btn-link text-decoration-none d-flex align-items-center p-0"
@@ -292,15 +348,27 @@ export function Sidebar() {
                 aria-controls="userDropdown"
               >
                 <div className="text-end me-3">
-                  <div className="fw-bold text-dark mb-0">{loading ? "Cargando..." : usuario?.fullname || ""}</div>
-                  <div className="text-muted small">{loading ? "Cargando..." : usuario?.department?.name || "sin departamento"}</div>
+                  <div className="fw-bold text-dark mb-0">
+                    {loading ? "Cargando..." : usuario?.fullname || ""}
+                  </div>
+                  <div className="text-muted small">
+                    {loading
+                      ? "Cargando..."
+                      : departamento?.name || "sin departamento"}
+                  </div>
                 </div>
-                <UserCircleIcon className="text-muted me-2" style={{ width: "50px", height: "50px" }} />
+                <UserCircleIcon
+                  className="text-muted me-2"
+                  style={{ width: "50px", height: "50px" }}
+                />
                 <span className="text-muted">▼</span>
               </button>
 
               {/* Bootstrap Collapse Dropdown */}
-              <div className="collapse position-absolute end-0 mt-2" id="userDropdown" style={{ zIndex: 1050 }}>
+              <div
+                className="collapse position-absolute end-0 mt-2"
+                id="userDropdown"
+              >
                 <div className="card shadow-sm" style={{ minWidth: "220px" }}>
                   <div className="card-body p-0">
                     {/* Solo mostrar Panel administración si el usuario es de Tecnología */}
@@ -313,7 +381,10 @@ export function Sidebar() {
                         Panel administración
                       </Link>
                     )}
-                    <button onClick={handleLogout} className="btn btn-link text-start w-100 text-decoration-none p-3">
+                    <button
+                      onClick={handleLogout}
+                      className="btn btn-link text-start w-100 text-decoration-none p-3"
+                    >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="20"
@@ -340,12 +411,15 @@ export function Sidebar() {
         </nav>
 
         {/* Content Area */}
-        <div className="flex-fill overflow-auto" style={{ backgroundColor: "#eaf2f9" }}>
+        <div
+          className="flex-fill overflow-auto"
+          style={{ backgroundColor: "#eaf2f9" }}
+        >
           <Outlet />
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default Sidebar
+export default Sidebar;

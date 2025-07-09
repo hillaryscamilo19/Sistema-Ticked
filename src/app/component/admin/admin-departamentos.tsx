@@ -31,7 +31,7 @@ export default function AdminDepartamentos() {
     const fetchDepartamentos = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch("http://localhost:8000/departments", {
+        const response = await fetch("http://10.0.0.15:8002/departments", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -60,7 +60,7 @@ export default function AdminDepartamentos() {
     setLoadingAction(true)
     try {
       const token = localStorage.getItem("token")
-      const response = await fetch(`http://localhost:8000/departments/${departmentId}`, {
+      const response = await fetch(`http://10.0.0.15:8002/departments/${departmentId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -149,7 +149,7 @@ export default function AdminDepartamentos() {
 
     try {
       setLoading(true);
-      const res = await fetch("http://localhost:8000/departments", {
+      const res = await fetch("http://10.0.0.15:8002/departments", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
