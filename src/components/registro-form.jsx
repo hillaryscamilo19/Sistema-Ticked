@@ -77,7 +77,7 @@ export function RegisterForm() {
     }
 
     try {
-      const response = await fetch("http://10.0.0.15:8002/register", {
+      const response = await fetch("http://localhost:8000/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -105,7 +105,7 @@ export function RegisterForm() {
   useEffect(() => {
     const fetchDepartamentos = async () => {
       try {
-        const response = await fetch("http://10.0.0.15:8002/departments")
+        const response = await fetch("http://localhost:8000/departments")
         if (!response.ok) throw new Error(`Error: ${response.status}`)
         const data = await response.json()
         // Intentar diferentes estructuras posibles

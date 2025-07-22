@@ -263,7 +263,7 @@ const TicketDetail = () => {
 
         // Fetch users from the logged user's department
         const response = await fetch(
-          "http://10.0.0.15:8002/usuarios/departamento/colaboradores",
+          "http://localhost:8000/usuarios/departamento/colaboradores",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -312,7 +312,7 @@ const TicketDetail = () => {
           return;
         }
 
-        const response = await fetch(`http://10.0.0.15:8002/tickets/${id}`, {
+        const response = await fetch(`http://localhost:8000/tickets/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -357,7 +357,7 @@ const TicketDetail = () => {
 
         // Fix: Changed the endpoint to match the API structure
         const response = await fetch(
-          `http://10.0.0.15:8002/messages/ticket/${id}`,
+          `http://localhost:8000/messages/ticket/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -388,7 +388,7 @@ const TicketDetail = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `http://10.0.0.15:8002/ticket/${id}/attachments`,
+          `http://localhost:8000/ticket/${id}/attachments`,
           {
             method: "POST",
             headers: {
@@ -405,7 +405,7 @@ const TicketDetail = () => {
         if (response.ok) {
           // Recargar el ticket para obtener los mensajes actualizados
           const ticketResponse = await fetch(
-            `http://10.0.0.15:8002/tickets/${id}`,
+            `http://localhost:8000/tickets/${id}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -421,7 +421,7 @@ const TicketDetail = () => {
 
           // Fetch updated messages
           const messagesResponse = await fetch(
-            `http://10.0.0.15:8002/messages/ticket/${id}`,
+            `http://localhost:8000/messages/ticket/${id}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -452,7 +452,7 @@ const TicketDetail = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `http://10.0.0.15:8002/ticket/${id}/mensajes`,
+          `http://localhost:8000/ticket/${id}/mensajes`,
           {
             method: "POST",
             headers: {
@@ -469,7 +469,7 @@ const TicketDetail = () => {
         if (response.ok) {
           // Recargar el ticket para obtener los mensajes actualizados
           const ticketResponse = await fetch(
-            `http://10.0.0.15:8002/tickets/${id}`,
+            `http://localhost:8000/tickets/${id}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -485,7 +485,7 @@ const TicketDetail = () => {
 
           // Fetch updated messages
           const messagesResponse = await fetch(
-            `http://10.0.0.15:8002/messages/ticket/${id}`,
+            `http://localhost:8000/messages/ticket/${id}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -518,7 +518,7 @@ const TicketDetail = () => {
 
       console.log(`Changing status for ticket ${id} to status ID ${statusId}`);
 
-      const url = `http://10.0.0.15:8002/tickets/${id}/estado?estado_id=${statusId}`;
+      const url = `http://localhost:8000/tickets/${id}/estado?estado_id=${statusId}`;
 
       const response = await fetch(url, {
         method: "PUT",
@@ -537,7 +537,7 @@ const TicketDetail = () => {
         );
 
         const refreshResponse = await fetch(
-          `http://10.0.0.15:8002/tickets/${id}`,
+          `http://localhost:8000/tickets/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -583,7 +583,7 @@ const TicketDetail = () => {
       const userIds = selectedUsers.map((id) => Number(id));
 
       const response = await fetch(
-        `http://10.0.0.15:8002/tickets/${id}/asignar-usuarios`,
+        `http://localhost:8000/tickets/${id}/asignar-usuarios`,
         {
           method: "POST",
           headers: {
@@ -598,7 +598,7 @@ const TicketDetail = () => {
         setAssignSuccess(true);
         setTimeout(() => setAssignSuccess(false), 3000);
         const refreshResponse = await fetch(
-          `http://10.0.0.15:8002/tickets/${id}`,
+          `http://localhost:8000/tickets/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

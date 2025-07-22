@@ -36,7 +36,7 @@ export default function Navbar() {
           return;
         }
 
-        const response = await fetch("http://10.0.0.15:8002/usuarios", {
+        const response = await fetch("http://localhost:8000/usuarios", {
           headers: {
             "Authorization": `Bearer ${token}`
           }
@@ -70,7 +70,7 @@ export default function Navbar() {
   const fetchDepartamento = async (departamentoId: string) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://10.0.0.15:8002/departments/", {
+      const response = await fetch("http://localhost:8000/departments/", {
         headers: {
           "Authorization": `Bearer ${token}`
         }

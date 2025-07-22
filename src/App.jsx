@@ -49,7 +49,7 @@ const TechAdminRoute = () => {
         }
 
         // Obtener datos del usuario
-        const userResponse = await fetch("http://10.0.0.15:8002/usuarios/me", {
+        const userResponse = await fetch("http://localhost:8000/usuarios/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -59,7 +59,7 @@ const TechAdminRoute = () => {
           if (userData.department_id) {
             // Obtener datos del departament
             const deptResponse = await fetch(
-              "http://10.0.0.15:8002/departments",
+              "http://localhost:8000/departments",
               {
                 headers: { Authorization: `Bearer ${token}` },
               }
@@ -141,7 +141,7 @@ function App() {
     setUserId(null);
     window.location.href = "/login";
   };
-
+  
   return (
     <BrowserRouter>
       <Routes>

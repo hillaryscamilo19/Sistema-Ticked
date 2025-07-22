@@ -121,7 +121,7 @@ export default function AssignedDepartment() {
         setIsLoading(true);
         setError(null);
         const res = await fetch(
-          "http://10.0.0.15:8002/tickets/asignados-departamento/",
+          "http://localhost:8000/tickets/asignados-departamento/",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,

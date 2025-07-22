@@ -75,13 +75,13 @@ export default function CrearNuevoTicket() {
         const token = localStorage.getItem("token");
 
         const [resDept, resCat] = await Promise.all([
-          fetch("http://10.0.0.15:8002/departments", {
+          fetch("http://localhost:8000/departments", {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
           }),
-          fetch("http://10.0.0.15:8002/categories", {
+          fetch("http://localhost:8000/categories", {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
@@ -126,7 +126,7 @@ export default function CrearNuevoTicket() {
       formData.append("file", file);
 
       const response = await fetch(
-        `http://10.0.0.15:8002/tickets/${ticketId}/attachments`,
+        `http://localhost:8000/tickets/${ticketId}/attachments`,
         {
           method: "POST",
           headers: {
@@ -406,7 +406,7 @@ export default function CrearNuevoTicket() {
         attachments: formData.attachments.id,
       };
 
-      const res = await fetch("http://10.0.0.15:8002/tickets", {
+      const res = await fetch("http://localhost:8000/tickets", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -442,7 +442,7 @@ export default function CrearNuevoTicket() {
         // Actualizar la descripción del ticket con las imágenes procesadas
         try {
           const updateResponse = await fetch(
-            `http://10.0.0.15:8002/tickets/${ticketId}`,
+            `http://localhost:8000/tickets/${ticketId}`,
             {
               method: "PUT",
               headers: {
