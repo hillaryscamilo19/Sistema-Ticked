@@ -166,7 +166,7 @@ export default function CrearNuevoTicket() {
       formData.append("file", imageFile);
 
       const response = await fetch(
-        `http://10.0.0.15:800/tickets/${ticketId}/attachments`,
+        `http://localhost:800/tickets/${ticketId}/attachments`,
         {
           method: "POST",
           headers: {
@@ -186,7 +186,7 @@ export default function CrearNuevoTicket() {
       console.log("Respuesta del servidor para imagen:", result);
 
       // Construir la URL completa para acceder a la imagen
-      const baseUrl = "http://10.0.0.15:8002";
+      const baseUrl = "http://localhost:8000";
       const filePath = result.file_path;
 
       if (filePath) {

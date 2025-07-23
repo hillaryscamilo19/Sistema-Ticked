@@ -12,7 +12,7 @@ login: async (params?: LoginCredentials): Promise<any> => {
   }
 
   const { username, password } = params;
-  const API_URL = import.meta.env.VITE_API_URL || "http://10.0.0.15:8002";
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
   const response = await axios.post(`${API_URL}/token`, {
     username,
     password,
