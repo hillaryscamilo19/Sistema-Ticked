@@ -1,4 +1,9 @@
-import React, { useState, useEffect, type FormEvent, type ChangeEvent } from "react";
+import React, {
+  useState,
+  useEffect,
+  type FormEvent,
+  type ChangeEvent,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import "../global.css";
 
@@ -42,6 +47,7 @@ export function CreateTicketForm() {
       setIsSubmitting(false);
       return;
     }
+
 
     try {
       const ticketData = {
@@ -89,7 +95,8 @@ export function CreateTicketForm() {
     <div className="form-container">
       <h1>Crear nuevo ticket</h1>
       <p className="form-description">
-        Completa el formulario para crear una nueva solicitud o reporte de problema.
+        Completa el formulario para crear una nueva solicitud o reporte de
+        problema.
       </p>
 
       {error && <div className="alert-error">{error}</div>}
@@ -105,7 +112,11 @@ export function CreateTicketForm() {
         />
 
         <label>Departamento*</label>
-        <select value={department} onChange={(e) => setDepartment(e.target.value)} required>
+        <select
+          value={department}
+          onChange={(e) => setDepartment(e.target.value)}
+          required
+        >
           <option value="">Selecciona un departamento</option>
           {departments.map((d) => (
             <option key={d._id} value={d._id}>
@@ -122,7 +133,9 @@ export function CreateTicketForm() {
           required
         >
           <option value="">
-            {!department ? "Selecciona un departamento primero" : "Selecciona una categoría"}
+            {!department
+              ? "Selecciona un departamento primero"
+              : "Selecciona una categoría"}
           </option>
           {categories.map((c) => (
             <option key={c._id} value={c._id}>

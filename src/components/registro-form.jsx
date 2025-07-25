@@ -11,15 +11,15 @@ import axios from "axios"
 export function RegisterForm() {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
-  const [departamentoSeleccionado, setDepartamentoSeleccionado] = useState("") // Cambiado a un nombre más claro
-  const [extension, setExtension] = useState("") // Cambiado a un nombre más claro
+  const [departamentoSeleccionado, setDepartamentoSeleccionado] = useState("")
+  const [extension, setExtension] = useState("")
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [departamentoList, setDepartamentoList] = useState([])
   const navigate = useNavigate()
   const [validationError, setValidationError] = useState(null)
-  const [isLoading, setIsLoading] = useState(false) // Añadido para manejar el estado de carga
+  const [isLoading, setIsLoading] = useState(false) 
 
   const handleRegister = async () => {
     // Clear previous errors
@@ -27,7 +27,6 @@ export function RegisterForm() {
     setValidationError(null)
     setIsLoading(true) // Iniciar carga
 
-    // Client-side validation
     if (!name.trim()) {
       setError("El nombre es requerido")
       setIsLoading(false)
@@ -59,21 +58,11 @@ export function RegisterForm() {
       return
     }
 
-    // La extensión debe ser un string si así la espera el backend de MongoDB
-    // Si el backend espera un int, asegúrate de que sea un número válido
-    // Por ahora, la dejamos como string para compatibilidad con MongoDB ObjectId si se usara así
-    // Si tu backend espera un INT para phone_ext, entonces sí deberías hacer Number.parseInt(extension, 10)
-    // Basado en tu esquema UserCreate, phone_ext es string, así que lo dejamos como string.
-    // const phoneExt = extension.trim(); // Ya es un string
-
-    // El department_id debe ser un string (ObjectId de MongoDB)
-    // const deptId = departamentoSeleccionado; // Ya es un string
-
     const payload = {
       fullname: name.trim(),
       email: email.trim(),
-      phone_ext: extension.trim(), // Asegúrate de que el backend lo espera como string
-      department_id: departamentoSeleccionado, // Asegúrate de que el backend lo espera como string (ObjectId)
+      phone_ext: extension.trim(),
+      department_id: departamentoSeleccionado, 
       role: 1,
       username: username.trim(),
       password: password,
@@ -86,12 +75,10 @@ export function RegisterForm() {
       })
 
       if (response.status === 201) {
-        // Axios usa response.status para el código HTTP
+      
         navigate("/")
       } else {
-        // Axios ya maneja errores de respuesta con throw, así que este else podría no ser necesario
-        // si el error se captura en el bloque catch.
-        const errorData = response.data // Axios ya parsea el JSON en response.data
+        const errorData = response.data 
         console.error("Registro fallido:", errorData)
         if (errorData.detail && Array.isArray(errorData.detail)) {
           setValidationError(errorData)
@@ -102,7 +89,7 @@ export function RegisterForm() {
     } catch (err) {
       console.error("Error al registrarse:", err)
       if (axios.isAxiosError(err) && err.response) {
-        // Errores de respuesta del servidor (ej. 400, 401, 404, 500)
+    
         const errorData = err.response.data
         if (errorData.detail && Array.isArray(errorData.detail)) {
           setValidationError(errorData)
@@ -121,8 +108,8 @@ export function RegisterForm() {
   useEffect(() => {
     const fetchDepartamentos = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/departments") // Axios para GET
-        const data = response.data // Axios ya parsea el JSON en response.data
+        const response = await axios.get("http://localhost:8000/departments") 
+        const data = response.data 
 
         let validDepartments = []
         if (data && data.length > 0) {
