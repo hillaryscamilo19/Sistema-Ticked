@@ -89,7 +89,7 @@ export default function Dashboard() {
   // Cargar colaboradores del departamento (solo activos)
   useEffect(() => {
     const fetchColaboradores = async () => {
-      if (!usuario || !usuario.department_id) {
+      if (!usuario || !usuario.department) {
         setLoadingColaboradores(false)
         setColaboradores([]) // Asegurarse de que la lista esté vacía si no hay departamento
         return
@@ -98,7 +98,7 @@ export default function Dashboard() {
       try {
         setLoadingColaboradores(true)
         const token = localStorage.getItem("token")
-        const departmentId = usuario.department_id // Obtener el department_id del usuario logueado
+        const departmentId = usuario.department // Obtener el department_id del usuario logueado
 
         const res = await fetch(`http://localhost:8000/usuarios/departamento/${departmentId}/colaboradores`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -125,7 +125,7 @@ export default function Dashboard() {
       }
     }
     // Solo cargar colaboradores si ya tenemos el usuario y su department_id
-    if (usuario && usuario.department_id) {
+    if (usuario && usuario.department) {
       fetchColaboradores()
     }
   }, [usuario, navigate]) // Depende de 'usuario' para que se ejecute cuando 'usuario' se carga
