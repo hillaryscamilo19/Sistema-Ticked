@@ -94,7 +94,6 @@ export default function Dashboard() {
         setColaboradores([]) // Asegurarse de que la lista esté vacía si no hay departamento
         return
       }
-
       try {
         setLoadingColaboradores(true)
         const token = localStorage.getItem("token")
