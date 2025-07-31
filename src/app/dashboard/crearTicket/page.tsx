@@ -29,7 +29,7 @@ interface FormData {
   title: string;
   description: string;
   category_id: string;
-  assigned_department_id: string;
+  assigned_department: string;
   status: string;
   attachments: {
     id?: string,
@@ -62,7 +62,7 @@ export default function CrearNuevoTicket() {
     title: "",
     description: "",
     category_id: "",
-    assigned_department_id: "",
+    assigned_department: "",
     status: "1", // Por defecto "Abierto",
     attachments: {}
   });
@@ -343,8 +343,8 @@ export default function CrearNuevoTicket() {
       newErrors.category_id = "Debe seleccionar una categoría";
     }
 
-    if (!formData.assigned_department_id) {
-      newErrors.assigned_department_id = "Debe seleccionar un departamento";
+    if (!formData.assigned_department) {
+      newErrors.assigned_department = "Debe seleccionar un departamento";
     }
 
     setErrors(newErrors);
@@ -400,8 +400,8 @@ export default function CrearNuevoTicket() {
         title: formData.title,
         description: initialDescription,
         category_id: Number(formData.category_id),
-        assigned_department_id: Number(formData.assigned_department_id),
-        created_user_id: Number(userId),
+        assigned_department: Number(formData.assigned_department),
+        created_user: Number(userId),
         status: formData.status,
         attachments: formData.attachments.id,
       };
@@ -453,7 +453,7 @@ export default function CrearNuevoTicket() {
                 title: formData.title,
                 description: formData.attachments.file_path,
                 category_id: Number(formData.category_id),
-                assigned_department_id: Number(formData.assigned_department_id),
+                assigned_department: Number(formData.assigned_department),
                 status: formData.status,
              
               }),
@@ -490,7 +490,7 @@ export default function CrearNuevoTicket() {
         title: "",
         description: "",
         category_id: "",
-        assigned_department_id: "",
+        assigned_department: "",
         status: "1",
         attachments: formData.attachments
       });
@@ -598,18 +598,18 @@ export default function CrearNuevoTicket() {
           <div className="form-row">
             <div className="form-group">
               <label
-                htmlFor="assigned_department_id"
+                htmlFor="assigned_department"
                 className="form-label required"
               >
                 Departamento
               </label>
               <select
-                id="assigned_department_id"
-                name="assigned_department_id"
+                id="assigned_department"
+                name="assigned_department"
                 className={`form-select ${
-                  errors.assigned_department_id ? "error" : ""
+                  errors.assigned_department ? "error" : ""
                 }`}
-                value={formData.assigned_department_id}
+                value={formData.assigned_department}
                 onChange={handleChange}
               >
                 <option value="">--- Seleccione un departamento</option>
@@ -619,9 +619,9 @@ export default function CrearNuevoTicket() {
                   </option>
                 ))}
               </select>
-              {errors.assigned_department_id && (
+              {errors.assigned_department && (
                 <span className="error-message">
-                  {errors.assigned_department_id}
+                  {errors.assigned_department}
                 </span>
               )}
             </div>
