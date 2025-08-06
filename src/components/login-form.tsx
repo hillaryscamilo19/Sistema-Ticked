@@ -36,7 +36,7 @@ export function LoginForm() {
         if (data?.access_token) {
           localStorage.setItem("token", data.access_token);
           setIsRedirecting(true);
-           navigate("/dashboard");
+          navigate("/dashboard");
         } else {
           setErrorMessage("Token no recibido.");
         }
@@ -76,67 +76,67 @@ export function LoginForm() {
           <div className="w-full p-4 sm:p-12.5 xl:p-17.5">
 
 
-            
+
             <div className="Container-input">
-                        <h3 className="TextSeccion">Inicio de sesión</h3>
-          <h3 className="TextTYZ">Iniciar sesión en TYZ</h3>
+              <h3 className="TextSeccion">Inicio de sesión</h3>
+              <h3 className="TextTYZ">Iniciar sesión en TYZ</h3>
               {/* Input Usuario */}
               <div className="mb-6 relative">
-              <span className="block mb-1 text-gray-600">Usuario</span>
-              <div className="relative">
-                <input
-                  id="username"
-                  type="text"
-                  placeholder="Escriba su nombre de usuario o email"
-                  className="inputPassword"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                />
-                <UserIcon className="iconoUser h-5 absolute left-3 top-2.5 text-gray-400" />
+                <span className="block mb-1 text-gray-600">Usuario</span>
+                <div className="relative">
+                  <input
+                    id="username"
+                    type="text"
+                    placeholder="Escriba su nombre de usuario o email"
+                    className="inputPassword"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                  />
+                  <UserIcon className="iconoUser h-5 absolute left-3 top-2.5 text-gray-400" />
+                </div>
               </div>
-            </div>
 
-            {/* Input Contraseña */}
-            <div className="mb-6 relative">
-              <span className="block mb-1 text-gray-600">Contraseña</span>
-              <div className="relative">
-                <input
-                  id="password"
-                  type="password"
-                  placeholder="Escriba su contraseña"
-                  className="InputContrasena"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={isLoading || isRedirecting}
-                />
-                <LockClosedIcon className="iconoClose  h-5 absolute left-3 top-2.5 text-gray-400" />
+              {/* Input Contraseña */}
+              <div className="mb-6 relative">
+                <span className="block mb-1 text-gray-600">Contraseña</span>
+                <div className="relative">
+                  <input
+                    id="password"
+                    type="password"
+                    placeholder="Escriba su contraseña"
+                    className="InputContrasena"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={isLoading || isRedirecting}
+                  />
+                  <LockClosedIcon className="iconoClose  h-5 absolute left-3 top-2.5 text-gray-400" />
+                </div>
               </div>
+              {/* Botón Entrar */}
+              <button
+                onClick={login}
+                type="submit"
+                disabled={isLoading || isRedirecting}
+                className="w-full Boton hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition"
+              >
+                <ArrowRightStartOnRectangleIcon className="IconoBoton h-6 mr-1" />
+                {isLoading ? "Iniciando sesión..." : "Entrar"}
+              </button>
+
+              {/* Registro */}
+              <p className="text-center text-sm text-gray-600 mt-4">
+                ¿No tienes una cuenta?{" "}
+                <a href="/registro" className="texto">
+                  Registrarse
+                </a>
+              </p>
+
             </div>
-                       {/* Botón Entrar */}
-            <button
-              onClick={login}
-              type="submit"
-              disabled={isLoading || isRedirecting}
-              className="w-full Boton hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition"
-            >
-              <ArrowRightStartOnRectangleIcon className="IconoBoton h-6 mr-1" />
-              {isLoading ? "Iniciando sesión..." : "Entrar"}
-            </button>
 
-            {/* Registro */}
-            <p className="text-center text-sm text-gray-600 mt-4">
-              ¿No tienes una cuenta?{" "}
-              <a href="/registro" className="texto">
-                Registrarse
-              </a>
-            </p>
 
-            </div>
-    
 
- 
           </div>
         </div>
       </div>

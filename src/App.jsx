@@ -39,63 +39,65 @@ const TechAdminRoute = () => {
   const [isTechUser, setIsTechUser] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const checkTechDepartment = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          setLoading(false);
-          return;
-        }
+useEffect(() => {
+  const checkTechDepartment = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setLoading(false);
+        return;
+      }
 
-        // Obtener datos del usuario
-        const userResponse = await fetch("http://10.0.0.15:8002/usuarios/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+      const userResponse = await fetch("http://localhost:8000/usuarios/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-        if (userResponse.ok) {
-          const userData = await userResponse.json();
+      if (userResponse.ok) {
+        const userData = await userResponse.json();
+        console.log("👉 Usuario:", userData);
 
-          if (userData.department_id) {
-            // Obtener datos del departament
-            const deptResponse = await fetch(
-              "http://10.0.0.15:8002/departments",
-              {
-                headers: { Authorization: `Bearer ${token}` },
-              }
+        if (userData.department_id) {
+          const deptResponse = await fetch("http://localhost:8000/departments", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (deptResponse.ok) {
+            const departments = await deptResponse.json();
+            console.log("👉 Departamentos:", departments);
+
+            const userDepartment = departments.find(
+              (dept) =>
+                String(dept._id) === String(userData.department_id) ||
+                String(dept.id) === String(userData.department_id)
             );
 
-            if (deptResponse.ok) {
-              const departments = await deptResponse.json();
+            console.log("👉 Departamento del usuario:", userDepartment);
 
-              const userDepartment = departments.find(
-                (dept) =>
-                  dept._id === userData.department_id ||
-                  dept.id === userData.department_id
-              );
-
-              // Verificar si el departamento es "Tecnología"
-              if (
-                userDepartment &&
-                (userDepartment.name?.toLowerCase() === "tecnología" ||
-                  userDepartment.name?.toLowerCase() === "tecnologia" ||
-                  userDepartment.nombre?.toLowerCase() === "tecnología" ||
-                  userDepartment.nombre?.toLowerCase() === "tecnologia")
-              ) {
-                setIsTechUser(true);
-              } else {
-              }
+            if (
+              userDepartment &&
+              (userDepartment.name?.toLowerCase() === "tecnologia" ||
+                userDepartment.name?.toLowerCase() === "tecnología" ||
+                userDepartment.nombre?.toLowerCase() === "tecnologia" ||
+                userDepartment.nombre?.toLowerCase() === "tecnología")
+            ) {
+              console.log("✅ Usuario pertenece a Tecnología");
+              setIsTechUser(true);
+            } else {
+              console.warn("⚠️ El usuario NO es de Tecnología");
             }
           }
         }
-      } catch (error) {
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (error) {
+      console.error("❌ Error al verificar el departamento:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    checkTechDepartment();
-  }, []);
+  checkTechDepartment();
+}, []);
+
 
   if (loading) {
     return (

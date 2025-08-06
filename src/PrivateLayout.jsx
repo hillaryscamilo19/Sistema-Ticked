@@ -9,7 +9,7 @@ const PrivateLayout = () => {
 
 
       <div className="Main">
-
+<Outlet />
 
         <main className="">
   

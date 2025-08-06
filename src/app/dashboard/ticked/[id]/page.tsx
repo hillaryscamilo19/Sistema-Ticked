@@ -128,7 +128,7 @@ export default function TicketList() {
         setIsLoading(true);
         setError(null);
         const res = await fetch(
-          "http://10.0.0.15:8002/tickets/asignados-a-mi/",
+          "http://localhost:8000/tickets/asignados-a-mi/",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
