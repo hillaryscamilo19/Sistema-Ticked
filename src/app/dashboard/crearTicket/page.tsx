@@ -28,7 +28,7 @@ interface Category {
 interface FormData {
   title: string;
   description: string;
-  category_id: string;
+  category: string;
   assigned_department: string;
   status: string;
   attachments: {
@@ -61,7 +61,7 @@ export default function CrearNuevoTicket() {
   const [formData, setFormData] = useState<FormData>({
     title: "",
     description: "",
-    category_id: "",
+    category: "",
     assigned_department: "",
     status: "1", // Por defecto "Abierto",
     attachments: {}
@@ -244,6 +244,7 @@ export default function CrearNuevoTicket() {
     }
   };
 
+
   // Manejar cambio de archivo
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
@@ -343,8 +344,8 @@ export default function CrearNuevoTicket() {
       newErrors.description = "La descripción es obligatoria";
     }
 
-    if (!formData.category_id) {
-      newErrors.category_id = "Debe seleccionar una categoría";
+    if (!formData.category) {
+      newErrors.category = "Debe seleccionar una categoría";
     }
 
     if (!formData.assigned_department) {
@@ -403,7 +404,7 @@ export default function CrearNuevoTicket() {
       const ticketData = {
         title: formData.title,
         description: initialDescription,
-        category_id: Number(formData.category_id),
+        category: Number(formData.category),
         assigned_department: Number(formData.assigned_department),
         created_user: Number(userId),
         status: formData.status,
@@ -456,7 +457,7 @@ export default function CrearNuevoTicket() {
               body: JSON.stringify({
                 title: formData.title,
                 description: formData.attachments.file_path,
-                category_id: Number(formData.category_id),
+                category: Number(formData.category),
                 assigned_department: Number(formData.assigned_department),
                 status: formData.status,
              
@@ -493,7 +494,7 @@ export default function CrearNuevoTicket() {
       setFormData({
         title: "",
         description: "",
-        category_id: "",
+        category: "",
         assigned_department: "",
         status: "1",
         attachments: formData.attachments
@@ -631,14 +632,14 @@ export default function CrearNuevoTicket() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="category_id" className="form-label required">
+              <label htmlFor="category" className="form-label required">
                 Categoría
               </label>
               <select
-                id="category_id"
-                name="category_id"
-                className={`form-select ${errors.category_id ? "error" : ""}`}
-                value={formData.category_id}
+                id="category"
+                name="category"
+                className={`form-select ${errors.category ? "error" : ""}`}
+                value={formData.category}
                 onChange={handleChange}
               >
                 <option value="">--- Seleccione una categoría</option>
@@ -648,8 +649,8 @@ export default function CrearNuevoTicket() {
                   </option>
                 ))}
               </select>
-              {errors.category_id && (
-                <span className="error-message">{errors.category_id}</span>
+              {errors.category && (
+                <span className="error-message">{errors.category}</span>
               )}
             </div>
 
