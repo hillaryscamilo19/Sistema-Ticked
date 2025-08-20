@@ -10,6 +10,7 @@ import logo from "../img/logo2.png";
 import "../app/styles/stylesLogin.css";
 import { authService } from "../lib/api/auth-service";
 import { useNavigate, useSearchParams } from "react-router-dom";
+
 export function LoginForm() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -56,7 +57,13 @@ export function LoginForm() {
         {/* Columna Izquierda */}
         <div className="col-md-6 login-left d-none d-md-flex flex-column align-items-center justify-content-center text-center">
           <div className="py-10 px-26 text-center img">
-            <img src={tyz} alt="Logo" width={150} height={100} className="imgae" />
+            <img
+              src={tyz}
+              alt="Logo"
+              width={150}
+              height={100}
+              className="imgae"
+            />
             <p className="text-center text-gray-600 mb-8 max-w-sm ">
               Aplicación de tickets interna para las solicitudes realizadas
               entre departamentos.
@@ -74,9 +81,12 @@ export function LoginForm() {
         {/* Columna Derecha */}
         <div className="col-md-6 login-right p-5">
           <div className="w-full p-4 sm:p-12.5 xl:p-17.5">
+<<<<<<< HEAD
 
 
 
+=======
+>>>>>>> 4e47438791ea922d27f4c9daae31769b103470c5
             <div className="Container-input">
               <h3 className="TextSeccion">Inicio de sesión</h3>
               <h3 className="TextTYZ">Iniciar sesión en TYZ</h3>
@@ -132,14 +142,22 @@ export function LoginForm() {
                   Registrarse
                 </a>
               </p>
+<<<<<<< HEAD
 
             </div>
 
 
 
+=======
+            </div>
+>>>>>>> 4e47438791ea922d27f4c9daae31769b103470c5
           </div>
         </div>
       </div>
     </div>
   );
 }
+ 
+<h1>
+
+</h1>

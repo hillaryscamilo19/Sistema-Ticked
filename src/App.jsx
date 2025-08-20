@@ -48,14 +48,22 @@ useEffect(() => {
         return;
       }
 
+<<<<<<< HEAD
       const userResponse = await fetch("http://localhost:8000/usuarios/me", {
         headers: { Authorization: `Bearer ${token}` },
       });
+=======
+        // Obtener datos del usuario
+        const userResponse = await fetch("http://localhost:8000/usuarios/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+>>>>>>> 4e47438791ea922d27f4c9daae31769b103470c5
 
       if (userResponse.ok) {
         const userData = await userResponse.json();
         console.log("👉 Usuario:", userData);
 
+<<<<<<< HEAD
         if (userData.department_id) {
           const deptResponse = await fetch("http://localhost:8000/departments", {
             headers: { Authorization: `Bearer ${token}` },
@@ -69,6 +77,15 @@ useEffect(() => {
               (dept) =>
                 String(dept._id) === String(userData.department_id) ||
                 String(dept.id) === String(userData.department_id)
+=======
+          if (userData.department_id) {
+            // Obtener datos del departament
+            const deptResponse = await fetch(
+              "http://localhost:8000/departments",
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              }
+>>>>>>> 4e47438791ea922d27f4c9daae31769b103470c5
             );
 
             console.log("👉 Departamento del usuario:", userDepartment);
@@ -143,7 +160,7 @@ function App() {
     setUserId(null);
     window.location.href = "/login";
   };
-
+  
   return (
     <BrowserRouter>
       <Routes>
@@ -184,3 +201,5 @@ function App() {
 }
 
 export default App;
+
+

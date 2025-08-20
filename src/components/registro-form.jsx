@@ -1,5 +1,4 @@
 "use client"
-
 import { useEffect, useState } from "react"
 import { UserIcon, EnvelopeIcon, BuildingOffice2Icon, PhoneIcon, KeyIcon } from "@heroicons/react/24/outline"
 import { useNavigate, Link } from "react-router-dom"
@@ -7,69 +6,63 @@ import tyz from "../img/tyz.png"
 import logo from "../img/logo2.png"
 import "../app/styles/stylesregistro.css"
 import { ErrorDisplay } from "./error-display"
+import axios from "axios"
 
 export function RegisterForm() {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
-  const [departamentos, setDepartamentos] = useState("")
-  const [extensión, setExtensión] = useState("")
+  const [departamentoSeleccionado, setDepartamentoSeleccionado] = useState("")
+  const [extension, setExtension] = useState("")
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [departamentoList, setDepartamentoList] = useState([])
   const navigate = useNavigate()
   const [validationError, setValidationError] = useState(null)
+  const [isLoading, setIsLoading] = useState(false) 
 
   const handleRegister = async () => {
     // Clear previous errors
     setError("")
     setValidationError(null)
+    setIsLoading(true) // Iniciar carga
 
-    // Client-side validation
     if (!name.trim()) {
       setError("El nombre es requerido")
+      setIsLoading(false)
       return
     }
     if (!email.trim()) {
       setError("El email es requerido")
+      setIsLoading(false)
       return
     }
-    if (!departamentos) {
+    if (!departamentoSeleccionado) {
       setError("Debe seleccionar un departamento")
+      setIsLoading(false)
       return
     }
-    if (!extensión.trim()) {
+    if (!extension.trim()) {
       setError("La extensión es requerida")
+      setIsLoading(false)
       return
     }
     if (!username.trim()) {
       setError("El nombre de usuario es requerido")
+      setIsLoading(false)
       return
     }
     if (!password.trim()) {
       setError("La contraseña es requerida")
-      return
-    }
-
-    // Validate that extensión is a number
-    const phoneExt = Number.parseInt(extensión, 10)
-    if (isNaN(phoneExt)) {
-      setError("La extensión debe ser un número válido")
-      return
-    }
-
-    // Validate that departamentos is a number
-    const deptId = Number.parseInt(departamentos, 10)
-    if (isNaN(deptId) || deptId <= 0) {
-      setError("Debe seleccionar un departamento válido")
+      setIsLoading(false)
       return
     }
 
     const payload = {
       fullname: name.trim(),
       email: email.trim(),
-      phone_ext: phoneExt,
-      department_id: deptId,
+      phone_ext: extension.trim(),
+      department_id: departamentoSeleccionado, 
       role: 1,
       username: username.trim(),
       password: password,
@@ -77,19 +70,21 @@ export function RegisterForm() {
     }
 
     try {
+<<<<<<< HEAD
       const response = await fetch("http://localhost:8000/register", {
         method: "POST",
+=======
+      const response = await axios.post("http://localhost:8000/register", payload, {
+>>>>>>> 4e47438791ea922d27f4c9daae31769b103470c5
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
       })
 
-      if (response.ok) {
+      if (response.status === 201) {
+      
         navigate("/")
       } else {
-        const errorData = await response.json()
+        const errorData = response.data 
         console.error("Registro fallido:", errorData)
-
-        // Check if it's a validation error (Pydantic format)
         if (errorData.detail && Array.isArray(errorData.detail)) {
           setValidationError(errorData)
         } else {
@@ -98,45 +93,45 @@ export function RegisterForm() {
       }
     } catch (err) {
       console.error("Error al registrarse:", err)
-      setError("Error de conexión con el servidor")
+      if (axios.isAxiosError(err) && err.response) {
+    
+        const errorData = err.response.data
+        if (errorData.detail && Array.isArray(errorData.detail)) {
+          setValidationError(errorData)
+        } else {
+          setError(errorData.message || err.response.statusText || "Error al registrar. Verifica los campos.")
+        }
+      } else {
+        // Otros errores (ej. de red)
+        setError("Error de conexión con el servidor o error inesperado.")
+      }
+    } finally {
+      setIsLoading(false) // Finalizar carga
     }
   }
 
   useEffect(() => {
     const fetchDepartamentos = async () => {
       try {
+<<<<<<< HEAD
         const response = await fetch("http://localhost:8000/departments")
         if (!response.ok) throw new Error(`Error: ${response.status}`)
         const data = await response.json()
         // Intentar diferentes estructuras posibles
+=======
+        const response = await axios.get("http://localhost:8000/departments") 
+        const data = response.data 
+
+>>>>>>> 4e47438791ea922d27f4c9daae31769b103470c5
         let validDepartments = []
-
         if (data && data.length > 0) {
-          // Verificar si usa _id
-          if (data[0]._id !== undefined) {
-    
-            validDepartments = data.filter((dept) => dept._id != null)
-          }
-          // Verificar si usa id
-          else if (data[0].id !== undefined) {
- 
-            validDepartments = data.filter((dept) => dept.id != null)
-            // Convertir id a _id para mantener compatibilidad
-            validDepartments = validDepartments.map((dept) => ({
-              ...dept,
-              _id: dept.id,
-            }))
-          }
-          // Si no tiene ni id ni _id, usar todos los datos
-          else {
-            console.log("No se encontró id ni _id, usando todos los datos")
-            validDepartments = data
-          }
+          // Tu backend ahora devuelve 'id' como string (ObjectId)
+          validDepartments = data.filter((dept) => dept._id != null)
         }
-
         setDepartamentoList(validDepartments)
       } catch (error) {
-     
+        console.error("Error al cargar los departamentos:", error)
+        setError("No se pudieron cargar los departamentos.")
       }
     }
     fetchDepartamentos()
@@ -155,13 +150,11 @@ export function RegisterForm() {
             <img className="img-fluid mb-3" src={logo || "/placeholder.svg"} alt="Logo" width={350} height={200} />
           </div>
         </div>
-
         {/* Columna Derecha */}
         <div className="col-md-6 login-right p-5">
           <div className="w-full p-4 sm:p-12.5 xl:p-17.5">
             <h2 className="mb-1.5 block font-medium TextSeccion">Crear cuenta</h2>
             <h1 className="TextTYZ">Registrarse en TYZ</h1>
-
             {/* Nombre */}
             <div className="mb-4 relative">
               <span className="block mb-1 text-gray-600">Nombre</span>
@@ -182,7 +175,6 @@ export function RegisterForm() {
                 <UserIcon className="iconoClose h-5 absolute left-3 top-2.5 text-gray-400" />
               </div>
             </div>
-
             {/* Email */}
             <div className="mb-4 relative">
               <span className="block mb-1 text-gray-600">Email</span>
@@ -203,7 +195,6 @@ export function RegisterForm() {
                 <EnvelopeIcon className=" iconoClose  h-5 absolute left-3 top-2.5 text-gray-400" />
               </div>
             </div>
-
             {/* Departamento y Extensión */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
@@ -212,9 +203,9 @@ export function RegisterForm() {
                   <select
                     name="departments"
                     className="Inputdepartamento"
-                    value={departamentos}
+                    value={departamentoSeleccionado}
                     onChange={(e) => {
-                      setDepartamentos(e.target.value)
+                      setDepartamentoSeleccionado(e.target.value)
                       if (error || validationError) {
                         setError("")
                         setValidationError(null)
@@ -224,8 +215,9 @@ export function RegisterForm() {
                     <option value="">Seleccione un departamento</option>
                     {departamentoList.length > 0 ? (
                       departamentoList.map((dept) =>
-                        dept.id ? (
-                          <option key={dept.id} value={dept._id.toString()}>
+                        // Asegúrate de que dept.id exista y sea el valor correcto (string de ObjectId)
+                        dept._id ? (
+                          <option key={dept._id} value={dept._id}>
                             {dept.name}
                           </option>
                         ) : null,
@@ -237,17 +229,16 @@ export function RegisterForm() {
                   <BuildingOffice2Icon className="iconoClose h-5 absolute left-3 top-2.5 text-gray-400" />
                 </div>
               </div>
-
               <div>
                 <span className="block mb-1 font-medium text-gray-600">Número de extensión</span>
                 <div className="relative">
                   <input
-                    type="text"
+                    type="text" // Mantener como texto si el backend espera string
                     placeholder="Escriba su extensión"
                     className="InputUsuario"
-                    value={extensión}
+                    value={extension}
                     onChange={(e) => {
-                      setExtensión(e.target.value)
+                      setExtension(e.target.value)
                       if (error || validationError) {
                         setError("")
                         setValidationError(null)
@@ -258,7 +249,6 @@ export function RegisterForm() {
                 </div>
               </div>
             </div>
-
             {/* Username */}
             <div className="mb-4 relative">
               <span className="block mb-1 text-gray-600">Nombre de usuario</span>
@@ -279,7 +269,6 @@ export function RegisterForm() {
                 <UserIcon className="iconoClose h-5 absolute left-3 top-2.5 text-gray-400" />
               </div>
             </div>
-
             {/* Contraseña */}
             <div className="mb-4 relative">
               <span className="block mb-1 text-gray-600">Contraseña</span>
@@ -300,21 +289,18 @@ export function RegisterForm() {
                 <KeyIcon className="iconoClose h-5 absolute left-3 top-2.5 text-gray-400" />
               </div>
             </div>
-
             {/* Validation Errors */}
             {validationError && <ErrorDisplay error={validationError} onDismiss={() => setValidationError(null)} />}
-
             {/* General Error */}
             {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-
             {/* Botón */}
             <button
               onClick={handleRegister}
               className="w-full Boton hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition"
+              disabled={isLoading} // Deshabilitar botón durante la carga
             >
-              Registrarse
+              {isLoading ? "Registrando..." : "Registrarse"}
             </button>
-
             {/* Enlace a login */}
             <p className="text-center text-sm text-gray-600 mt-4">
               ¿Ya tienes una cuenta?{" "}

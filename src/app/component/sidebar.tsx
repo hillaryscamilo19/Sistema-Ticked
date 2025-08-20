@@ -42,7 +42,11 @@ export function Sidebar() {
     const fetchUsuario = async () => {
       try {
         const token = localStorage.getItem("token")
+<<<<<<< HEAD
         const res = await fetch("http://8000/usuarios/me", {
+=======
+        const res = await fetch("http://localhost:8000/usuarios/me", {
+>>>>>>> 4e47438791ea922d27f4c9daae31769b103470c5
           headers: { Authorization: `Bearer ${token}` },
         })
 
