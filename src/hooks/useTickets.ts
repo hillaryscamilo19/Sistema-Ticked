@@ -32,11 +32,14 @@ export const useTickets = () => {
     const fetchTickets = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get("http://localhost:8000/tickets/", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await axios.get(
+          "http://localhost:8000/tickets/asignados-a-mi/",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         const tickets: Ticket[] = res.data;
 

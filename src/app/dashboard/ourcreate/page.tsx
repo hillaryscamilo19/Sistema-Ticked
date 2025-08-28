@@ -1,6 +1,3 @@
-"use client";
-
-import type React from "react";
 import { useEffect, useState } from "react";
 import {
   BuildingOfficeIcon,
@@ -10,7 +7,7 @@ import {
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
-import "./style.css";
+import "../ourcreate/styles.css";
 
 interface TicketUser {
   id: number;
@@ -27,12 +24,13 @@ interface Ticket {
   id: number;
   title: string;
   status: string;
-  createdAt: string;
-  created_at?: string;
+  created_at: string;
   created_user?: TicketUser | string;
   assigned_department?: TicketDepartment | string;
   assigned_users?: TicketUser[] | string[];
-  category?: { name?: string } | string;
+  category: {
+    name: string;
+  };
 }
 
 const statusMap: Record<
@@ -105,20 +103,12 @@ function extractAssignedUsers(
     .join(", ");
 }
 
-function extractCategoryName(
-  category: { name?: string } | string | undefined
-): string {
-  if (!category) return "Otros";
-  if (typeof category === "string") return category;
-  return category.name || "Otros";
-}
-
-export default function TicketList() {
+export default function NuestroCreado() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
-  const [activeTab, setActiveTab] = useState<string>("1"); // Cambié a "1" para que Abierto esté activo por defecto
+  const [activeTab, setActiveTab] = useState<string>("1"); // Abierto por defecto
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
+  const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -128,7 +118,7 @@ export default function TicketList() {
         setIsLoading(true);
         setError(null);
         const res = await fetch(
-          "http://localhost:8000/tickets/asignados-a-mi/",
+          "http://localhost:8000/tickets/creados/",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -141,7 +131,7 @@ export default function TicketList() {
         }
 
         const data = await res.json();
-        setTickets(data);
+        setTickets(data.mios || []);
       } catch (err) {
         console.error("Error al cargar los tickets:", err);
         setError(err instanceof Error ? err.message : "Error desconocido");
@@ -232,11 +222,11 @@ export default function TicketList() {
     return (
       <div className="page-container">
         <div className="page-header">
-          <h1 className="page-title">Mis Asignados</h1>
+          <h1 className="page-title">Nuestros Creados</h1>
           <div className="breadcrumb">
             <span className="breadcrumb-link">Inicio</span>
             <span className="breadcrumb-separator">/</span>
-            <span className="breadcrumb-current">Mis Asignados</span>
+            <span className="breadcrumb-current">Nuestros Creados</span>
           </div>
         </div>
         <div className="main-container">
@@ -253,11 +243,11 @@ export default function TicketList() {
     return (
       <div className="page-container">
         <div className="page-header">
-          <h1 className="page-title">Mis Asignados</h1>
+          <h1 className="page-title">Nuestros Creados</h1>
           <div className="breadcrumb">
             <span className="breadcrumb-link">Inicio</span>
             <span className="breadcrumb-separator">/</span>
-            <span className="breadcrumb-current">Mis Asignados</span>
+            <span className="breadcrumb-current">Nuestros Creados</span>
           </div>
         </div>
         <div className="main-container">
@@ -279,11 +269,11 @@ export default function TicketList() {
     <div className="page-container">
       {/* Header con breadcrumb */}
       <div className="page-header">
-        <h1 className="page-title">Mis Asignados</h1>
+        <h1 className="page-title">Nuestros Creados</h1>
         <div className="breadcrumb">
           <span className="breadcrumb-link">Inicio</span>
           <span className="breadcrumb-separator">/</span>
-          <span className="breadcrumb-current">Mis Asignados</span>
+          <span className="breadcrumb-current">Nuestros Creados</span>
         </div>
       </div>
 
@@ -291,7 +281,7 @@ export default function TicketList() {
       <div className="main-container">
         <div className="content-header">
           <h2 className="content-title">
-            Listado de tickets asignados al usuario.
+            Listado de tickets creados por el departamento.
           </h2>
         </div>
 
@@ -365,9 +355,9 @@ export default function TicketList() {
                     <div className="ticket-metadata">
                       <span>
                         Fecha:{" "}
-                        {new Date(
-                          ticket.created_at || ticket.createdAt
-                        ).toLocaleDateString("es-ES")}
+                        {new Date(ticket.created_at).toLocaleDateString(
+                          "es-ES"
+                        )}
                       </span>
                       <span className="metadata-separator">•</span>
                       <span>
@@ -384,24 +374,7 @@ export default function TicketList() {
                       </span>
                     </div>
                     <div className="relative-date">
-                      {formatRelativeDate(
-                        ticket.createdAt || ticket.created_at
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="ticket-assignment">
-                    <div className="assigned-user">
-                      <UsersIcon className="user-icon" />
-                      <span className="user-name">
-                        {extractAssignedUsers(ticket.assigned_users)}
-                      </span>
-                    </div>
-                    <div className="ticket-category">
-                      <TagIcon className="category-icon" />
-                      <span className="category-name">
-                        {extractCategoryName(ticket.category)}
-                      </span>
+                      {formatRelativeDate(ticket.created_at)}
                     </div>
                   </div>
 
@@ -418,64 +391,63 @@ export default function TicketList() {
               </article>
             ))
           )}
-
-          {/* Paginación inferior */}
-          {filteredTickets.length > 0 && (
-            <div className="pagination-container">
-              <div className="pagination-info">
-                <span className="pagination-text">Mostrar</span>
-                <select
-                  className="pagination-select"
-                  value={itemsPerPage}
-                  onChange={handleItemsPerPageChange}
-                  aria-label="Elementos por página"
-                >
-                  <option value="10">5</option>
-                  <option value="10">10</option>
-                  <option value="20">20</option>
-                  <option value="50">50</option>
-                  <option value="100">100</option>
-                </select>
-                <span className="pagination-text">elementos por página</span>
-              </div>
-
-              <div className="pagination-controls">
-                {/* Previous button */}
-                {currentPage > 1 && (
-                  <button
-                    onClick={() => paginate(currentPage - 1)}
-                    className="page-button nav-button"
-                    aria-label="Página anterior"
-                  >
-                    ‹
-                  </button>
-                )}
-
-                {/* Page numbers */}
-                {renderPaginationButtons()}
-
-                {/* Next button */}
-                {currentPage < totalFilteredPages && (
-                  <button
-                    onClick={() => paginate(currentPage + 1)}
-                    className="page-button nav-button"
-                    aria-label="Página siguiente"
-                  >
-                    ›
-                  </button>
-                )}
-              </div>
-
-              <div className="pagination-summary">
-                <span className="pagination-text">
-                  Mostrando {indexOfFirstItem + 1}-
-                  {Math.min(indexOfLastItem, filteredTickets.length)} de{" "}
-                  {filteredTickets.length} tickets
-                </span>
-              </div>
-            </div>
-          )}
         </div>
+
+        {/* Paginación inferior */}
+        {filteredTickets.length > 0 && (
+          <div className="pagination-container">
+            <div className="pagination-info">
+              <span className="pagination-text">Mostrar</span>
+              <select
+                className="pagination-select"
+                value={itemsPerPage}
+                onChange={handleItemsPerPageChange}
+                aria-label="Elementos por página"
+              >
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+              <span className="pagination-text">elementos por página</span>
+            </div>
+
+            <div className="pagination-controls">
+              {/* Previous button */}
+              {currentPage > 1 && (
+                <button
+                  onClick={() => paginate(currentPage - 1)}
+                  className="page-button nav-button"
+                  aria-label="Página anterior"
+                >
+                  ‹
+                </button>
+              )}
+
+              {/* Page numbers */}
+              {renderPaginationButtons()}
+
+              {/* Next button */}
+              {currentPage < totalFilteredPages && (
+                <button
+                  onClick={() => paginate(currentPage + 1)}
+                  className="page-button nav-button"
+                  aria-label="Página siguiente"
+                >
+                  ›
+                </button>
+              )}
+            </div>
+
+            <div className="pagination-summary">
+              <span className="pagination-text">
+                Mostrando {indexOfFirstItem + 1}-
+                {Math.min(indexOfLastItem, filteredTickets.length)} de{" "}
+                {filteredTickets.length} tickets
+              </span>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,0 +1,340 @@
+/* Estilos específicos para gráficos de estadísticas */
+
+/* Contenedor principal de gráficos */
+.admin-charts-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Tarjeta de gráfico */
+.admin-chart-card {
+  background-color: var(--admin-background-white);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-lg);
+  box-shadow: var(--admin-shadow-sm);
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.admin-chart-card:hover {
+  box-shadow: var(--admin-shadow-md);
+  border-color: var(--admin-primary);
+}
+
+/* Gráfico grande */
+.admin-chart-large {
+  margin-bottom: 1rem;
+}
+
+/* Header del gráfico */
+.admin-chart-header {
+  padding: 1.5rem 2rem 1rem 2rem;
+  border-bottom: 1px solid var(--admin-border-light);
+  background-color: var(--admin-background-gray);
+}
+
+.admin-chart-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--admin-text-primary);
+  margin: 0;
+}
+
+.admin-chart-large .admin-chart-title {
+  font-size: 1.5rem;
+}
+
+/* Contenido del gráfico */
+.admin-chart-content {
+   height: 300px;
+  padding: 2rem;
+  position: relative;
+}
+
+.admin-chart-large .admin-chart-content {
+  height: 400px;
+  padding: 2rem 3rem;
+}
+
+.admin-chart-card:not(.admin-chart-large) .admin-chart-content {
+  height: 300px;
+}
+
+/* Grid de gráficos secundarios */
+.admin-charts-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+/* Canvas responsivo */
+.admin-chart-content canvas {
+  width: 100% !important;
+  max-width: 100%;
+  height: 300px !important; /* o más, según el gráfico */
+}
+
+/* Estados de carga específicos para gráficos */
+.admin-charts-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  background-color: var(--admin-background-white);
+  border-radius: var(--admin-radius-lg);
+  border: 1px solid var(--admin-border);
+}
+
+.admin-charts-loading .admin-spinner {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 1rem;
+}
+
+/* Placeholder para gráficos */
+.admin-chart-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--admin-text-muted);
+  background-color: var(--admin-background-gray);
+  border-radius: var(--admin-radius);
+}
+
+.admin-chart-placeholder-icon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.admin-chart-placeholder-text {
+  font-size: 0.875rem;
+  text-align: center;
+  margin: 0;
+}
+
+/* Responsive Design para gráficos */
+@media (min-width: 768px) {
+  .admin-charts-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 1024px) {
+  .admin-charts-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+  }
+
+  .admin-chart-large .admin-chart-content {
+    height: 450px;
+    padding: 2.5rem 3rem;
+  }
+
+  .admin-chart-card:not(.admin-chart-large) .admin-chart-content {
+    height: 350px;
+  }
+}
+
+@media (min-width: 1328px) {
+  .admin-charts-container {
+    gap: 3rem;
+  }
+
+  .admin-charts-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+  }
+
+  .admin-chart-large .admin-chart-content {
+    height: 500px;
+    padding: 3rem;
+  }
+
+  .admin-chart-card:not(.admin-chart-large) .admin-chart-content {
+    height: 400px;
+    padding: 2.5rem;
+  }
+
+  .admin-chart-header {
+    padding: 2rem 3rem 1.5rem 3rem;
+  }
+
+  .admin-chart-large .admin-chart-title {
+    font-size: 1.75rem;
+  }
+
+  .admin-chart-title {
+    font-size: 1.375rem;
+  }
+}
+
+@media (min-width: 1600px) {
+  .admin-charts-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .admin-chart-large .admin-chart-content {
+    height: 550px;
+  }
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .admin-chart-large .admin-chart-content {
+    height: 350px;
+    padding: 1.5rem 2rem;
+  }
+
+  .admin-chart-card:not(.admin-chart-large) .admin-chart-content {
+    height: 280px;
+    padding: 1.5rem;
+  }
+
+  .admin-chart-header {
+    padding: 1.25rem 1.5rem 1rem 1.5rem;
+  }
+}
+
+/* Móvil */
+@media (max-width: 768px) {
+  .admin-charts-container {
+    gap: 1.5rem;
+  }
+
+  .admin-charts-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .admin-chart-large .admin-chart-content {
+    height: 300px;
+    padding: 1rem;
+  }
+
+  .admin-chart-card:not(.admin-chart-large) .admin-chart-content {
+    height: 250px;
+    padding: 1rem;
+  }
+
+  .admin-chart-header {
+    padding: 1rem 1.25rem 0.75rem 1.25rem;
+  }
+
+  .admin-chart-title {
+    font-size: 1rem;
+  }
+
+  .admin-chart-large .admin-chart-title {
+    font-size: 1.125rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-chart-large .admin-chart-content {
+    height: 250px;
+    padding: 0.75rem;
+  }
+
+  .admin-chart-card:not(.admin-chart-large) .admin-chart-content {
+    height: 200px;
+    padding: 0.75rem;
+  }
+
+  .admin-chart-header {
+    padding: 0.75rem 1rem 0.5rem 1rem;
+  }
+
+  .admin-chart-title {
+    font-size: 0.875rem;
+  }
+
+  .admin-chart-large .admin-chart-title {
+    font-size: 1rem;
+  }
+}
+
+/* Mejoras para la legibilidad de gráficos en móvil */
+@media (max-width: 768px) {
+  /* Asegurar que las leyendas sean legibles */
+  .admin-chart-content canvas {
+    font-size: 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-chart-content canvas {
+    font-size: 10px !important;
+  }
+}
+
+/* Animaciones para los gráficos */
+.admin-chart-card {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.admin-chart-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.admin-chart-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.admin-chart-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.admin-chart-card:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estados de hover mejorados */
+.admin-chart-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Estilos para tooltips de Chart.js */
+.chartjs-tooltip {
+  background-color: var(--admin-text-primary) !important;
+  border-radius: var(--admin-radius) !important;
+  box-shadow: var(--admin-shadow-lg) !important;
+}
+
+/* Personalización de colores para modo oscuro (si se implementa) */
+@media (prefers-color-scheme: dark) {
+  .admin-chart-card {
+    background-color: #1f2937;
+    border-color: #374151;
+  }
+
+  .admin-chart-header {
+    background-color: #111827;
+    border-color: #374151;
+  }
+
+  .admin-chart-title {
+    color: #f9fafb;
+  }
+
+  .admin-chart-placeholder {
+    background-color: #374151;
+    color: #416db8;
+  }
+}

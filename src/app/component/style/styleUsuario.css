@@ -1,0 +1,17 @@
+.Role{
+    display: inline-block;
+    width: 56px;
+    height: 28px;
+    color: #2b81e2;
+    border: 1px solid #1791d8;
+    border-radius: 15px;
+}
+
+.bto-cambia{
+    height: 47px;
+    width: 41%;
+}
+
+.botone{
+    display: flex;
+}
