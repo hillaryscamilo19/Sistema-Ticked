@@ -312,7 +312,7 @@ const TicketDetail = () => {
           return;
         }
 
-        const response = await fetch(`http://localhost:8000/tickets/${id}`, {
+        const response = await fetch(`http://localhost:8000/tickets/asignados-a-mi/`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -357,11 +357,7 @@ const TicketDetail = () => {
 
         // Fix: Changed the endpoint to match the API structure
         const response = await fetch(
-<<<<<<< HEAD
-          `659d3d0e14b98bd611bf5cf2/messages/ticket/${id}`,
-=======
-          `http://localhost:8000/messages/ticket/${id}`,
->>>>>>> 4e47438791ea922d27f4c9daae31769b103470c5
+          `http://localhost:8000/messages/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -425,7 +421,7 @@ const TicketDetail = () => {
 
           // Fetch updated messages
           const messagesResponse = await fetch(
-            `http://localhost:8000/messages/ticket/${id}`,
+            `http://localhost:8000/messages/${id}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -489,7 +485,7 @@ const TicketDetail = () => {
 
           // Fetch updated messages
           const messagesResponse = await fetch(
-            `http://localhost:8000/messages/ticket/${id}`,
+            `http://localhost:8000/messages/${id}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,

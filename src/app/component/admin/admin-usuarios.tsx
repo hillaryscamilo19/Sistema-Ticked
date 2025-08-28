@@ -262,9 +262,7 @@ export default function AdminUsuarios() {
       );
 
       const response = await fetch(
-        `http://localhost:8000/usuarios/${
-          usuario._id || usuario.id
-        }/toggle-status`,
+        `http://localhost:8000/usuarios/estado/${usuario._id || usuario.id}`,
         {
           method: "PUT",
           headers: {

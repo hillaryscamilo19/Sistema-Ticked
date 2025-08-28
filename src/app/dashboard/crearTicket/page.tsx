@@ -35,7 +35,7 @@ interface FormData {
     id?: string,
     file_name?: string,
     file_path?: string,
-    file_extension?:string
+    file_extension?: string
   }
 }
 
@@ -186,11 +186,7 @@ export default function CrearNuevoTicket() {
       console.log("Respuesta del servidor para imagen:", result);
 
       // Construir la URL completa para acceder a la imagen
-<<<<<<< HEAD
       const baseUrl = "http://http://localhost:8000";
-=======
-      const baseUrl = "http://localhost:8000";
->>>>>>> 4e47438791ea922d27f4c9daae31769b103470c5
       const filePath = result.file_path;
 
       if (filePath) {
@@ -397,21 +393,22 @@ export default function CrearNuevoTicket() {
       const hasBase64Images = descripcionHTML.includes("data:image/");
       console.log("¿Tiene imágenes en base64?", hasBase64Images);
 
-      // Decidir qué descripción usar inicialmente
+      // Decidir qué descripción usar inicialme
+      // nte
       const initialDescription = hasBase64Images ? "Procesando contenido00..." : descripcionHTML || formData.attachments.file_path
 
       // Crear el ticket
       const ticketData = {
         title: formData.title,
         description: initialDescription,
-        category: Number(formData.category),
-        assigned_department: Number(formData.assigned_department),
-        created_user: Number(userId),
+        category_id: Number(formData.category),
+        assigned_department_id: Number(formData.assigned_department),
         status: formData.status,
-        attachments: formData.attachments.id,
+        created_user_id: Number(userId),
       };
 
-      const res = await fetch("http://localhost:8000/tickets", {
+
+      const res = await fetch("http://localhost:8000/tickets/", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -460,7 +457,7 @@ export default function CrearNuevoTicket() {
                 category: Number(formData.category),
                 assigned_department: Number(formData.assigned_department),
                 status: formData.status,
-             
+
               }),
             }
           );
@@ -611,9 +608,8 @@ export default function CrearNuevoTicket() {
               <select
                 id="assigned_department"
                 name="assigned_department"
-                className={`form-select ${
-                  errors.assigned_department ? "error" : ""
-                }`}
+                className={`form-select ${errors.assigned_department ? "error" : ""
+                  }`}
                 value={formData.assigned_department}
                 onChange={handleChange}
               >
@@ -680,9 +676,8 @@ export default function CrearNuevoTicket() {
               Descripción
             </label>
             <div
-              className={`editor-container ${
-                errors.description ? "error" : ""
-              }`}
+              className={`editor-container ${errors.description ? "error" : ""
+                }`}
             >
               <TiptapEditor
                 value={descripcionHTML}

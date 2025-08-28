@@ -36,12 +36,6 @@ export default function Dashboard() {
     const fetchUsuario = async () => {
       try {
         const token = localStorage.getItem("token")
-<<<<<<< HEAD
-=======
-        if (!token) {
-          return navigate("/login")
-        }
->>>>>>> 4e47438791ea922d27f4c9daae31769b103470c5
         const res = await fetch("http://localhost:8000/usuarios/me", {
           headers: { Authorization: `Bearer ${token}` },
         })
@@ -73,33 +67,8 @@ export default function Dashboard() {
           },
         })
 
-<<<<<<< HEAD
-    useEffect(() => {
-      const fetchTickets = async () => {
-        try {
-          setIsLoading(true)
-          setError(null)
-          const res = await fetch("http://localhost:8000/tickets/asignados-a-mi/", {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          })
-  
-          if (!res.ok) {
-            throw new Error(`Error ${res.status}: ${res.statusText}`)
-          }
-  
-          const data = await res.json()
-          setTickets(data)
-        } catch (err) {
-          console.error("Error al cargar los tickets:", err)
-          setError(err instanceof Error ? err.message : "Error desconocido")
-        } finally {
-          setIsLoading(false)
-=======
         if (!res.ok) {
           throw new Error(`Error ${res.status}: ${res.statusText}`)
->>>>>>> 4e47438791ea922d27f4c9daae31769b103470c5
         }
 
         const data = await res.json()
@@ -125,13 +94,9 @@ export default function Dashboard() {
       try {
         setLoadingColaboradores(true)
         const token = localStorage.getItem("token")
-<<<<<<< HEAD
-        const res = await fetch("http://localhost:8000/usuarios/departamento/colaboradores", {
-=======
         const departmentId = usuario.department // Obtener el department_id del usuario logueado
 
         const res = await fetch(`http://localhost:8000/usuarios/departamento/${departmentId}/colaboradores`, {
->>>>>>> 4e47438791ea922d27f4c9daae31769b103470c5
           headers: { Authorization: `Bearer ${token}` },
         })
 

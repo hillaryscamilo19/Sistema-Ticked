@@ -11,8 +11,9 @@ import axios from "axios"
 export function RegisterForm() {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
+  const [fullname, setFullname] = useState("");
   const [departamentoSeleccionado, setDepartamentoSeleccionado] = useState("")
-  const [extension, setExtension] = useState("")
+  const [phoneExt, setExtension] = useState("")
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
@@ -58,26 +59,25 @@ export function RegisterForm() {
       return
     }
 
-    const payload = {
-      fullname: name.trim(),
-      email: email.trim(),
-      phone_ext: extension.trim(),
-      department_id: departamentoSeleccionado, 
-      role: 1,
-      username: username.trim(),
-      password: password,
-      status: true,
-    }
+const payload = {
+  fullname: fullname,
+  email: email,
+  phone_ext: parseInt(phoneExt),
+  department_id: parseInt(departmentId),
+  role: 1,
+  username: username,
+  password: password,
+  status: false
+};
+
 
     try {
-<<<<<<< HEAD
       const response = await fetch("http://localhost:8000/register", {
-        method: "POST",
-=======
-      const response = await axios.post("http://localhost:8000/register", payload, {
->>>>>>> 4e47438791ea922d27f4c9daae31769b103470c5
-        headers: { "Content-Type": "application/json" },
-      })
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(payload)
+});
+
 
       if (response.status === 201) {
       
@@ -109,33 +109,23 @@ export function RegisterForm() {
       setIsLoading(false) // Finalizar carga
     }
   }
+useEffect(() => {
+  const fetchDepartamentos = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/departments/")
+      if (!response.ok) throw new Error("Error al cargar departamentos")
 
-  useEffect(() => {
-    const fetchDepartamentos = async () => {
-      try {
-<<<<<<< HEAD
-        const response = await fetch("http://localhost:8000/departments")
-        if (!response.ok) throw new Error(`Error: ${response.status}`)
-        const data = await response.json()
-        // Intentar diferentes estructuras posibles
-=======
-        const response = await axios.get("http://localhost:8000/departments") 
-        const data = response.data 
-
->>>>>>> 4e47438791ea922d27f4c9daae31769b103470c5
-        let validDepartments = []
-        if (data && data.length > 0) {
-          // Tu backend ahora devuelve 'id' como string (ObjectId)
-          validDepartments = data.filter((dept) => dept._id != null)
-        }
-        setDepartamentoList(validDepartments)
-      } catch (error) {
-        console.error("Error al cargar los departamentos:", error)
-        setError("No se pudieron cargar los departamentos.")
-      }
+      const data = await response.json() // Aquí obtienes tu array [{id, name}, ...]
+      setDepartamentoList(data)
+    } catch (error) {
+      console.error("Error al cargar los departamentos:", error)
+      setError("No se pudieron cargar los departamentos.")
     }
-    fetchDepartamentos()
-  }, [])
+  }
+
+  fetchDepartamentos()
+}, [])
+
 
   return (
     <div className="login-container min-h-screen flex items-center justify-center bg-gray-100 px-4">
@@ -163,9 +153,9 @@ export function RegisterForm() {
                   type="text"
                   placeholder="Escriba su nombre completo"
                   className="InputUsuario"
-                  value={name}
+               value={fullname}
                   onChange={(e) => {
-                    setName(e.target.value)
+                    setFullname(e.target.value)
                     if (error || validationError) {
                       setError("")
                       setValidationError(null)
@@ -200,32 +190,30 @@ export function RegisterForm() {
               <div>
                 <span className="block mb-1 font-medium text-gray-600">Departamento</span>
                 <div className="relative">
-                  <select
-                    name="departments"
-                    className="Inputdepartamento"
-                    value={departamentoSeleccionado}
-                    onChange={(e) => {
-                      setDepartamentoSeleccionado(e.target.value)
-                      if (error || validationError) {
-                        setError("")
-                        setValidationError(null)
-                      }
-                    }}
-                  >
-                    <option value="">Seleccione un departamento</option>
-                    {departamentoList.length > 0 ? (
-                      departamentoList.map((dept) =>
-                        // Asegúrate de que dept.id exista y sea el valor correcto (string de ObjectId)
-                        dept._id ? (
-                          <option key={dept._id} value={dept._id}>
-                            {dept.name}
-                          </option>
-                        ) : null,
-                      )
-                    ) : (
-                      <option disabled>No hay departamentos disponibles</option>
-                    )}
-                  </select>
+          <select
+  name="departments"
+  className="Inputdepartamento"
+  value={departamentoSeleccionado}
+  onChange={(e) => {
+    setDepartamentoSeleccionado(e.target.value)
+    if (error || validationError) {
+      setError("")
+      setValidationError(null)
+    }
+  }}
+>
+  <option value="">Seleccione un departamento</option>
+  {departamentoList.length > 0 ? (
+    departamentoList.map((dept) => (
+      <option key={dept.id} value={dept.id}>
+        {dept.name}
+      </option>
+    ))
+  ) : (
+    <option disabled>No hay departamentos disponibles</option>
+  )}
+</select>
+
                   <BuildingOffice2Icon className="iconoClose h-5 absolute left-3 top-2.5 text-gray-400" />
                 </div>
               </div>
@@ -236,7 +224,7 @@ export function RegisterForm() {
                     type="text" // Mantener como texto si el backend espera string
                     placeholder="Escriba su extensión"
                     className="InputUsuario"
-                    value={extension}
+                    value={phoneExt}
                     onChange={(e) => {
                       setExtension(e.target.value)
                       if (error || validationError) {
