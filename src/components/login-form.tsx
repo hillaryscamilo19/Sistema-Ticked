@@ -81,9 +81,12 @@ export function LoginForm() {
         {/* Columna Derecha */}
         <div className="col-md-6 login-right p-5">
           <div className="w-full p-4 sm:p-12.5 xl:p-17.5">
+<<<<<<< HEAD
 
 
 
+=======
+>>>>>>> 4e47438791ea922d27f4c9daae31769b103470c5
             <div className="Container-input">
               <h3 className="TextSeccion">Inicio de sesión</h3>
               <h3 className="TextTYZ">Iniciar sesión en TYZ</h3>
@@ -139,11 +142,15 @@ export function LoginForm() {
                   Registrarse
                 </a>
               </p>
+<<<<<<< HEAD
 
             </div>
 
 
 
+=======
+            </div>
+>>>>>>> 4e47438791ea922d27f4c9daae31769b103470c5
           </div>
         </div>
       </div>

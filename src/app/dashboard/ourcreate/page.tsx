@@ -118,7 +118,7 @@ export default function NuestroCreado() {
         setIsLoading(true);
         setError(null);
         const res = await fetch(
-          "http://localhost:8000/tickets/asignados-departamento/",
+          "http://localhost:8000/tickets/creados/",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -131,7 +131,7 @@ export default function NuestroCreado() {
         }
 
         const data = await res.json();
-        setTickets(data);
+        setTickets(data.mios || []);
       } catch (err) {
         console.error("Error al cargar los tickets:", err);
         setError(err instanceof Error ? err.message : "Error desconocido");

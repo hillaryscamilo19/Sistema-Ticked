@@ -6,7 +6,7 @@ export interface LoginCredentials {
 }
 
 export const authService = {
-login: async (params?: LoginCredentials): Promise<any> => {
+login: async (params?: LoginCredentials): Promise<unknown> => {
   if (!params) {
     throw new Error("Credenciales requeridas");
   }

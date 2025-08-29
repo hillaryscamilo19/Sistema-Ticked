@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 
 import { useState, useEffect, useRef } from "react"
@@ -358,3 +359,7 @@ export default function AdminEstadisticas() {
     </div>
   )
 }
+function setChartsVisible(_arg0: boolean) {
+  throw new Error("Function not implemented.")
+}
+

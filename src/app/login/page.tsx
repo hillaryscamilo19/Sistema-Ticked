@@ -11,6 +11,7 @@ import "../../style.css";
 import { useApi } from "../../hooks/use-api";
 import { authService } from "../../lib/api/auth-service";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface LoginProps {
   setToken: (token: string | null) => void;
   setUsername: (username: string | null) => void;
