@@ -13,6 +13,11 @@
   display: flex;
 }
 
+.img-decrip{
+  width: 90%;
+  height: 80%;
+}
+
 .containerMesange {
   background-color: aqua;
   display: flex;

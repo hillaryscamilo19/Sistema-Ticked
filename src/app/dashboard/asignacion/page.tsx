@@ -357,7 +357,7 @@ const TicketDetail = () => {
 
         // Fix: Changed the endpoint to match the API structure
         const response = await fetch(
-          `http://localhost:8000/tickets/${id}/mensajes`,
+          `http://localhost:8000/messages/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -447,72 +447,43 @@ const TicketDetail = () => {
     }
   };
 
-  //Peticion PAra mandar un nuevo mensaje
-  const handleSendMessage = async () => {
-    if (!newMessage.trim() && id && ticket) {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(
-          `http://localhost:8000/tickets/${id}/mensajes`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              message: newMessage,
-              ticket_id: Number(id),
-            }),
+//Peticion para mandar un nuevo mensaje
+const handleSendMessage = async () => {
+  if (!newMessage.trim() || !id || !ticket) return;
 
-
-          }
-        );
-
-        if (response.ok) {
-          // Recargar el ticket para obtener los mensajes actualizados
-          const ticketResponse = await fetch(
-            `http://localhost:8000/tickets/${id}`,
-            {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            }
-          );
-
-          if (ticketResponse.ok) {
-            const updatedTicket = await ticketResponse.json();
-            setTicket(updatedTicket);
-          }
-
-          // Fetch updated messages
-          const messagesResponse = await fetch(
-            `http://localhost:8000/messages/${id}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            }
-          );
-
-          if (messagesResponse.ok) {
-            const updatedMessages = await messagesResponse.json();
-            setMessages(updatedMessages);
-          }
-
-          // Limpiar el campo de entrada
-          setNewMessage("");
-        } else {
-          console.error("Error al crear mensaje:", response.status);
-        }
-      } catch (err) {
-        console.error("Error al enviar mensaje:", err);
+  try {
+    const token = localStorage.getItem("token");
+    const response = await fetch(
+      `http://localhost:8000/tickets/${id}/mensajes/`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contenido: newMessage,
+          ticket_id: Number(id),
+        }),
       }
+    );
+
+    if (response.ok) {
+      const nuevoMensaje = await response.json();
+
+      // lo agregamos al estado sin tener que recargar todo
+      setMessages((prev) => [...prev, nuevoMensaje]);
+
+      // limpiar input
+      setNewMessage("");
+    } else {
+      console.error("Error al crear mensaje:", response.status);
     }
-  };
+  } catch (err) {
+    console.error("Error al enviar mensaje:", err);
+  }
+};
+
 
   //Peticion para cambiar de estado
   const handleStatusChange = async (statusKey: string) => {
@@ -969,7 +940,7 @@ const TicketDetail = () => {
               {/* Description Section */}
               <div className="Linea2"></div>
               <div className="DescriptionSection">
-                <h2 className="text-lg font-medium text-gray-900 mb-4">Descripción</h2>
+                <h2 className="text-lg Text-form text-gray-900 mb-4">Descripción:</h2>
 
                 <div
                   className="prose max-w-none text-gray-700"
@@ -978,16 +949,16 @@ const TicketDetail = () => {
 
                 {ticket.attachments && ticket.attachments.length > 0 && (
                   <div className="mt-4">
-                    <h3 className="font-medium">Archivos adjuntos:</h3>
+                    <h3 className="Text-form">Archivos adjuntos:</h3>
                     <ul className="list-disc list-inside">
                       {ticket.attachments.map((file) => (
                         <li key={file.id} className="mb-2">
                           {/* Si es imagen, mostrarla */}
                           {["jpg", "jpeg", "png", "gif"].includes(file.file_extension.toLowerCase()) ? (
                             <img
-                              src={`http://localhost:8000${file.file_path}`}
+                              src={`http://localhost:8000${file.file_path} `}
                               alt={file.file_name}
-                              className="max-w-xs border rounded"
+                              className="img-decrip"
                             />
 
                           ) : (
