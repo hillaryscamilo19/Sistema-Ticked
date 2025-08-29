@@ -95,7 +95,7 @@ if (response.status === 201) {
     setValidationError(errorData);
   } else {
     setError(
-      errorData.message || "Error al registrar. Verifica los campos."
+      !errorData.message || "Error al registrar. Verifica los campos."
     );
   }
 }

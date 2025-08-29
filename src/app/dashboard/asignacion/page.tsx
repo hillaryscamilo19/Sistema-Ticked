@@ -119,7 +119,7 @@ interface Ticket {
     id?: string,
     file_name?: string,
     file_path?: string,
-    file_extension?:string
+    file_extension?: string
   }
   comments?: Comment[];
 }
@@ -312,7 +312,7 @@ const TicketDetail = () => {
           return;
         }
 
-        const response = await fetch(`http://localhost:8000/tickets/asignados-a-mi/`, {
+        const response = await fetch(`http://localhost:8000/tickets/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -357,7 +357,7 @@ const TicketDetail = () => {
 
         // Fix: Changed the endpoint to match the API structure
         const response = await fetch(
-          `http://localhost:8000/messages/${id}`,
+          `http://localhost:8000/tickets/${id}/mensajes`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -372,6 +372,7 @@ const TicketDetail = () => {
         } else {
           console.error("Error al obtener mensajes:", response.status);
         }
+
       } catch (err) {
         console.error("Error al cargar mensajes:", err);
       }
@@ -405,7 +406,7 @@ const TicketDetail = () => {
         if (response.ok) {
           // Recargar el ticket para obtener los mensajes actualizados
           const ticketResponse = await fetch(
-            `http://localhost:8000/tickets/${id}`,
+            `http://localhost:8000/messages/${id}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -448,11 +449,11 @@ const TicketDetail = () => {
 
   //Peticion PAra mandar un nuevo mensaje
   const handleSendMessage = async () => {
-    if (newMessage.trim() && id && ticket) {
+    if (!newMessage.trim() && id && ticket) {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `http://localhost:8000/ticket/${id}/mensajes`,
+          `http://localhost:8000/tickets/${id}/mensajes`,
           {
             method: "POST",
             headers: {
@@ -463,6 +464,8 @@ const TicketDetail = () => {
               message: newMessage,
               ticket_id: Number(id),
             }),
+
+
           }
         );
 
@@ -471,6 +474,7 @@ const TicketDetail = () => {
           const ticketResponse = await fetch(
             `http://localhost:8000/tickets/${id}`,
             {
+              method: "POST",
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
@@ -790,9 +794,8 @@ const TicketDetail = () => {
                           <button
                             key={option.key}
                             onClick={() => handleStatusChange(option.key)}
-                            className={`dropdown-option ${
-                              isSelected ? "selected" : ""
-                            }`}
+                            className={`dropdown-option ${isSelected ? "selected" : ""
+                              }`}
                           >
                             <div className={`icon-container ${option}`}>
                               <IconComponent className="icon" />
@@ -831,9 +834,8 @@ const TicketDetail = () => {
                         <button
                           key={option.key}
                           onClick={() => handleStatusChange(option.key)}
-                          className={`dropdown-item ${
-                            isSelected ? "selected" : ""
-                          }`}
+                          className={`dropdown-item ${isSelected ? "selected" : ""
+                            }`}
                         >
                           <div
                             className={`dropdown-icon-wrapper ${option.color}`}
@@ -967,44 +969,45 @@ const TicketDetail = () => {
               {/* Description Section */}
               <div className="Linea2"></div>
               <div className="DescriptionSection">
-                <h2 className="text-lg font-medium text-gray-900 mb-4">
-                  Descripción
-                </h2>
+                <h2 className="text-lg font-medium text-gray-900 mb-4">Descripción</h2>
+
                 <div
                   className="prose max-w-none text-gray-700"
-                  dangerouslySetInnerHTML={{
-                    __html: (() => {
-                      {
-                        ticket.attachments && (
-                          <a
-                            href={ticket.attachments.file_path}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 underline"
-                          >
-                            Ver archivo adjunto
-                          </a>
-                        );
-                      }
-                      try {
-                        if (
-                          typeof ticket.description === "string" &&
-                          !ticket.description.startsWith("{")
-                        ) {
-                          return ticket.description;
-                        }
-                        return deltaToHTML(JSON.parse(ticket.description));
-                      } catch (error) {
-                        console.error(
-                          "Error parsing description as JSON:",
-                          error
-                        );
-                        return ticket.attachments;
-                      }
-                    })(),
-                  }}
+                  dangerouslySetInnerHTML={{ __html: ticket.description }}
                 />
+
+                {ticket.attachments && ticket.attachments.length > 0 && (
+                  <div className="mt-4">
+                    <h3 className="font-medium">Archivos adjuntos:</h3>
+                    <ul className="list-disc list-inside">
+                      {ticket.attachments.map((file) => (
+                        <li key={file.id} className="mb-2">
+                          {/* Si es imagen, mostrarla */}
+                          {["jpg", "jpeg", "png", "gif"].includes(file.file_extension.toLowerCase()) ? (
+                            <img
+                              src={`http://localhost:8000${file.file_path}`}
+                              alt={file.file_name}
+                              className="max-w-xs border rounded"
+                            />
+
+                          ) : (
+                            <a
+                              href={file.file_path}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 underline"
+                            >
+                              {file.file_name}
+                            </a>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
               </div>
+
             </div>
           </div>
         </div>
@@ -1037,20 +1040,22 @@ const TicketDetail = () => {
                 {messages.map((message) => (
                   <div key={message.id} className="flex items-start space-x-3">
                     <div className="flex-1">
-                      <div className="">
+                      <div>
                         <span className="text-sm font-medium text-gray-900">
                           <UserIcon className="icoBuild" />
                           {message.user.fullname}
                         </span>
                       </div>
-                      <p className="menssageConteiner">{message.content}</p>
-
+                      <p className="menssageConteiner">{message.message}</p>
                       <span className="text-xs text-gray-500">
                         {formatDate(message.created_at)}
                       </span>
                     </div>
                   </div>
                 ))}
+
+
+
               </div>
             )}
           </div>
@@ -1066,8 +1071,8 @@ const TicketDetail = () => {
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-                  className="InputMesaje"
                 />
+
 
                 <button
                   onClick={handleSendMessage}
@@ -1083,74 +1088,75 @@ const TicketDetail = () => {
       </div>
 
       {/* Assign Users Modal */}
-      {showAssignModal && (
-        <div
-          className="modal-overlay"
-          onClick={() => setShowAssignModal(false)}
-        >
-          <div className="modal-contet" onClick={(e) => e.stopPropagation()}>
-            <div className="contenertext">
-              <UserGroupIcon className="icouser"></UserGroupIcon>
-              <h2 className="TextAsignacio">Asignar Usuarios</h2>
-            </div>
-            <div className="linea4"></div>
-            <div className="user-list">
-              {loadingUsers ? (
-                <div className="text-center py-4">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-                  <p className="mt-2 text-gray-600">
-                    Cargando usuarios del departamento...
-                  </p>
-                </div>
-              ) : departmentUsers.length === 0 ? (
-                <div className="text-center py-4">
-                  <p className="text-gray-500">
-                    No hay usuarios activos en el departamento
-                  </p>
-                </div>
-              ) : (
-                departmentUsers.map((user) => {
-                  const isSelected = selectedUsers.includes(user.id);
-                  return (
-                    <div key={user.id} className="user-item">
-                      <div>
-                        <strong>{user.name}</strong> - #{user.employeeId} -{" "}
-                        {user.email}
-                      </div>
-                      <button
-                        onClick={() => handleUserToggle(user.id)}
-                        disabled={user.isAvailable && !isSelected}
-                        className={`user-toggle ${
-                          isSelected
+      {
+        showAssignModal && (
+          <div
+            className="modal-overlay"
+            onClick={() => setShowAssignModal(false)}
+          >
+            <div className="modal-contet" onClick={(e) => e.stopPropagation()}>
+              <div className="contenertext">
+                <UserGroupIcon className="icouser"></UserGroupIcon>
+                <h2 className="TextAsignacio">Asignar Usuarios</h2>
+              </div>
+              <div className="linea4"></div>
+              <div className="user-list">
+                {loadingUsers ? (
+                  <div className="text-center py-4">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                    <p className="mt-2 text-gray-600">
+                      Cargando usuarios del departamento...
+                    </p>
+                  </div>
+                ) : departmentUsers.length === 0 ? (
+                  <div className="text-center py-4">
+                    <p className="text-gray-500">
+                      No hay usuarios activos en el departamento
+                    </p>
+                  </div>
+                ) : (
+                  departmentUsers.map((user) => {
+                    const isSelected = selectedUsers.includes(user.id);
+                    return (
+                      <div key={user.id} className="user-item">
+                        <div>
+                          <strong>{user.name}</strong> - #{user.employeeId} -{" "}
+                          {user.email}
+                        </div>
+                        <button
+                          onClick={() => handleUserToggle(user.id)}
+                          disabled={user.isAvailable && !isSelected}
+                          className={`user-toggle ${isSelected
                             ? "selected"
                             : user.isAvailable
-                            ? ""
-                            : "disabled"
-                        }`}
-                      >
-                        {isSelected ? "Quitar" : "Asignar"}
-                      </button>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-            <div className="linea4"></div>
-            <div className="modal-footer">
-              <button className="bottonAsignar" onClick={handleAssignUsers}>
-                Asignar Usuario
-              </button>
-              <button
-                className="botonCerrar"
-                onClick={() => setShowAssignModal(false)}
-              >
-                Cerrar
-              </button>
+                              ? ""
+                              : "disabled"
+                            }`}
+                        >
+                          {isSelected ? "Quitar" : "Asignar"}
+                        </button>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+              <div className="linea4"></div>
+              <div className="modal-footer">
+                <button className="bottonAsignar" onClick={handleAssignUsers}>
+                  Asignar Usuario
+                </button>
+                <button
+                  className="botonCerrar"
+                  onClick={() => setShowAssignModal(false)}
+                >
+                  Cerrar
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )
+      }
+    </div >
   );
 };
 
