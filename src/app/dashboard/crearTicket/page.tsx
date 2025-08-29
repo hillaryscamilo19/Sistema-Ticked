@@ -186,11 +186,7 @@ export default function CrearNuevoTicket() {
       console.log("Respuesta del servidor para imagen:", result);
 
       // Construir la URL completa para acceder a la imagen
-<<<<<<< HEAD
       const baseUrl = "http://http://localhost:8000";
-=======
-      const baseUrl = "http://localhost:8000";
->>>>>>> 4e47438791ea922d27f4c9daae31769b103470c5
       const filePath = result.file_path;
 
       if (filePath) {

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import type React from "react";
@@ -32,7 +34,7 @@ import "../asignacion/style.css";
 
 
 //Functio para convertir la descripcion en Negrita o otro formato
-function deltaToHTML(deltaJson: any): string {
+function deltaToHTML(deltaJson: unknown): string {
   try {
     const delta =
       typeof deltaJson === "string" ? JSON.parse(deltaJson) : deltaJson;
@@ -84,7 +86,7 @@ interface User {
 }
 
 interface Ticket {
-  attachment: any;
+  attachment: unknown;
   id: string;
   title: string;
   description: string;
@@ -228,6 +230,7 @@ const statusMap: Record<string, { label: string; color: string }> = {
   cerrado: { label: "Cerrado", color: "bg-gray-100 text-gray-800" },
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const priorityMap: Record<string, { label: string; color: string }> = {
   baja: { label: "Baja", color: "bg-green-100 text-green-800" },
   media: { label: "Media", color: "bg-yellow-100 text-yellow-800" },
@@ -357,11 +360,7 @@ const TicketDetail = () => {
 
         // Fix: Changed the endpoint to match the API structure
         const response = await fetch(
-<<<<<<< HEAD
           `659d3d0e14b98bd611bf5cf2/messages/ticket/${id}`,
-=======
-          `http://localhost:8000/messages/ticket/${id}`,
->>>>>>> 4e47438791ea922d27f4c9daae31769b103470c5
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -979,6 +978,7 @@ const TicketDetail = () => {
                   dangerouslySetInnerHTML={{
                     __html: (() => {
                       {
+                        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                         ticket.attachments && (
                           <a
                             href={ticket.attachments.file_path}

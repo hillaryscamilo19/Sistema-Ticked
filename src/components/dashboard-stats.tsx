@@ -34,6 +34,7 @@ export function DashboardStats() {
       const counts: { [key: string]: number } = { "0": 0, "1": 0, "2": 0, "5": 0 };
 
       tickets.forEach((ticket: Ticket) => {
+        // eslint-disable-next-line no-prototype-builtins
         if (counts.hasOwnProperty(ticket.status)) {
           counts[ticket.status]++;
         }

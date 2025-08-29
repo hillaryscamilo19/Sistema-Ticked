@@ -70,12 +70,8 @@ export function RegisterForm() {
     }
 
     try {
-<<<<<<< HEAD
       const response = await fetch("http://localhost:8000/register", {
         method: "POST",
-=======
-      const response = await axios.post("http://localhost:8000/register", payload, {
->>>>>>> 4e47438791ea922d27f4c9daae31769b103470c5
         headers: { "Content-Type": "application/json" },
       })
 
@@ -113,16 +109,10 @@ export function RegisterForm() {
   useEffect(() => {
     const fetchDepartamentos = async () => {
       try {
-<<<<<<< HEAD
         const response = await fetch("http://localhost:8000/departments")
         if (!response.ok) throw new Error(`Error: ${response.status}`)
         const data = await response.json()
         // Intentar diferentes estructuras posibles
-=======
-        const response = await axios.get("http://localhost:8000/departments") 
-        const data = response.data 
-
->>>>>>> 4e47438791ea922d27f4c9daae31769b103470c5
         let validDepartments = []
         if (data && data.length > 0) {
           // Tu backend ahora devuelve 'id' como string (ObjectId)

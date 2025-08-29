@@ -36,12 +36,6 @@ export default function Dashboard() {
     const fetchUsuario = async () => {
       try {
         const token = localStorage.getItem("token")
-<<<<<<< HEAD
-=======
-        if (!token) {
-          return navigate("/login")
-        }
->>>>>>> 4e47438791ea922d27f4c9daae31769b103470c5
         const res = await fetch("http://localhost:8000/usuarios/me", {
           headers: { Authorization: `Bearer ${token}` },
         })
@@ -73,44 +67,39 @@ export default function Dashboard() {
           },
         })
 
-<<<<<<< HEAD
-    useEffect(() => {
-      const fetchTickets = async () => {
-        try {
-          setIsLoading(true)
-          setError(null)
-          const res = await fetch("http://localhost:8000/tickets/asignados-a-mi/", {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          })
-  
-          if (!res.ok) {
-            throw new Error(`Error ${res.status}: ${res.statusText}`)
-          }
-  
-          const data = await res.json()
-          setTickets(data)
-        } catch (err) {
-          console.error("Error al cargar los tickets:", err)
-          setError(err instanceof Error ? err.message : "Error desconocido")
-        } finally {
-          setIsLoading(false)
-=======
-        if (!res.ok) {
-          throw new Error(`Error ${res.status}: ${res.statusText}`)
->>>>>>> 4e47438791ea922d27f4c9daae31769b103470c5
-        }
+        useEffect(() => {
+          const fetchTickets = async () => {
+            try {
+              setIsLoading(true)
+              setError(null)
+              const res = await fetch("http://localhost:8000/tickets/asignados-a-mi/", {
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+              })
 
-        const data = await res.json()
-        setTickets(data)
-      } catch (err) {
-        console.error("Error al cargar los tickets:", err)
-        setErrorTickets(err instanceof Error ? err.message : "Error desconocido")
-      } finally {
-        setIsLoadingTickets(false)
-      }
-    }
+              if (!res.ok) {
+                throw new Error(`Error ${res.status}: ${res.statusText}`)
+              }
+
+              const data = await res.json()
+              setTickets(data)
+            } catch (err) {
+              console.error("Error al cargar los tickets:", err)
+              setError(err instanceof Error ? err.message : "Error desconocido")
+            } finally {
+              setIsLoading(false)
+            }
+
+            const data = await res.json()
+            setTickets(data)
+          } catch (err) {
+            console.error("Error al cargar los tickets:", err)
+            setErrorTickets(err instanceof Error ? err.message : "Error desconocido")
+          } finally {
+            setIsLoadingTickets(false)
+          }
+        }
     fetchTickets()
   }, []) // Dependencias vacías si no depende de props o estados externos
 
@@ -125,13 +114,7 @@ export default function Dashboard() {
       try {
         setLoadingColaboradores(true)
         const token = localStorage.getItem("token")
-<<<<<<< HEAD
         const res = await fetch("http://localhost:8000/usuarios/departamento/colaboradores", {
-=======
-        const departmentId = usuario.department // Obtener el department_id del usuario logueado
-
-        const res = await fetch(`http://localhost:8000/usuarios/departamento/${departmentId}/colaboradores`, {
->>>>>>> 4e47438791ea922d27f4c9daae31769b103470c5
           headers: { Authorization: `Bearer ${token}` },
         })
 
@@ -142,7 +125,7 @@ export default function Dashboard() {
         if (res.ok) {
           const data = await res.json()
           // Filtro adicional en el frontend para asegurar que solo sean usuarios activos
-          const colaboradoresActivos = data.filter((colaborador) => colaborador.status === true)
+          const colaboradoresActivos = data.filter((colaborador: { status: boolean }) => colaborador.status === true)
           setColaboradores(colaboradoresActivos)
         } else {
           console.error("Error al cargar colaboradores:", res.status)
@@ -233,3 +216,11 @@ export default function Dashboard() {
     </div>
   )
 }
+function setIsLoading(arg0: boolean) {
+  throw new Error("Function not implemented.")
+}
+
+function setError(arg0: null) {
+  throw new Error("Function not implemented.")
+}
+
