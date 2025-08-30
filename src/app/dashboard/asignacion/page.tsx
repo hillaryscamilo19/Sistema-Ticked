@@ -1,8 +1,8 @@
-"use client";
+"use client"
 
-import type React from "react";
-import { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import type React from "react"
+import { useEffect, useState } from "react"
+import { useParams, useNavigate, Link } from "react-router-dom"
 import {
   ArrowLeftIcon,
   UserIcon,
@@ -26,28 +26,24 @@ import {
   DocumentMagnifyingGlassIcon,
   CheckCircleIcon,
   UserGroupIcon,
-} from "@heroicons/react/24/outline";
-import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
-import "../asignacion/style.css";
+} from "@heroicons/react/24/outline"
+import { QuillDeltaToHtmlConverter } from "quill-delta-to-html"
+import "../asignacion/style.css"
 
-
-//Functio para convertir la descripcion en Negrita o otro formato
+// Function to convert description to HTML
 function deltaToHTML(deltaJson: any): string {
   try {
-    const delta =
-      typeof deltaJson === "string" ? JSON.parse(deltaJson) : deltaJson;
+    const delta = typeof deltaJson === "string" ? JSON.parse(deltaJson) : deltaJson
 
     if (delta && delta.ops) {
-      const converter = new QuillDeltaToHtmlConverter(delta.ops, {});
-      return converter.convert();
+      const converter = new QuillDeltaToHtmlConverter(delta.ops, {})
+      return converter.convert()
     } else {
-      return typeof deltaJson === "string"
-        ? deltaJson
-        : JSON.stringify(deltaJson);
+      return typeof deltaJson === "string" ? deltaJson : JSON.stringify(deltaJson)
     }
   } catch (error) {
-    console.error("Failed to parse delta JSON:", error);
-    return typeof deltaJson === "string" ? deltaJson : String(deltaJson);
+    console.error("Failed to parse delta JSON:", error)
+    return typeof deltaJson === "string" ? deltaJson : String(deltaJson)
   }
 }
 
@@ -60,86 +56,86 @@ function getStatusId(statusText: string): number {
     espera: 4,
     completado: 5,
     cancelado: 6,
-  };
+  }
 
-  return statusMap[statusText.toLowerCase()] || 1;
+  return statusMap[statusText.toLowerCase()] || 1
 }
 
 interface StatusOption {
-  key: string;
-  label: string;
-  description: string;
-  icon: React.ComponentType<{ className?: string }>;
-  color: string;
-  badge?: string;
+  key: string
+  label: string
+  description: string
+  icon: React.ComponentType<{ className?: string }>
+  color: string
+  badge?: string
 }
 
 interface User {
-  id: string;
-  name: string;
-  email: string;
-  employeeId: string;
-  isAvailable: boolean;
-  isAssigned: boolean;
+  id: string
+  name: string
+  email: string
+  employeeId: string
+  isAvailable: boolean
+  isAssigned: boolean
 }
 
 interface Ticket {
-  attachment: any;
-  id: string;
-  title: string;
-  description: string;
-  status: string;
-  priority: string;
-  createdAt: string;
-  updatedAt: string;
-  requested_by: string;
-  assigned_to?: string;
-  departamento_id: string;
+  attachment: any
+  id: string
+  title: string
+  description: string
+  status: string
+  priority: string
+  createdAt: string
+  updatedAt: string
+  requested_by: string
+  assigned_to?: string
+  departamento_id: string
   created_user: {
-    id: string;
-    fullname: string;
-    email: string;
-    phone_ext: string;
+    id: string
+    fullname: string
+    email: string
+    phone_ext: string
     department: {
-      id: string;
-      name: string;
-    };
-  };
-  category?: {
-    id: string;
-    name: string;
-  };
-  assigned_user: {
-    id: string;
-    fullname: string;
-    email: string;
-    phone_ext: string;
-  };
-  attachments: {
-    id?: string,
-    file_name?: string,
-    file_path?: string,
-    file_extension?:string
+      id: string
+      name: string
+    }
   }
-  comments?: Comment[];
+  category?: {
+    id: string
+    name: string
+  }
+  assigned_user: {
+    id: string
+    fullname: string
+    email: string
+    phone_ext: string
+  }
+  attachments: {
+    id?: string
+    file_name?: string
+    file_path?: string
+    file_extension?: string
+  }
+  messages?: Message[]
 }
 
 interface Comment {
-  id: string;
-  content: string;
-  user_id: string;
-  createdAt: string;
+  id: string
+  content: string
+  user_id: string
+  createdAt: string
 }
 
 interface Message {
-  id: number;
-  messages: string;
-  content: string;
-  created_at: string;
+  id: number
+  messages: string
+  content: string
+  created_at: string
   user: {
-    id: number;
-    fullname: string;
-  };
+    id: number
+    fullname: string
+  }
 }
 
 // Function to convert numeric status to text
@@ -151,9 +147,9 @@ function getStatusText(statusNumber: string | number): string {
     "4": "Espera",
     "5": "Completado",
     "6": "Cancelado",
-  };
+  }
 
-  return statusMap[String(statusNumber)] || `Estado ${statusNumber}`;
+  return statusMap[String(statusNumber)] || `Estado ${statusNumber}`
 }
 
 // Function to get status color based on status number
@@ -165,12 +161,12 @@ function getStatusColor(statusNumber: string | number): string {
     "4": "text-yellow-600",
     "5": "text-green-600",
     "6": "text-red-600",
-  };
+  }
 
-  return colorMap[String(statusNumber)] || "text-gray-600";
+  return colorMap[String(statusNumber)] || "text-gray-600"
 }
 
-//Condicion para el estado
+// Status options
 const statusOptions: StatusOption[] = [
   {
     key: "cancelado",
@@ -182,7 +178,7 @@ const statusOptions: StatusOption[] = [
   {
     key: "abierto",
     label: "Abierto",
-    description: "El ticket esta creado pero si empezar a trabajar.",
+    description: "El ticket está creado pero no ha empezado a trabajar.",
     icon: ClipboardDocumentListIcon,
     color: "text-blue-600",
     badge: "Ideal",
@@ -190,7 +186,7 @@ const statusOptions: StatusOption[] = [
   {
     key: "proceso",
     label: "Proceso",
-    description: "El departamento asignado ya esta trabajando el ticket.",
+    description: "El departamento asignado ya está trabajando el ticket.",
     icon: WrenchScrewdriverIcon,
     color: "text-orange-600",
   },
@@ -204,21 +200,20 @@ const statusOptions: StatusOption[] = [
   {
     key: "revision",
     label: "Revisión",
-    description:
-      "El creador del ticket procedera a revisar que se haya realizado.",
+    description: "El creador del ticket procederá a revisar que se haya realizado.",
     icon: DocumentMagnifyingGlassIcon,
     color: "text-purple-600",
   },
   {
     key: "completado",
     label: "Completado",
-    description: "Completado marcado por el creado.",
+    description: "Completado marcado por el creador.",
     icon: CheckCircleIcon,
     color: "text-green-600",
   },
-];
+]
 
-//Codicion para los diferente estado
+// Status map
 const statusMap: Record<string, { label: string; color: string }> = {
   abierto: { label: "Abierto", color: "bg-green-100 text-success" },
   "en progreso": { label: "En Proceso", color: "bg-blue-100 text-blue-800" },
@@ -226,55 +221,50 @@ const statusMap: Record<string, { label: string; color: string }> = {
   resuelto: { label: "Resuelto", color: "bg-purple-100 text-purple-800" },
   completado: { label: "Completado", color: "bg-indigo-100 text-indigo-800" },
   cerrado: { label: "Cerrado", color: "bg-gray-100 text-gray-800" },
-};
+}
 
 const priorityMap: Record<string, { label: string; color: string }> = {
   baja: { label: "Baja", color: "bg-green-100 text-green-800" },
   media: { label: "Media", color: "bg-yellow-100 text-yellow-800" },
   alta: { label: "Alta", color: "bg-orange-100 text-orange-800" },
   crítica: { label: "Crítica", color: "bg-red-100 text-red-800" },
-};
+}
 
 const TicketDetail = () => {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
 
-  const [ticket, setTicket] = useState<Ticket | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState("");
-  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
-  const [showAssignModal, setShowAssignModal] = useState(false);
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
-  const [statusChangeSuccess, setStatusChangeSuccess] = useState(false);
-  const [assignSuccess, setAssignSuccess] = useState(false);
-  const [departmentUsers, setDepartmentUsers] = useState<User[]>([]);
-  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [ticket, setTicket] = useState<Ticket | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
+  const [messages, setMessages] = useState<Message[]>([])
+  const [newMessage, setNewMessage] = useState("")
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false)
+  const [showAssignModal, setShowAssignModal] = useState(false)
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([])
+  const [statusChangeSuccess, setStatusChangeSuccess] = useState(false)
+  const [assignSuccess, setAssignSuccess] = useState(false)
+  const [departmentUsers, setDepartmentUsers] = useState<User[]>([])
+  const [loadingUsers, setLoadingUsers] = useState(false)
 
-  // Peticion para Extrar los colaboradores de cada departamento
+  // Fetch department users
   useEffect(() => {
     const fetchDepartmentUsers = async () => {
-      if (!showAssignModal) return;
+      if (!showAssignModal) return
 
-      setLoadingUsers(true);
+      setLoadingUsers(true)
       try {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("token")
 
-        // Fetch users from the logged user's department
-        const response = await fetch(
-          "http://localhost:8000/usuarios/departamento/colaboradores",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const response = await fetch("http://localhost:8000/usuarios/departamento/colaboradores", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        })
 
         if (response.ok) {
-          const users = await response.json();
-          // Transform the API response to match our User interface
+          const users = await response.json()
           const transformedUsers = users.map((user: any) => ({
             id: user._id || user.id,
             name: user.fullname || user.name,
@@ -282,34 +272,31 @@ const TicketDetail = () => {
             employeeId: user.phone_ext || user.employee_id || "N/A",
             isAvailable: user.status === "true" || user.status === "true ",
             isAssigned: selectedUsers.includes(user._id || user.id),
-          }));
-          setDepartmentUsers(transformedUsers);
+          }))
+          setDepartmentUsers(transformedUsers)
         } else {
-          console.error(
-            "Error al obtener usuarios del departamento:",
-            response.status
-          );
+          console.error("Error al obtener usuarios del departamento:", response.status)
         }
       } catch (err) {
-        console.error("Error al cargar usuarios del departamento:", err);
+        console.error("Error al cargar usuarios del departamento:", err)
       } finally {
-        setLoadingUsers(false);
+        setLoadingUsers(false)
       }
-    };
+    }
 
-    fetchDepartmentUsers();
-  }, [showAssignModal, selectedUsers]);
+    fetchDepartmentUsers()
+  }, [showAssignModal, selectedUsers])
 
-  //peticion para mostrar los ticked por ID
+  // Fetch ticket by ID
   useEffect(() => {
     const fetchTicket = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("token")
 
         if (!token) {
-          setError("No hay token de autenticación");
-          navigate("/login");
-          return;
+          setError("No hay token de autenticación")
+          navigate("/login")
+          return
         }
 
         const response = await fetch(`http://localhost:8000/tickets/asignados-a-mi/`, {
@@ -317,208 +304,161 @@ const TicketDetail = () => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-        });
+        })
 
         if (!response.ok) {
           if (response.status === 401) {
-            setError("No autorizado. Por favor, inicia sesión nuevamente.");
-            localStorage.removeItem("token");
-            navigate("/login");
-            return;
+            setError("No autorizado. Por favor, inicia sesión nuevamente.")
+            localStorage.removeItem("token")
+            navigate("/login")
+            return
           }
           if (response.status === 404) {
-            setError("Ticket no encontrado");
-            return;
+            setError("Ticket no encontrado")
+            return
           }
-          throw new Error(`Error ${response.status}: ${response.statusText}`);
+          throw new Error(`Error ${response.status}: ${response.statusText}`)
         }
 
-        const data = await response.json();
-        setTicket(data);
+        const data = await response.json()
+        setTicket(data)
+
+        setMessages(data.messages || [])
       } catch (err) {
-        console.error("Error al cargar el ticket:", err);
-        setError(err instanceof Error ? err.message : "Error desconocido");
+        console.error("Error al cargar el ticket:", err)
+        setError(err instanceof Error ? err.message : "Error desconocido")
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
     if (id) {
-      fetchTicket();
+      fetchTicket()
     }
-  }, [id, navigate]);
+  }, [id, navigate])
 
-  //Peticion para mandar mensaje
+  // Fetch messages
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const token = localStorage.getItem("token");
-        if (!token || !id) return;
+        const token = localStorage.getItem("token")
+        if (!token || !id) return
 
-        // Fix: Changed the endpoint to match the API structure
-        const response = await fetch(
-          `http://localhost:8000/messages/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const response = await fetch(`http://localhost:8000/tickets/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        })
 
         if (response.ok) {
-          const data = await response.json();
-          setMessages(data);
+          const ticketData = await response.json()
+          setMessages(ticketData.messages || [])
+          setTicket(ticketData)
         } else {
-          console.error("Error al obtener mensajes:", response.status);
+          console.error("Error al obtener mensajes:", response.status)
         }
       } catch (err) {
-        console.error("Error al cargar mensajes:", err);
+        console.error("Error al cargar mensajes:", err)
       }
-    };
+    }
 
     if (id) {
-      fetchMessages();
+      fetchMessages()
     }
-  }, [id]);
+  }, [id])
 
-  //Peticion para mandar achivos
+  // Handle sending attachments
   const handleSendattachments = async () => {
     if (newMessage.trim() && id && ticket) {
       try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(
-          `http://localhost:8000/ticket/${id}/attachments`,
-          {
-            method: "POST",
+        const token = localStorage.getItem("token")
+        const response = await fetch(`http://localhost:8000/tickets/${id}/attachments`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            file: newMessage,
+            ticket_id: Number(id),
+          }),
+        })
+
+        if (response.ok) {
+          const ticketResponse = await fetch(`http://localhost:8000/tickets/${id}`, {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({
-              file: newMessage,
-              ticket_id: Number(id),
-            }),
-          }
-        );
-
-        if (response.ok) {
-          // Recargar el ticket para obtener los mensajes actualizados
-          const ticketResponse = await fetch(
-            `http://localhost:8000/tickets/${id}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            }
-          );
+          })
 
           if (ticketResponse.ok) {
-            const updatedTicket = await ticketResponse.json();
-            setTicket(updatedTicket);
+            const updatedTicket = await ticketResponse.json()
+            setTicket(updatedTicket)
+            setMessages(updatedTicket.messages || [])
           }
 
-          // Fetch updated messages
-          const messagesResponse = await fetch(
-            `http://localhost:8000/messages/${id}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            }
-          );
-
-          if (messagesResponse.ok) {
-            const updatedMessages = await messagesResponse.json();
-            setMessages(updatedMessages);
-          }
-
-          // Limpiar el campo de entrada
-          setNewMessage("");
+          setNewMessage("")
         } else {
-          console.error("Error al crear mensaje:", response.status);
+          console.error("Error al crear mensaje:", response.status)
         }
       } catch (err) {
-        console.error("Error al enviar mensaje:", err);
+        console.error("Error al enviar mensaje:", err)
       }
     }
-  };
+  }
 
-  //Peticion PAra mandar un nuevo mensaje
+  // Handle sending a new message
   const handleSendMessage = async () => {
     if (newMessage.trim() && id && ticket) {
       try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(
-          `http://localhost:8000/ticket/${id}/mensajes`,
-          {
-            method: "POST",
+        const token = localStorage.getItem("token")
+        const response = await fetch(`http://localhost:8000/tickets/${id}/mensajes/`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            message: newMessage,
+            ticket_id: Number(id),
+          }),
+        })
+
+        if (response.ok) {
+          const ticketResponse = await fetch(`http://localhost:8000/tickets/${id}`, {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({
-              message: newMessage,
-              ticket_id: Number(id),
-            }),
-          }
-        );
-
-        if (response.ok) {
-          // Recargar el ticket para obtener los mensajes actualizados
-          const ticketResponse = await fetch(
-            `http://localhost:8000/tickets/${id}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            }
-          );
+          })
 
           if (ticketResponse.ok) {
-            const updatedTicket = await ticketResponse.json();
-            setTicket(updatedTicket);
+            const updatedTicket = await ticketResponse.json()
+            setTicket(updatedTicket)
+            setMessages(updatedTicket.messages || [])
           }
 
-          // Fetch updated messages
-          const messagesResponse = await fetch(
-            `http://localhost:8000/messages/${id}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            }
-          );
-
-          if (messagesResponse.ok) {
-            const updatedMessages = await messagesResponse.json();
-            setMessages(updatedMessages);
-          }
-
-          // Limpiar el campo de entrada
-          setNewMessage("");
+          setNewMessage("")
         } else {
-          console.error("Error al crear mensaje:", response.status);
+          console.error("Error al crear mensaje:", response.status)
         }
       } catch (err) {
-        console.error("Error al enviar mensaje:", err);
+        console.error("Error al enviar mensaje:", err)
       }
     }
-  };
+  }
 
-  //Peticion para cambiar de estado
+  // Handle status change
   const handleStatusChange = async (statusKey: string) => {
     try {
-      const statusId = getStatusId(statusKey);
-      const token = localStorage.getItem("token");
+      const statusId = getStatusId(statusKey)
+      const token = localStorage.getItem("token")
 
-      console.log(`Changing status for ticket ${id} to status ID ${statusId}`);
+      console.log(`Changing status for ticket ${id} to status ID ${statusId}`)
 
-      const url = `http://localhost:8000/tickets/${id}/estado?estado_id=${statusId}`;
+      const url = `http://localhost:8000/tickets/${id}/estado?estado_id=${statusId}`
 
       const response = await fetch(url, {
         method: "PUT",
@@ -526,125 +466,114 @@ const TicketDetail = () => {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-      });
+      })
 
       if (response.ok) {
-        setStatusChangeSuccess(true);
-        setTimeout(() => setStatusChangeSuccess(false), 3000);
+        setStatusChangeSuccess(true)
+        setTimeout(() => setStatusChangeSuccess(false), 3000)
 
-        setTicket((prev) =>
-          prev ? { ...prev, status: String(statusId) } : null
-        );
+        setTicket((prev) => (prev ? { ...prev, status: String(statusId) } : null))
 
-        const refreshResponse = await fetch(
-          `http://localhost:8000/tickets/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        if (refreshResponse.ok) {
-          const updatedTicket = await refreshResponse.json();
-          setTicket(updatedTicket);
-        }
-      } else {
-        const errorText = await response.text();
-        console.error("Error al cambiar estado:", response.status, errorText);
-        alert(`Error al cambiar el estado del ticket: ${response.status}`);
-      }
-    } catch (err) {
-      console.error("Error al cambiar estado:", err);
-      alert("Error al cambiar el estado del ticket");
-    }
-    setShowStatusDropdown(false);
-  };
-
-  const handleUserToggle = (userId: string) => {
-    setSelectedUsers((prev) => {
-      if (prev.includes(userId)) {
-        return prev.filter((id) => id !== userId);
-      } else {
-        return [...prev, userId];
-      }
-    });
-  };
-
-  //Peticion para Asignar un nuevo usuario
-  const handleAssignUsers = async () => {
-    if (selectedUsers.length === 0) {
-      alert("Por favor seleccione al menos un usuario para asignar");
-      return;
-    }
-    try {
-      const token = localStorage.getItem("token");
-      const userIds = selectedUsers.map((id) => Number(id));
-
-      const response = await fetch(
-        `http://localhost:8000/tickets/${id}/asignar-usuarios`,
-        {
-          method: "POST",
+        const refreshResponse = await fetch(`http://localhost:8000/tickets/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(userIds),
-        }
-      );
+        })
 
-      if (response.ok) {
-        setAssignSuccess(true);
-        setTimeout(() => setAssignSuccess(false), 3000);
-        const refreshResponse = await fetch(
-          `http://localhost:8000/tickets/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
         if (refreshResponse.ok) {
-          const updatedTicket = await refreshResponse.json();
-          setTicket(updatedTicket);
+          const updatedTicket = await refreshResponse.json()
+          setTicket(updatedTicket)
         }
-        setSelectedUsers([]);
-        setShowAssignModal(false);
       } else {
-        const errorText = await response.text();
-        console.error("Error al asignar usuarios:", response.status, errorText);
-        alert(`Error al asignar usuarios al ticket: ${response.status}`);
+        const errorText = await response.text()
+        console.error("Error al cambiar estado:", response.status, errorText)
+        alert(`Error al cambiar el estado del ticket: ${response.status}`)
       }
     } catch (err) {
-      console.error("Error al asignar usuarios:", err);
-      alert("Error al asignar usuarios al ticket");
+      console.error("Error al cambiar estado:", err)
+      alert("Error al cambiar el estado del ticket")
     }
-  };
+    setShowStatusDropdown(false)
+  }
 
-  //Formateo de fecha
+  const handleUserToggle = (userId: string) => {
+    setSelectedUsers((prev) => {
+      if (prev.includes(userId)) {
+        return prev.filter((id) => id !== userId)
+      } else {
+        return [...prev, userId]
+      }
+    })
+  }
+
+  // Handle assigning users
+  const handleAssignUsers = async () => {
+    if (selectedUsers.length === 0) {
+      alert("Por favor seleccione al menos un usuario para asignar")
+      return
+    }
+    try {
+      const token = localStorage.getItem("token")
+      const userIds = selectedUsers.map((id) => Number(id))
+
+      const response = await fetch(`http://localhost:8000/tickets/${id}/asignar-usuarios`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userIds),
+      })
+
+      if (response.ok) {
+        setAssignSuccess(true)
+        setTimeout(() => setAssignSuccess(false), 3000)
+        const refreshResponse = await fetch(`http://localhost:8000/tickets/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        })
+        if (refreshResponse.ok) {
+          const updatedTicket = await refreshResponse.json()
+          setTicket(updatedTicket)
+        }
+        setSelectedUsers([])
+        setShowAssignModal(false)
+      } else {
+        const errorText = await response.text()
+        console.error("Error al asignar usuarios:", response.status, errorText)
+        alert(`Error al asignar usuarios al ticket: ${response.status}`)
+      }
+    } catch (err) {
+      console.error("Error al asignar usuarios:", err)
+      alert("Error al asignar usuarios al ticket")
+    }
+  }
+
+  // Format date
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+    const date = new Date(dateString)
     return date.toLocaleDateString("es-ES", {
       day: "numeric",
       month: "long",
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-    });
-  };
+    })
+  }
 
-  //Formateo de Calculo de Dias
+  // Calculate days ago
   const calculateDaysAgo = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - date.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-  };
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffTime = Math.abs(now.getTime() - date.getTime())
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    return diffDays
+  }
 
-  //Condicion para Cargar mas rapida de los ticked
+  // Loading state
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -653,9 +582,10 @@ const TicketDetail = () => {
           <p className="mt-4 text-gray-600">Cargando detalles del ticket...</p>
         </div>
       </div>
-    );
+    )
   }
 
+  // Error state
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -678,23 +608,21 @@ const TicketDetail = () => {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
+  // Ticket not found state
   if (!ticket) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-500 mb-4">Ticket no encontrado</p>
-          <Link
-            to="/dashboard/asignado"
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
+          <Link to="/dashboard/asignado" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
             Volver a la lista
           </Link>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -716,9 +644,7 @@ const TicketDetail = () => {
             role="alert"
           >
             <strong className="font-bold">¡Éxito! </strong>
-            <span className="block sm:inline">
-              El estado del ticket ha sido actualizado.
-            </span>
+            <span className="block sm:inline">El estado del ticket ha sido actualizado.</span>
           </div>
         )}
 
@@ -728,28 +654,22 @@ const TicketDetail = () => {
             role="alert"
           >
             <strong className="font-bold">¡Éxito! </strong>
-            <span className="block sm:inline">
-              Los usuarios han sido asignados al ticket.
-            </span>
+            <span className="block sm:inline">Los usuarios han sido asignados al ticket.</span>
           </div>
         )}
 
         {/* Header Card */}
         <div className="ticket-card">
-          {/* Icono del ticket */}
+          {/* Ticket Icon */}
           <div className="ticket-info">
             <div className="ticket-icon">
               <TicketIcon className="ticket-icon-inner" />
             </div>
             <div>
               <div className="ticket-meta">
-                <span
-                  className={`ticket-badge ${getStatusColor(ticket.status)}`}
-                >
+                <span className={`ticket-badge ${getStatusColor(ticket.status)}`}>
                   <TicketIcon className="ticket-badge-icon" />
-                  <span className="titlo-statud">
-                    {getStatusText(ticket.status)}
-                  </span>
+                  <span className="titlo-statud">{getStatusText(ticket.status)}</span>
                 </span>
                 <span className="ticket-id">{ticket.id}</span>
               </div>
@@ -761,55 +681,43 @@ const TicketDetail = () => {
             </div>
           </div>
 
-          {/* Estado + botón Asignar */}
+          {/* Status + Assign Button */}
           <div className="ticket-actions">
             <div className="status-dropdown-wrapper">
-              <button
-                onClick={() => setShowStatusDropdown(!showStatusDropdown)}
-                className="status-toggle"
-              >
+              <button onClick={() => setShowStatusDropdown(!showStatusDropdown)} className="status-toggle">
                 Estado
                 <ChevronDownIcon className="dropdown-icon" />
               </button>
 
-              {/* Modal de asignacion de estados*/}
+              {/* Status Dropdown Modal */}
               {showStatusDropdown && (
                 <>
-                  <div
-                    className="fixed inset-0 z-10"
-                    onClick={() => setShowStatusDropdown(false)}
-                  />
+                  <div className="fixed inset-0 z-10" onClick={() => setShowStatusDropdown(false)} />
                   <div>
                     <div className="dropdown-container">
                       {statusOptions.map((option) => {
-                        const IconComponent = option.icon;
-                        const statusId = getStatusId(option.key);
-                        const isSelected = ticket.status === String(statusId);
+                        const IconComponent = option.icon
+                        const statusId = getStatusId(option.key)
+                        const isSelected = ticket.status === String(statusId)
 
                         return (
                           <button
                             key={option.key}
                             onClick={() => handleStatusChange(option.key)}
-                            className={`dropdown-option ${
-                              isSelected ? "selected" : ""
-                            }`}
+                            className={`dropdown-option ${isSelected ? "selected" : ""}`}
                           >
-                            <div className={`icon-container ${option}`}>
+                            <div className={`icon-container ${option.color}`}>
                               <IconComponent className="icon" />
                             </div>
                             <div className="content-container">
                               <div className="label-badge">
                                 <p className="option-label">{option.label}</p>
-                                {option.badge && (
-                                  <span className="badge">{option.badge}</span>
-                                )}
+                                {option.badge && <span className="badge">{option.badge}</span>}
                               </div>
-                              <p className="option-description">
-                                {option.description}
-                              </p>
+                              <p className="option-description">{option.description}</p>
                             </div>
                           </button>
-                        );
+                        )
                       })}
                     </div>
                   </div>
@@ -818,38 +726,27 @@ const TicketDetail = () => {
 
               {showStatusDropdown && (
                 <>
-                  <div
-                    className="dropdown-overlay"
-                    onClick={() => setShowStatusDropdown(false)}
-                  />
+                  <div className="dropdown-overlay" onClick={() => setShowStatusDropdown(false)} />
                   <div className="dropdown-menu">
                     {statusOptions.map((option) => {
-                      const IconComponent = option.icon;
-                      const statusId = getStatusId(option.key);
-                      const isSelected = ticket.status === String(statusId);
+                      const IconComponent = option.icon
+                      const statusId = getStatusId(option.key)
+                      const isSelected = ticket.status === String(statusId)
                       return (
                         <button
                           key={option.key}
                           onClick={() => handleStatusChange(option.key)}
-                          className={`dropdown-item ${
-                            isSelected ? "selected" : ""
-                          }`}
+                          className={`dropdown-item ${isSelected ? "selected" : ""}`}
                         >
-                          <div
-                            className={`dropdown-icon-wrapper ${option.color}`}
-                          >
+                          <div className={`dropdown-icon-wrapper ${option.color}`}>
                             <IconComponent className="dropdown-icon-inside" />
                           </div>
                           <div className="dropdown-content">
                             <p className="dropdown-title">{option.label}</p>
-                            {option.description && (
-                              <p className="dropdown-desc">
-                                {option.description}
-                              </p>
-                            )}
+                            {option.description && <p className="dropdown-desc">{option.description}</p>}
                           </div>
                         </button>
-                      );
+                      )
                     })}
                   </div>
                 </>
@@ -867,9 +764,7 @@ const TicketDetail = () => {
           <div className="modalCreate">
             <div className="contenerdor-departamento">
               <h3 className="Texto2">Creado por</h3>
-              <span
-                className={`btonDepar${statusMap[ticket.status]?.color || ""}`}
-              >
+              <span className={`btonDepar${statusMap[ticket.status]?.color || ""}`}>
                 <BuildingOfficeIcon className="ticked"></BuildingOfficeIcon>
                 {ticket.created_user.department.name || ""}
               </span>
@@ -883,15 +778,11 @@ const TicketDetail = () => {
               </div>
               <div className="flex items-center">
                 <EnvelopeOpenIcon className="icoBuild" />
-                <span className="text-sm text-gray-600">
-                  {ticket.created_user.email || ""}
-                </span>
+                <span className="text-sm text-gray-600">{ticket.created_user.email || ""}</span>
               </div>
               <div className="flex items-center">
                 <PhoneIcon className="icoBuild" />
-                <span className="text-sm text-gray-600">
-                  {ticket.created_user.phone_ext || ""}
-                </span>
+                <span className="text-sm text-gray-600">{ticket.created_user.phone_ext || ""}</span>
               </div>
             </div>
             <div className="linea"></div>
@@ -910,20 +801,12 @@ const TicketDetail = () => {
               </div>
               <div className="container-fecha">
                 <div>
-                  <p className="text-sm text-gray-500 mb-1">
-                    Creación: {formatDate(ticket.createdAt)}
-                  </p>
-                  <p className="text-sm text-gray-400">
-                    Hace {calculateDaysAgo(ticket.createdAt)} días
-                  </p>
+                  <p className="text-sm text-gray-500 mb-1">Creación: {formatDate(ticket.createdAt)}</p>
+                  <p className="text-sm text-gray-400">Hace {calculateDaysAgo(ticket.createdAt)} días</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 mb-1">
-                    Modificación: {formatDate(ticket.updatedAt)}
-                  </p>
-                  <p className="text-sm text-gray-400">
-                    Hace {calculateDaysAgo(ticket.createdAt)} días
-                  </p>
+                  <p className="text-sm text-gray-500 mb-1">Modificación: {formatDate(ticket.updatedAt)}</p>
+                  <p className="text-sm text-gray-400">Hace {calculateDaysAgo(ticket.updatedAt)} días</p>
                 </div>
               </div>
 
@@ -943,20 +826,9 @@ const TicketDetail = () => {
                   <div>
                     <p className="text-sm font-medium text-gray-900">
                       <UserIcon className="icoBuild" />
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      {ticket.assigned_user?.fullname || ""}
-                      {ticket.assigned_user?.phone_ext || ""}
-                      {ticket.assigned_user?.email || ""}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      <UserIcon className="icoBuild" />
                       {ticket.assigned_user?.fullname || ""}
                     </p>
                     <p className="text-sm text-gray-500">
-                      {ticket.assigned_user?.fullname || ""}
                       {ticket.assigned_user?.phone_ext || ""}
                       {ticket.assigned_user?.email || ""}
                     </p>
@@ -967,39 +839,22 @@ const TicketDetail = () => {
               {/* Description Section */}
               <div className="Linea2"></div>
               <div className="DescriptionSection">
-                <h2 className="text-lg font-medium text-gray-900 mb-4">
-                  Descripción
-                </h2>
+                <h2 className="text-lg font-medium text-gray-900 mb-4">Descripción</h2>
                 <div
                   className="prose max-w-none text-gray-700"
                   dangerouslySetInnerHTML={{
                     __html: (() => {
-                      {
-                        ticket.attachments && (
-                          <a
-                            href={ticket.attachments.file_path}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 underline"
-                          >
-                            Ver archivo adjunto
-                          </a>
-                        );
+                      if (ticket.attachments && ticket.attachments.file_path) {
+                        return `<a href="${ticket.attachments.file_path}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">Ver archivo adjunto</a>`
                       }
                       try {
-                        if (
-                          typeof ticket.description === "string" &&
-                          !ticket.description.startsWith("{")
-                        ) {
-                          return ticket.description;
+                        if (typeof ticket.description === "string" && !ticket.description.startsWith("{")) {
+                          return ticket.description
                         }
-                        return deltaToHTML(JSON.parse(ticket.description));
+                        return deltaToHTML(JSON.parse(ticket.description))
                       } catch (error) {
-                        console.error(
-                          "Error parsing description as JSON:",
-                          error
-                        );
-                        return ticket.attachments;
+                        console.error("Error parsing description as JSON:", error)
+                        return ticket.description
                       }
                     })(),
                   }}
@@ -1045,9 +900,7 @@ const TicketDetail = () => {
                       </div>
                       <p className="menssageConteiner">{message.content}</p>
 
-                      <span className="text-xs text-gray-500">
-                        {formatDate(message.created_at)}
-                      </span>
+                      <span className="text-xs text-gray-500">{formatDate(message.created_at)}</span>
                     </div>
                   </div>
                 ))}
@@ -1069,11 +922,7 @@ const TicketDetail = () => {
                   className="InputMesaje"
                 />
 
-                <button
-                  onClick={handleSendMessage}
-                  disabled={!newMessage.trim()}
-                  className="BotonMensaje"
-                >
+                <button onClick={handleSendMessage} disabled={!newMessage.trim()} className="BotonMensaje">
                   <PaperAirplaneIcon className="icoB" />
                 </button>
               </div>
@@ -1084,10 +933,7 @@ const TicketDetail = () => {
 
       {/* Assign Users Modal */}
       {showAssignModal && (
-        <div
-          className="modal-overlay"
-          onClick={() => setShowAssignModal(false)}
-        >
+        <div className="modal-overlay" onClick={() => setShowAssignModal(false)}>
           <div className="modal-contet" onClick={(e) => e.stopPropagation()}>
             <div className="contenertext">
               <UserGroupIcon className="icouser"></UserGroupIcon>
@@ -1098,40 +944,29 @@ const TicketDetail = () => {
               {loadingUsers ? (
                 <div className="text-center py-4">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-                  <p className="mt-2 text-gray-600">
-                    Cargando usuarios del departamento...
-                  </p>
+                  <p className="mt-2 text-gray-600">Cargando usuarios del departamento...</p>
                 </div>
               ) : departmentUsers.length === 0 ? (
                 <div className="text-center py-4">
-                  <p className="text-gray-500">
-                    No hay usuarios activos en el departamento
-                  </p>
+                  <p className="text-gray-500">No hay usuarios activos en el departamento</p>
                 </div>
               ) : (
                 departmentUsers.map((user) => {
-                  const isSelected = selectedUsers.includes(user.id);
+                  const isSelected = selectedUsers.includes(user.id)
                   return (
                     <div key={user.id} className="user-item">
                       <div>
-                        <strong>{user.name}</strong> - #{user.employeeId} -{" "}
-                        {user.email}
+                        <strong>{user.name}</strong> - #{user.employeeId} - {user.email}
                       </div>
                       <button
                         onClick={() => handleUserToggle(user.id)}
                         disabled={user.isAvailable && !isSelected}
-                        className={`user-toggle ${
-                          isSelected
-                            ? "selected"
-                            : user.isAvailable
-                            ? ""
-                            : "disabled"
-                        }`}
+                        className={`user-toggle ${isSelected ? "selected" : user.isAvailable ? "" : "disabled"}`}
                       >
                         {isSelected ? "Quitar" : "Asignar"}
                       </button>
                     </div>
-                  );
+                  )
                 })
               )}
             </div>
@@ -1140,10 +975,7 @@ const TicketDetail = () => {
               <button className="bottonAsignar" onClick={handleAssignUsers}>
                 Asignar Usuario
               </button>
-              <button
-                className="botonCerrar"
-                onClick={() => setShowAssignModal(false)}
-              >
+              <button className="botonCerrar" onClick={() => setShowAssignModal(false)}>
                 Cerrar
               </button>
             </div>
@@ -1151,7 +983,7 @@ const TicketDetail = () => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default TicketDetail;
+export default TicketDetail
