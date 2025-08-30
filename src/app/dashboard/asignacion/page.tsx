@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import type React from "react";
@@ -34,7 +32,7 @@ import "../asignacion/style.css";
 
 
 //Functio para convertir la descripcion en Negrita o otro formato
-function deltaToHTML(deltaJson: unknown): string {
+function deltaToHTML(deltaJson: any): string {
   try {
     const delta =
       typeof deltaJson === "string" ? JSON.parse(deltaJson) : deltaJson;
@@ -86,7 +84,7 @@ interface User {
 }
 
 interface Ticket {
-  attachment: unknown;
+  attachment: any;
   id: string;
   title: string;
   description: string;
@@ -121,7 +119,7 @@ interface Ticket {
     id?: string,
     file_name?: string,
     file_path?: string,
-    file_extension?: string
+    file_extension?:string
   }
   comments?: Comment[];
 }
@@ -230,7 +228,6 @@ const statusMap: Record<string, { label: string; color: string }> = {
   cerrado: { label: "Cerrado", color: "bg-gray-100 text-gray-800" },
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const priorityMap: Record<string, { label: string; color: string }> = {
   baja: { label: "Baja", color: "bg-green-100 text-green-800" },
   media: { label: "Media", color: "bg-yellow-100 text-yellow-800" },
@@ -315,7 +312,7 @@ const TicketDetail = () => {
           return;
         }
 
-        const response = await fetch(`http://localhost:8000/tickets/${id}`, {
+        const response = await fetch(`http://localhost:8000/tickets/asignados-a-mi/`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -360,11 +357,7 @@ const TicketDetail = () => {
 
         // Fix: Changed the endpoint to match the API structure
         const response = await fetch(
-<<<<<<< HEAD
-          `659d3d0e14b98bd611bf5cf2/messages/ticket/${id}`,
-=======
-          `http://localhost:8000/messages/ticket/${id}`,
->>>>>>> 4e47438791ea922d27f4c9daae31769b103470c5
+          `http://localhost:8000/messages/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -379,7 +372,6 @@ const TicketDetail = () => {
         } else {
           console.error("Error al obtener mensajes:", response.status);
         }
-
       } catch (err) {
         console.error("Error al cargar mensajes:", err);
       }
@@ -413,7 +405,7 @@ const TicketDetail = () => {
         if (response.ok) {
           // Recargar el ticket para obtener los mensajes actualizados
           const ticketResponse = await fetch(
-            `http://localhost:8000/messages/${id}`,
+            `http://localhost:8000/tickets/${id}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -454,43 +446,69 @@ const TicketDetail = () => {
     }
   };
 
-//Peticion para mandar un nuevo mensaje
-const handleSendMessage = async () => {
-  if (!newMessage.trim() || !id || !ticket) return;
+  //Peticion PAra mandar un nuevo mensaje
+  const handleSendMessage = async () => {
+    if (newMessage.trim() && id && ticket) {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          `http://localhost:8000/ticket/${id}/mensajes`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              message: newMessage,
+              ticket_id: Number(id),
+            }),
+          }
+        );
 
-  try {
-    const token = localStorage.getItem("token");
-    const response = await fetch(
-      `http://localhost:8000/tickets/${id}/mensajes/`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          contenido: newMessage,
-          ticket_id: Number(id),
-        }),
+        if (response.ok) {
+          // Recargar el ticket para obtener los mensajes actualizados
+          const ticketResponse = await fetch(
+            `http://localhost:8000/tickets/${id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (ticketResponse.ok) {
+            const updatedTicket = await ticketResponse.json();
+            setTicket(updatedTicket);
+          }
+
+          // Fetch updated messages
+          const messagesResponse = await fetch(
+            `http://localhost:8000/messages/${id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (messagesResponse.ok) {
+            const updatedMessages = await messagesResponse.json();
+            setMessages(updatedMessages);
+          }
+
+          // Limpiar el campo de entrada
+          setNewMessage("");
+        } else {
+          console.error("Error al crear mensaje:", response.status);
+        }
+      } catch (err) {
+        console.error("Error al enviar mensaje:", err);
       }
-    );
-
-    if (response.ok) {
-      const nuevoMensaje = await response.json();
-
-      // lo agregamos al estado sin tener que recargar todo
-      setMessages((prev) => [...prev, nuevoMensaje]);
-
-      // limpiar input
-      setNewMessage("");
-    } else {
-      console.error("Error al crear mensaje:", response.status);
     }
-  } catch (err) {
-    console.error("Error al enviar mensaje:", err);
-  }
-};
-
+  };
 
   //Peticion para cambiar de estado
   const handleStatusChange = async (statusKey: string) => {
@@ -772,8 +790,9 @@ const handleSendMessage = async () => {
                           <button
                             key={option.key}
                             onClick={() => handleStatusChange(option.key)}
-                            className={`dropdown-option ${isSelected ? "selected" : ""
-                              }`}
+                            className={`dropdown-option ${
+                              isSelected ? "selected" : ""
+                            }`}
                           >
                             <div className={`icon-container ${option}`}>
                               <IconComponent className="icon" />
@@ -812,8 +831,9 @@ const handleSendMessage = async () => {
                         <button
                           key={option.key}
                           onClick={() => handleStatusChange(option.key)}
-                          className={`dropdown-item ${isSelected ? "selected" : ""
-                            }`}
+                          className={`dropdown-item ${
+                            isSelected ? "selected" : ""
+                          }`}
                         >
                           <div
                             className={`dropdown-icon-wrapper ${option.color}`}
@@ -947,8 +967,9 @@ const handleSendMessage = async () => {
               {/* Description Section */}
               <div className="Linea2"></div>
               <div className="DescriptionSection">
-                <h2 className="text-lg Text-form text-gray-900 mb-4">Descripción:</h2>
-
+                <h2 className="text-lg font-medium text-gray-900 mb-4">
+                  Descripción
+                </h2>
                 <div
                   className="prose max-w-none text-gray-700"
                   dangerouslySetInnerHTML={{
@@ -1016,22 +1037,20 @@ const handleSendMessage = async () => {
                 {messages.map((message) => (
                   <div key={message.id} className="flex items-start space-x-3">
                     <div className="flex-1">
-                      <div>
+                      <div className="">
                         <span className="text-sm font-medium text-gray-900">
                           <UserIcon className="icoBuild" />
                           {message.user.fullname}
                         </span>
                       </div>
-                      <p className="menssageConteiner">{message.message}</p>
+                      <p className="menssageConteiner">{message.content}</p>
+
                       <span className="text-xs text-gray-500">
                         {formatDate(message.created_at)}
                       </span>
                     </div>
                   </div>
                 ))}
-
-
-
               </div>
             )}
           </div>
@@ -1047,8 +1066,8 @@ const handleSendMessage = async () => {
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+                  className="InputMesaje"
                 />
-
 
                 <button
                   onClick={handleSendMessage}
@@ -1064,75 +1083,74 @@ const handleSendMessage = async () => {
       </div>
 
       {/* Assign Users Modal */}
-      {
-        showAssignModal && (
-          <div
-            className="modal-overlay"
-            onClick={() => setShowAssignModal(false)}
-          >
-            <div className="modal-contet" onClick={(e) => e.stopPropagation()}>
-              <div className="contenertext">
-                <UserGroupIcon className="icouser"></UserGroupIcon>
-                <h2 className="TextAsignacio">Asignar Usuarios</h2>
-              </div>
-              <div className="linea4"></div>
-              <div className="user-list">
-                {loadingUsers ? (
-                  <div className="text-center py-4">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-                    <p className="mt-2 text-gray-600">
-                      Cargando usuarios del departamento...
-                    </p>
-                  </div>
-                ) : departmentUsers.length === 0 ? (
-                  <div className="text-center py-4">
-                    <p className="text-gray-500">
-                      No hay usuarios activos en el departamento
-                    </p>
-                  </div>
-                ) : (
-                  departmentUsers.map((user) => {
-                    const isSelected = selectedUsers.includes(user.id);
-                    return (
-                      <div key={user.id} className="user-item">
-                        <div>
-                          <strong>{user.name}</strong> - #{user.employeeId} -{" "}
-                          {user.email}
-                        </div>
-                        <button
-                          onClick={() => handleUserToggle(user.id)}
-                          disabled={user.isAvailable && !isSelected}
-                          className={`user-toggle ${isSelected
+      {showAssignModal && (
+        <div
+          className="modal-overlay"
+          onClick={() => setShowAssignModal(false)}
+        >
+          <div className="modal-contet" onClick={(e) => e.stopPropagation()}>
+            <div className="contenertext">
+              <UserGroupIcon className="icouser"></UserGroupIcon>
+              <h2 className="TextAsignacio">Asignar Usuarios</h2>
+            </div>
+            <div className="linea4"></div>
+            <div className="user-list">
+              {loadingUsers ? (
+                <div className="text-center py-4">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                  <p className="mt-2 text-gray-600">
+                    Cargando usuarios del departamento...
+                  </p>
+                </div>
+              ) : departmentUsers.length === 0 ? (
+                <div className="text-center py-4">
+                  <p className="text-gray-500">
+                    No hay usuarios activos en el departamento
+                  </p>
+                </div>
+              ) : (
+                departmentUsers.map((user) => {
+                  const isSelected = selectedUsers.includes(user.id);
+                  return (
+                    <div key={user.id} className="user-item">
+                      <div>
+                        <strong>{user.name}</strong> - #{user.employeeId} -{" "}
+                        {user.email}
+                      </div>
+                      <button
+                        onClick={() => handleUserToggle(user.id)}
+                        disabled={user.isAvailable && !isSelected}
+                        className={`user-toggle ${
+                          isSelected
                             ? "selected"
                             : user.isAvailable
-                              ? ""
-                              : "disabled"
-                            }`}
-                        >
-                          {isSelected ? "Quitar" : "Asignar"}
-                        </button>
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-              <div className="linea4"></div>
-              <div className="modal-footer">
-                <button className="bottonAsignar" onClick={handleAssignUsers}>
-                  Asignar Usuario
-                </button>
-                <button
-                  className="botonCerrar"
-                  onClick={() => setShowAssignModal(false)}
-                >
-                  Cerrar
-                </button>
-              </div>
+                            ? ""
+                            : "disabled"
+                        }`}
+                      >
+                        {isSelected ? "Quitar" : "Asignar"}
+                      </button>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+            <div className="linea4"></div>
+            <div className="modal-footer">
+              <button className="bottonAsignar" onClick={handleAssignUsers}>
+                Asignar Usuario
+              </button>
+              <button
+                className="botonCerrar"
+                onClick={() => setShowAssignModal(false)}
+              >
+                Cerrar
+              </button>
             </div>
           </div>
-        )
-      }
-    </div >
+        </div>
+      )}
+    </div>
   );
 };
 
